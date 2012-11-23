@@ -94,8 +94,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_undoer_impl.html">UndoerImpl</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_type_registry.html">TypeRegistry</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterable, statically stored registry of items associated with a type.  <a href="struct_nialls_c_p_p11_utilities_1_1_type_registry.html#details">More...</a><br/></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html">StaticTypeRegistry</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterable, statically stored registry of items associated with a type.  <a href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -143,11 +143,11 @@ template&lt;class _typeregistry , class _type &gt; </div>
 
 <p>Auto registers a data item with a type registry. Typically used at static init/deinit time. </p>
 <p>Per DLL object: </p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> TypeRegistry&lt;Foo, std::unique_ptr&lt;Foo&gt;(*)()&gt; MakeablesRegistry;</div>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> StaticTypeRegistry&lt;Foo, std::unique_ptr&lt;Foo&gt;(*)()&gt; MakeablesRegistry;</div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">auto</span> reg=AutoDataRegistration&lt;MakeablesRegistry&gt;(&amp;Goo::Make);</div>
 </div><!-- fragment --><p> This registers the Goo::Make callable with the registry MakeablesRegistry during DLL load. It also unregisters during DLL unload.</p>
 <p>You now have a registry of static Make() methods associated with type MakeablesRegistry. To iterate: </p>
-<div class="fragment"><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> n : TypeRegistry&lt;MakeablesRegistry&gt;())</div>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> n : StaticTypeRegistry&lt;MakeablesRegistry&gt;())</div>
 <div class="line">   ...</div>
 </div><!-- fragment --> 
 </div>
@@ -245,11 +245,6 @@ template&lt;class typeregistry &gt; </div>
 </div>
 </div>
 </div><!-- contents -->
-<!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 23 2012 15:55:10 for Niall's C++ 11 Utilities by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.2
-</small></address>
+<hr class="footer"/><address class="footer">(C) 2012 <a href="http://www.nedprod.com/">Niall Douglas</a></address>
 </body>
 </html>

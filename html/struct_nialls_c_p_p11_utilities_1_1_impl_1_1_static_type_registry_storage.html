@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>Niall&#39;s C++ 11 Utilities: NiallsCPP11Utilities::TypeRegistry&lt; _registry, _type, _containertype &gt; Struct Template Reference</title>
+<title>Niall&#39;s C++ 11 Utilities: NiallsCPP11Utilities::Impl::StaticTypeRegistryStorage&lt; _registry, _type, _containertype &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -80,57 +80,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="namespace_nialls_c_p_p11_utilities.html">NiallsCPP11Utilities</a></li><li class="navelem"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_type_registry.html">TypeRegistry</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespace_nialls_c_p_p11_utilities.html">NiallsCPP11Utilities</a></li><li class="navelem"><b>Impl</b></li><li class="navelem"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_impl_1_1_static_type_registry_storage.html">StaticTypeRegistryStorage</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="struct_nialls_c_p_p11_utilities_1_1_type_registry-members.html">List of all members</a>  </div>
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="struct_nialls_c_p_p11_utilities_1_1_impl_1_1_static_type_registry_storage-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">NiallsCPP11Utilities::TypeRegistry&lt; _registry, _type, _containertype &gt; Struct Template Reference</div>  </div>
+<div class="title">NiallsCPP11Utilities::Impl::StaticTypeRegistryStorage&lt; _registry, _type, _containertype &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>An iterable, statically stored registry of items associated with a type.  
- <a href="struct_nialls_c_p_p11_utilities_1_1_type_registry.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="_nialls_c_p_p11_utilities_8hpp_source.html">NiallsCPP11Utilities.hpp</a>&gt;</code></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a79a433feab1f0cf9dc2cb1046ad15c6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79a433feab1f0cf9dc2cb1046ad15c6d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>operator _containertype &amp;</b> ()</td></tr>
-<tr class="separator:a79a433feab1f0cf9dc2cb1046ad15c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ce5373178aa6b302b6c00bc204837c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ce5373178aa6b302b6c00bc204837c8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>operator const _containertype &amp;</b> () const </td></tr>
-<tr class="separator:a7ce5373178aa6b302b6c00bc204837c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ad6f3add1afe7aa4c95442594b00358"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ad6f3add1afe7aa4c95442594b00358"></a>
-_containertype::iterator &amp;&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
-<tr class="separator:a1ad6f3add1afe7aa4c95442594b00358"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad54319b63ddc292b013534548c09cece"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad54319b63ddc292b013534548c09cece"></a>
-_containertype::iterator &amp;&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
-<tr class="separator:ad54319b63ddc292b013534548c09cece"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a7cdaf005b096d38cd8072b2ed048d9a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7cdaf005b096d38cd8072b2ed048d9a3"></a>
+typedef _registry&#160;</td><td class="memItemRight" valign="bottom"><b>registry</b></td></tr>
+<tr class="separator:a7cdaf005b096d38cd8072b2ed048d9a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8c8f50528d476bc723289916beb92c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8c8f50528d476bc723289916beb92c7"></a>
+typedef _type&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
+<tr class="separator:af8c8f50528d476bc723289916beb92c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2f8672fdbfb49a84f08ec4e78e7e13d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af2f8672fdbfb49a84f08ec4e78e7e13d"></a>
+typedef _containertype&#160;</td><td class="memItemRight" valign="bottom"><b>containertype</b></td></tr>
+<tr class="separator:af2f8672fdbfb49a84f08ec4e78e7e13d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a8073f29cf0859b322c16db2b5f4a70ad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8073f29cf0859b322c16db2b5f4a70ad"></a>
+static containertype *&amp;&#160;</td><td class="memItemRight" valign="bottom"><b>registryStorage</b> ()</td></tr>
+<tr class="separator:a8073f29cf0859b322c16db2b5f4a70ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00156a6bae2ac2f481161af6c4c52b83"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a00156a6bae2ac2f481161af6c4c52b83"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>RegisterData</b> (type &amp;&amp;c)</td></tr>
+<tr class="separator:a00156a6bae2ac2f481161af6c4c52b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27c2bc083b6614563c4e2a3ac9975b25"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a27c2bc083b6614563c4e2a3ac9975b25"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>UnregisterData</b> (type &amp;&amp;c)</td></tr>
+<tr class="separator:a27c2bc083b6614563c4e2a3ac9975b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class _registry, class _type, class _containertype = std::vector&lt;_type&gt;&gt;<br/>
-struct NiallsCPP11Utilities::TypeRegistry&lt; _registry, _type, _containertype &gt;</h3>
-
-<p>An iterable, statically stored registry of items associated with a type. </p>
-<p>Only one of these ever exists in the process, so you can always iterate like this: </p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> TypeRegistry&lt;Foo, std::unique_ptr&lt;Foo&gt;(*)()&gt; MakeablesRegistry;</div>
-<div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> n : TypeRegistry&lt;MakeablesRegistry&gt;())</div>
-<div class="line">   ...</div>
-</div><!-- fragment --><dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a143d79eb9062a1f4f0daa5128d42d29b" title="Registers a piece of data with the specified type registry.">NiallsCPP11Utilities::RegisterData()</a>, <a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb" title="Auto registers a data item with a type registry. Typically used at static init/deinit time...">NiallsCPP11Utilities::AutoDataRegistration()</a> </dd></dl>
-</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="_nialls_c_p_p11_utilities_8hpp_source.html">NiallsCPP11Utilities.hpp</a></li>
 </ul>
 </div><!-- contents -->
-<!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 23 2012 15:55:10 for Niall's C++ 11 Utilities by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.2
-</small></address>
+<hr class="footer"/><address class="footer">(C) 2012 <a href="http://www.nedprod.com/">Niall Douglas</a></address>
 </body>
 </html>

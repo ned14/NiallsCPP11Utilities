@@ -76,7 +76,7 @@ template<typename callable> UndoerImpl<callable> &&Undoer(callable &&c)
 }
 
 namespace Impl {
-	template<class _registry, class _type, class _containertype> struct TypeRegistryStorage
+	template<class _registry, class _type, class _containertype> struct StaticTypeRegistryStorage
 	{
 		typedef _registry registry;
 		typedef _type type;
@@ -111,18 +111,18 @@ namespace Impl {
 
 Only one of these ever exists in the process, so you can always iterate like this:
 \code
-typedef TypeRegistry<Foo, std::unique_ptr<Foo>(*)()> MakeablesRegistry;
-for(auto n : TypeRegistry<MakeablesRegistry>())
+typedef StaticTypeRegistry<Foo, std::unique_ptr<Foo>(*)()> MakeablesRegistry;
+for(auto n : MakeablesRegistry())
    ...
 \endcode
 
 \sa NiallsCPP11Utilities::RegisterData(), NiallsCPP11Utilities::AutoDataRegistration()
 */
-template<class _registry, class _type, class _containertype=std::vector<_type>> struct TypeRegistry
+template<class _registry, class _type, class _containertype=std::vector<_type>> struct StaticTypeRegistry
 {
 private:
-	_containertype &__me() { return *Impl::TypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
-	const _containertype &__me() const { return *Impl::TypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
+	_containertype &__me() { return *Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
+	const _containertype &__me() const { return *Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
 public:
 	operator _containertype &() { return __me(); }
 	operator const _containertype &() const { return __me(); }
@@ -132,25 +132,25 @@ public:
 
 namespace Impl {
 	template<class typeregistry> struct RegisterDataImpl;
-	template<class _registry, class _type, class _containertype> struct RegisterDataImpl<TypeRegistry<_registry, _type, _containertype>>
+	template<class _registry, class _type, class _containertype> struct RegisterDataImpl<StaticTypeRegistry<_registry, _type, _containertype>>
 	{
 		typedef _registry registry;
 		typedef _type type;
 		typedef _containertype containertype;
 		static void Do(_type &&v)
 		{
-			Impl::TypeRegistryStorage<_registry, _type, _containertype>::RegisterData(std::forward<_type>(v));
+			Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::RegisterData(std::forward<_type>(v));
 		}
 	};
 	template<class typeregistry> struct UnregisterDataImpl;
-	template<class _registry, class _type, class _containertype> struct UnregisterDataImpl<TypeRegistry<_registry, _type, _containertype>>
+	template<class _registry, class _type, class _containertype> struct UnregisterDataImpl<StaticTypeRegistry<_registry, _type, _containertype>>
 	{
 		typedef _registry registry;
 		typedef _type type;
 		typedef _containertype containertype;
 		static void Do(_type &&v)
 		{
-			Impl::TypeRegistryStorage<_registry, _type, _containertype>::UnregisterData(std::forward<_type>(v));
+			Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::UnregisterData(std::forward<_type>(v));
 		}
 	};
 }
@@ -167,9 +167,9 @@ template<class typeregistry> void UnregisterData(typename Impl::UnregisterDataIm
 
 namespace Impl {
 	template<class _typeregistry> struct DataRegistration;
-	template<class _registry, class _type, class _containertype> struct DataRegistration<TypeRegistry<_registry, _type, _containertype>>
+	template<class _registry, class _type, class _containertype> struct DataRegistration<StaticTypeRegistry<_registry, _type, _containertype>>
 	{
-		typedef TypeRegistry<_registry, _type, _containertype> _typeregistry;
+		typedef StaticTypeRegistry<_registry, _type, _containertype> _typeregistry;
 		DataRegistration(_type &&_c) : c(std::move(_c)) { RegisterData<_typeregistry>(std::forward<_type>(c)); }
 		~DataRegistration() { UnregisterData<_typeregistry>(std::forward<_type>(c)); }
 	private:
@@ -180,14 +180,14 @@ namespace Impl {
 
 Per DLL object:
 \code
-typedef TypeRegistry<Foo, std::unique_ptr<Foo>(*)()> MakeablesRegistry;
+typedef StaticTypeRegistry<Foo, std::unique_ptr<Foo>(*)()> MakeablesRegistry;
 static auto reg=AutoDataRegistration<MakeablesRegistry>(&Goo::Make);
 \endcode
 This registers the Goo::Make callable with the registry MakeablesRegistry during DLL load. It also unregisters during DLL unload.
 
 You now have a registry of static Make() methods associated with type MakeablesRegistry. To iterate:
 \code
-for(auto n : TypeRegistry<MakeablesRegistry>())
+for(auto n : StaticTypeRegistry<MakeablesRegistry>())
    ...
 \endcode
 */
