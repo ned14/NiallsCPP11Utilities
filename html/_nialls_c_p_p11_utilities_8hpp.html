@@ -83,7 +83,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">NiallsCPP11Utilities.hpp File Reference</div>  </div>
 </div><!--header-->
@@ -96,6 +98,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;type_traits&gt;</code><br/>
 <code>#include &lt;functional&gt;</code><br/>
 <code>#include &lt;algorithm&gt;</code><br/>
+<code>#include &lt;map&gt;</code><br/>
+<code>#include &lt;unordered_map&gt;</code><br/>
+<code>#include &lt;typeinfo&gt;</code><br/>
+<code>#include &lt;string&gt;</code><br/>
 </div>
 <p><a href="_nialls_c_p_p11_utilities_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -133,9 +139,26 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:aa518edad45d94864e27d8e5574c668a9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#aa518edad45d94864e27d8e5574c668a9">DLLEXPORTMARKUP</a></td></tr>
+<tr class="memdesc:aa518edad45d94864e27d8e5574c668a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL  <a href="#aa518edad45d94864e27d8e5574c668a9"></a><br/></td></tr>
+<tr class="separator:aa518edad45d94864e27d8e5574c668a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa31e63a742cd6e51d1c328aa06517e78"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#aa31e63a742cd6e51d1c328aa06517e78">DLLIMPORTMARKUP</a></td></tr>
+<tr class="memdesc:aa31e63a742cd6e51d1c328aa06517e78"><td class="mdescLeft">&#160;</td><td class="mdescRight">DLLIMPORTMARKUP The markup this compiler uses to import a symbol from a DLL  <a href="#aa31e63a742cd6e51d1c328aa06517e78"></a><br/></td></tr>
+<tr class="separator:aa31e63a742cd6e51d1c328aa06517e78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e58b66a458170222acc53c4b4b84714"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a4e58b66a458170222acc53c4b4b84714">DLLWEAKMARKUP</a>(type, name)</td></tr>
+<tr class="memdesc:a4e58b66a458170222acc53c4b4b84714"><td class="mdescLeft">&#160;</td><td class="mdescRight">DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak  <a href="#a4e58b66a458170222acc53c4b4b84714"></a><br/></td></tr>
+<tr class="separator:a4e58b66a458170222acc53c4b4b84714"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7eed15c4920ee413e81d42711b765166"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a7eed15c4920ee413e81d42711b765166">RETURNS</a>(...)&#160;&#160;&#160;-&gt; decltype(__VA_ARGS__) { return (__VA_ARGS__); }</td></tr>
 <tr class="memdesc:a7eed15c4920ee413e81d42711b765166"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEFINES Defines RETURNS to automatically figure out your return type  <a href="#a7eed15c4920ee413e81d42711b765166"></a><br/></td></tr>
 <tr class="separator:a7eed15c4920ee413e81d42711b765166"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a830c28c550eb540b5d778348b639250b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a830c28c550eb540b5d778348b639250b"></a>
+typedef std::unordered_map<br class="typebreak"/>
+&lt; size_t, std::map<br class="typebreak"/>
+&lt; std::string, void * &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>NiallsCPP11Utilities::Impl::ErasedTypeRegistryMapType</b></td></tr>
+<tr class="separator:a830c28c550eb540b5d778348b639250b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -147,6 +170,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a08c951d96c24f9153fc8badad32b21b0"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt; &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a08c951d96c24f9153fc8badad32b21b0">NiallsCPP11Utilities::Undoer</a> (callable &amp;&amp;c)</td></tr>
 <tr class="memdesc:a08c951d96c24f9153fc8badad32b21b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a08c951d96c24f9153fc8badad32b21b0"></a><br/></td></tr>
 <tr class="separator:a08c951d96c24f9153fc8badad32b21b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59d75ada7aff126b7ee892c3943ed79c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59d75ada7aff126b7ee892c3943ed79c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>NiallsCPP11Utilities::Impl::DLLWEAKMARKUP</b> (ErasedTypeRegistryMapType *, static_type_registry_storage)</td></tr>
+<tr class="separator:a59d75ada7aff126b7ee892c3943ed79c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
 <tr class="memitem:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a143d79eb9062a1f4f0daa5128d42d29b">NiallsCPP11Utilities::RegisterData</a> (typename Impl::RegisterDataImpl&lt; typeregistry &gt;::type &amp;&amp;v)</td></tr>
 <tr class="memdesc:a143d79eb9062a1f4f0daa5128d42d29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a piece of data with the specified type registry.  <a href="#a143d79eb9062a1f4f0daa5128d42d29b"></a><br/></td></tr>
@@ -160,10 +186,73 @@ Functions</h2></td></tr>
 &lt; _typeregistry &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb">NiallsCPP11Utilities::AutoDataRegistration</a> (_type &amp;&amp;c)</td></tr>
 <tr class="memdesc:a8fccad514b7b090e9f144752792001eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auto registers a data item with a type registry. Typically used at static init/deinit time.  <a href="#a8fccad514b7b090e9f144752792001eb"></a><br/></td></tr>
 <tr class="separator:a8fccad514b7b090e9f144752792001eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ad55ae8742f5afee5f8eefb81d8072347"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad55ae8742f5afee5f8eefb81d8072347"></a>
+<a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#aa518edad45d94864e27d8e5574c668a9">DLLEXPORTMARKUP</a> <br class="typebreak"/>
+ErasedTypeRegistryMapType *&#160;</td><td class="memItemRight" valign="bottom"><b>NiallsCPP11Utilities::Impl::static_type_registry_storage</b></td></tr>
+<tr class="separator:ad55ae8742f5afee5f8eefb81d8072347"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declares Niall's useful C++ 11 utilities. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="aa518edad45d94864e27d8e5574c668a9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DLLEXPORTMARKUP</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL </p>
+
+</div>
+</div>
+<a class="anchor" id="aa31e63a742cd6e51d1c328aa06517e78"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DLLIMPORTMARKUP</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DLLIMPORTMARKUP The markup this compiler uses to import a symbol from a DLL </p>
+
+</div>
+</div>
+<a class="anchor" id="a4e58b66a458170222acc53c4b4b84714"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DLLWEAKMARKUP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak </p>
+
+</div>
+</div>
 <a class="anchor" id="a7eed15c4920ee413e81d42711b765166"></a>
 <div class="memitem">
 <div class="memproto">

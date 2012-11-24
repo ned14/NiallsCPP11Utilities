@@ -22,10 +22,46 @@ Tested on Visual Studio 2012 Nov CTP (the one with variadic template support)
 #include <type_traits>
 #include <functional>
 #include <algorithm>
+#include <map>
+#include <unordered_map>
+#include <typeinfo>
+#include <string>
 
 #if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(noexcept)
 #define noexcept throw()
 #endif
+
+//! \define DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL
+#ifndef DLLEXPORTMARKUP
+#ifdef WIN32
+#define DLLEXPORTMARKUP __declspec(dllexport)
+#elif defined(__GNUC__)
+#define DLLEXPORTMARKUP __attribute__((visibility("default")))
+#else
+#define DLLEXPORTMARKUP
+#endif
+#endif
+
+//! \define DLLIMPORTMARKUP The markup this compiler uses to import a symbol from a DLL
+#ifndef DLLIMPORTMARKUP
+#ifdef WIN32
+#define DLLIMPORTMARKUP __declspec(dllimport)
+#else
+#define DLLIMPORTMARKUP
+#endif
+#endif
+
+//! \define DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak
+#ifndef DLLWEAKMARKUP
+#ifdef WIN32
+#define DLLWEAKMARKUP(type, name) extern __declspec(selectany) type name; extern __declspec(selectany) type name##_weak=NULL; __pragma(comment(linker, "/alternatename:_" #name "=_" #name "_weak"))
+#elif defined(__GNUC__)
+#define DLLWEAKMARKUP(type, name) extern __attribute__((weak)) type declaration
+#else
+#define DLLWEAKMARKUP(type, name)
+#endif
+#endif
+
 
 //! \define DEFINES Defines RETURNS to automatically figure out your return type
 #ifndef RETURNS
@@ -76,24 +112,40 @@ template<typename callable> UndoerImpl<callable> &&Undoer(callable &&c)
 }
 
 namespace Impl {
+	typedef std::unordered_map<size_t, std::map<std::string, void *>> ErasedTypeRegistryMapType;
+	extern DLLEXPORTMARKUP ErasedTypeRegistryMapType *static_type_registry_storage;
+	DLLWEAKMARKUP(ErasedTypeRegistryMapType *, static_type_registry_storage);
+
 	template<class _registry, class _type, class _containertype> struct StaticTypeRegistryStorage
 	{
 		typedef _registry registry;
 		typedef _type type;
 		typedef _containertype containertype;
-		static containertype *&registryStorage()
+		static containertype **registryStorage()
 		{
-			static containertype *_registryStorage;
+			static containertype **_registryStorage; // Keep a local cache
+			if(!_registryStorage)
+			{
+				const type_info &typeinfo=typeid(containertype);
+				// This deliberately and intentionally leaks because we have no way of knowing when to clean it up
+				if(!static_type_registry_storage)
+					static_type_registry_storage=new ErasedTypeRegistryMapType;
+				auto typemap=(*static_type_registry_storage)[typeinfo.hash_code()];
+				auto containerstorage=typemap[typeinfo.name()];
+				if(!containerstorage)
+					containerstorage=static_cast<void *>(new containertype());
+				_registryStorage=(containertype **) &containerstorage;
+			}
 			return _registryStorage;
 		}
 		static void RegisterData(type &&c)
 		{
-			if(!registryStorage()) registryStorage()=new containertype;
-			registryStorage()->push_back(std::move(c));
+			(*registryStorage())->push_back(std::move(c));
 		}
 		static void UnregisterData(type &&c)
 		{
-			auto r=registryStorage();
+			auto _r=registryStorage();
+			auto r=*_r;
 			// Quick optimisation for tail pop to avoid a search
 			if(*r->rbegin()==c)
 				r->erase(--r->end());
@@ -102,7 +154,7 @@ namespace Impl {
 			if(r->empty())
 			{
 				delete r;
-				registryStorage()=nullptr;
+				*_r=nullptr;
 			}
 		}
 	};
@@ -121,8 +173,8 @@ for(auto n : MakeablesRegistry())
 template<class _registry, class _type, class _containertype=std::vector<_type>> struct StaticTypeRegistry
 {
 private:
-	_containertype &__me() { return *Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
-	const _containertype &__me() const { return *Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); }
+	_containertype &__me() { auto r=Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); return **r; }
+	const _containertype &__me() const { auto r=Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::registryStorage(); return **r; }
 public:
 	operator _containertype &() { return __me(); }
 	operator const _containertype &() const { return __me(); }
