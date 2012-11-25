@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,8 +92,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_undoer_impl.html">UndoerImpl</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html">StaticTypeRegistry</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterable, statically stored registry of items associated with a type.  <a href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,7 +103,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a04452031db9c995ec65320b72012d44c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time safe detector of if <em>v</em> is nullptr (can cope with non-pointer convertibles)  <a href="#a04452031db9c995ec65320b72012d44c"></a><br/></td></tr>
 <tr class="separator:a04452031db9c995ec65320b72012d44c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08c951d96c24f9153fc8badad32b21b0"><td class="memTemplParams" colspan="2">template&lt;typename callable &gt; </td></tr>
-<tr class="memitem:a08c951d96c24f9153fc8badad32b21b0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_undoer_impl.html">UndoerImpl</a>&lt; callable &gt; &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a08c951d96c24f9153fc8badad32b21b0">Undoer</a> (callable &amp;&amp;c)</td></tr>
+<tr class="memitem:a08c951d96c24f9153fc8badad32b21b0"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt; &amp;&amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a08c951d96c24f9153fc8badad32b21b0">Undoer</a> (callable &amp;&amp;c)</td></tr>
 <tr class="memdesc:a08c951d96c24f9153fc8badad32b21b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a08c951d96c24f9153fc8badad32b21b0"></a><br/></td></tr>
 <tr class="separator:a08c951d96c24f9153fc8badad32b21b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
@@ -207,7 +205,7 @@ template&lt;class typeregistry &gt; </div>
 template&lt;typename callable &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_undoer_impl.html">UndoerImpl</a>&lt;callable&gt;&amp;&amp; NiallsCPP11Utilities::Undoer </td>
+          <td class="memname">UndoerImpl&lt;callable&gt;&amp;&amp; NiallsCPP11Utilities::Undoer </td>
           <td>(</td>
           <td class="paramtype">callable &amp;&amp;&#160;</td>
           <td class="paramname"><em>c</em></td><td>)</td>

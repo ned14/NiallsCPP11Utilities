@@ -6,7 +6,7 @@ Herein lies some C++ 11 rewrites of useful stuff from TnFOX (http://www.nedprod.
 Thanks to the new features of C++ 11, implementation is now both vastly shorter and
 easier. Hence the rewrite!
 
-See enclosed doxygen documentation for what's in here.
+See enclosed doxygen documentation for what's in here and how to build it.
 
 Enjoy!
 

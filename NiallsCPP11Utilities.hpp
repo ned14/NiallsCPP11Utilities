@@ -12,9 +12,21 @@ File Created: Nov 2012
 
 /*! \mainpage
 
-\warning You'll definitely need a fairly compliant C++ 11 compiler for this library to work
+\warning You'll definitely need a fairly compliant C++ 11 compiler for this library to work.
+In particular, you \b need variadic templates.
 
-Tested on Visual Studio 2012 Nov CTP (the one with variadic template support)
+Build using scons (http://www.scons.org/). You only need to build StaticTypeRegistry.cpp
+if you use NiallsCPP11Utilities::StaticTypeRegistry (it consists of one line unavoidable
+on Windows). You can use --useclang to force use of clang. You can use --usegcc to force
+use of gcc on Windows. I have configured scons to have the intelligence to try using g++
+if it's not being run from inside a Visual Studio Tools Command Box (i.e. vcvars32.bat
+hasn't been run). Finally, --debugbuild generates a debug build ;). There are a few more
+build options available too, try 'scons --help' to see them.
+
+Tested on the following compilers:
+ - Visual Studio 2012 Nov CTP (the one with variadic template support)
+ - clang++ v3.2.
+ - g++ v4.6.2.
 */
 
 #include <vector>
@@ -29,6 +41,11 @@ Tested on Visual Studio 2012 Nov CTP (the one with variadic template support)
 
 #if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(noexcept)
 #define noexcept throw()
+#endif
+#if defined(__GNUC__) && !defined(GCC_VERSION)
+#define GCC_VERSION (__GNUC__ * 10000 \
+				   + __GNUC_MINOR__ * 100 \
+				   + __GNUC_PATCHLEVEL__)
 #endif
 
 //! \define DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL
@@ -62,6 +79,11 @@ Tested on Visual Studio 2012 Nov CTP (the one with variadic template support)
 #endif
 #endif
 
+#ifdef NIALLSCPP11UTILITIES_DLL_EXPORTS
+#define NIALLSCPP11UTILITIES_API DLLEXPORTMARKUP
+#else
+#define NIALLSCPP11UTILITIES_API DLLIMPORTMARKUP
+#endif
 
 //! \define DEFINES Defines RETURNS to automatically figure out your return type
 #ifndef RETURNS
@@ -76,7 +98,11 @@ namespace Impl {
 	template<typename T> struct is_nullptr<T, false> { bool operator()(T c) const noexcept { return true; } };
 }
 //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
+#if defined(__GNUC__) && GCC_VERSION<40700
+template<typename T> bool is_nullptr(T &&v) noexcept { return Impl::is_nullptr<T, std::is_constructible<void *, T>::value>()(std::forward<T>(v)); }
+#else
 template<typename T> bool is_nullptr(T &&v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<void *, T>::value>()(std::forward<T>(v)); }
+#endif
 
 template<typename callable> class UndoerImpl
 {
@@ -88,7 +114,7 @@ template<typename callable> class UndoerImpl
 #endif
 	UndoerImpl(callable &&c) : undoer(std::move(c)), dismissed(false) { }
 public:
-	template<typename callable> friend UndoerImpl<callable> &&Undoer(callable &&c);
+	template<typename _callable> friend UndoerImpl<_callable> &&Undoer(_callable &&c);
 	~UndoerImpl() { if(!dismissed && !is_nullptr(undoer)) undoer(); }
 	//! Dismisses the Undoer
 	void dismiss(bool d=true) { dismissed=d; }
@@ -113,8 +139,7 @@ template<typename callable> UndoerImpl<callable> &&Undoer(callable &&c)
 
 namespace Impl {
 	typedef std::unordered_map<size_t, std::map<std::string, void *>> ErasedTypeRegistryMapType;
-	extern DLLEXPORTMARKUP ErasedTypeRegistryMapType *static_type_registry_storage;
-	DLLWEAKMARKUP(ErasedTypeRegistryMapType *, static_type_registry_storage);
+	extern NIALLSCPP11UTILITIES_API ErasedTypeRegistryMapType *static_type_registry_storage;
 
 	template<class _registry, class _type, class _containertype> struct StaticTypeRegistryStorage
 	{
@@ -126,7 +151,7 @@ namespace Impl {
 			static containertype **_registryStorage; // Keep a local cache
 			if(!_registryStorage)
 			{
-				const type_info &typeinfo=typeid(containertype);
+				const std::type_info &typeinfo=typeid(containertype);
 				// This deliberately and intentionally leaks because we have no way of knowing when to clean it up
 				if(!static_type_registry_storage)
 					static_type_registry_storage=new ErasedTypeRegistryMapType;
