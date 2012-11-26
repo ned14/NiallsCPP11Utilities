@@ -62,7 +62,7 @@ else:
         env['CCFLAGS']+=["-O0", "-g"]
     else:
         env['CCFLAGS']+=["-O2", "-g"]
-	env['CXXFLAGS']+=["-std=c++0x"]
+    env['CXXFLAGS']+=["-std=c++0x"]
     env['LINKFLAGS']+=[]
     env['LINKFLAGSEXE']=env['LINKFLAGS'][:]
 
@@ -70,7 +70,7 @@ outputs={}
 
 # Build the NiallsCPP11Utilities DLL
 sources = ["StaticTypeRegistry.cpp"]
-libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["NIALLSCPP11UTILITIES_DLL_EXPORTS"], CCFLAGS=env['CCFLAGS'])
+libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["NIALLSCPP11UTILITIES_DLL_EXPORTS"])
 if env.GetOption("static"):
     mylib = env.StaticLibrary("NiallsCPP11Utilities", source = libobjects)
     myliblib = mylib

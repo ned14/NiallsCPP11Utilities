@@ -94,32 +94,83 @@ Tested on the following compilers:
 namespace NiallsCPP11Utilities {
 
 namespace Impl {
-	template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const noexcept { return c!=nullptr; } };
-	template<typename T> struct is_nullptr<T, false> { bool operator()(T c) const noexcept { return true; } };
+	template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const noexcept { return !c; } };
+	template<typename T> struct is_nullptr<T, false> { bool operator()(T c) const noexcept { return false; } };
 }
 //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
 #if defined(__GNUC__) && GCC_VERSION<40700
-template<typename T> bool is_nullptr(T &&v) noexcept { return Impl::is_nullptr<T, std::is_constructible<void *, T>::value>()(std::forward<T>(v)); }
+template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
 #else
-template<typename T> bool is_nullptr(T &&v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<void *, T>::value>()(std::forward<T>(v)); }
+template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
 #endif
+
+namespace Impl {
+	template<bool isTemplated, typename T> struct has_regular_call_operator
+	{
+	  template<typename C> // detect regular operator()
+	  static char test(decltype(&C::operator()));
+
+	  template<typename C> // worst match
+	  static char (&test(...))[2];
+
+	  static constexpr bool value = (sizeof( test<T>(0)  ) == 1);
+	};
+
+	template<typename T> struct has_regular_call_operator<true,T>
+	{
+	  static constexpr bool value = true;
+	};
+}
+
+template<typename T> struct has_call_operator
+{
+  template<typename F, typename A> // detect 1-arg operator()
+  static char test(int, decltype( (*(F*)0)( (*(A*)0) ) ) = 0);
+
+  template<typename F, typename A, typename B> // detect 2-arg operator()
+  static char test(int, decltype( (*(F*)0)( (*(A*)0), (*(B*)0) ) ) = 0);
+
+  template<typename F, typename A, typename B, typename C> // detect 3-arg operator()
+  static char test(int, decltype( (*(F*)0)( (*(A*)0), (*(B*)0), (*(C*)0) ) ) = 0);
+
+  template<typename F, typename ...Args> // worst match
+  static char (&test(...))[2];
+
+  static constexpr bool OneArg = (sizeof( test<T, int>(0)  ) == 1);
+  static constexpr bool TwoArg = (sizeof( test<T, int, int>(0)  ) == 1);
+  static constexpr bool ThreeArg = (sizeof( test<T, int, int, int>(0)  ) == 1);
+
+  static constexpr bool HasTemplatedOperator = OneArg || TwoArg || ThreeArg;
+  static constexpr bool value = Impl::has_regular_call_operator<HasTemplatedOperator, T>::value;
+};
 
 template<typename callable> class UndoerImpl
 {
 	callable undoer;
-	bool dismissed;
+	bool _dismissed;
 
 #if !defined(_MSC_VER) || _MSC_VER>1700
 	UndoerImpl() = delete;
+	UndoerImpl(const UndoerImpl &) = delete;
+	UndoerImpl &operator=(const UndoerImpl &) = delete;
+#else
+	UndoerImpl();
+	UndoerImpl(const UndoerImpl &);
+	UndoerImpl &operator=(const UndoerImpl &);
 #endif
-	UndoerImpl(callable &&c) : undoer(std::move(c)), dismissed(false) { }
+	explicit UndoerImpl(callable &&c) : undoer(std::move(c)), _dismissed(false) { }
+	void int_trigger() { if(!_dismissed && !is_nullptr(undoer)) { undoer(); _dismissed=true; } }
 public:
-	template<typename _callable> friend UndoerImpl<_callable> &&Undoer(_callable &&c);
-	~UndoerImpl() { if(!dismissed && !is_nullptr(undoer)) undoer(); }
+	UndoerImpl(UndoerImpl &&o) : undoer(std::move(o.undoer)), _dismissed(o._dismissed) { o._dismissed=true; }
+	UndoerImpl &operator=(UndoerImpl &&o) { int_trigger(); undoer=std::move(o.undoer); _dismissed=o._dismissed; o._dismissed=true; return *this; }
+	template<typename _callable> friend UndoerImpl<_callable> Undoer(_callable &&c);
+	~UndoerImpl() { int_trigger(); }
+	//! Returns if the Undoer is dismissed
+	bool dismissed() const { return _dismissed; }
 	//! Dismisses the Undoer
-	void dismiss(bool d=true) { dismissed=d; }
+	void dismiss(bool d=true) { _dismissed=d; }
 	//! Undismisses the Undoer
-	void undismiss(bool d=true) { dismissed=!d; }
+	void undismiss(bool d=true) { _dismissed=!d; }
 };
 
 
@@ -132,9 +183,11 @@ auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
 resetpos.dismiss();
 \endcode
 */
-template<typename callable> UndoerImpl<callable> &&Undoer(callable &&c)
+template<typename callable> UndoerImpl<callable> Undoer(callable &&c)
 {
-	return std::move(UndoerImpl<callable>(std::move(c)));
+	//static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
+	auto foo=UndoerImpl<callable>(std::move(c));
+	return foo;
 }
 
 namespace Impl {
