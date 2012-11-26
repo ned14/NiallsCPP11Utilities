@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,7 +104,8 @@ struct NiallsCPP11Utilities::StaticTypeRegistry&lt; _registry, _type, _container
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> StaticTypeRegistry&lt;Foo, std::unique_ptr&lt;Foo&gt;(*)()&gt; MakeablesRegistry;</div>
 <div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> n : MakeablesRegistry())</div>
 <div class="line">   ...</div>
-</div><!-- fragment --><dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a143d79eb9062a1f4f0daa5128d42d29b" title="Registers a piece of data with the specified type registry.">NiallsCPP11Utilities::RegisterData()</a>, <a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb" title="Auto registers a data item with a type registry. Typically used at static init/deinit time...">NiallsCPP11Utilities::AutoDataRegistration()</a> </dd></dl>
+</div><!-- fragment --><p>To use this you must compile StaticTypeRegistry.cpp.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a143d79eb9062a1f4f0daa5128d42d29b" title="Registers a piece of data with the specified type registry.">NiallsCPP11Utilities::RegisterData()</a>, <a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb" title="Auto registers a data item with a type registry. Typically used at static init/deinit time...">NiallsCPP11Utilities::AutoDataRegistration()</a> </dd></dl>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="_nialls_c_p_p11_utilities_8hpp_source.html">NiallsCPP11Utilities.hpp</a></li>
 </ul>

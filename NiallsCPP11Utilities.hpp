@@ -10,6 +10,12 @@ File Created: Nov 2012
 \brief Declares Niall's useful C++ 11 utilities
 */
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4251) // needs to have dll-interface to be used by clients of
+#endif
+
+
 /*! \mainpage
 
 \warning You'll definitely need a fairly compliant C++ 11 compiler for this library to work.
@@ -28,6 +34,8 @@ Tested on the following compilers:
  - clang++ v3.2.
  - g++ v4.6.2.
 */
+
+#include <cassert>
 
 #include <vector>
 #include <memory>
@@ -95,6 +103,23 @@ Tested on the following compilers:
 
 //! \namespace NiallsCPP11Utilities Where Niall's useful C++ 11 utilities live
 namespace NiallsCPP11Utilities {
+
+/*! \brief Defines a byte buffer processing std::streambuf
+
+Use like this:
+\code
+char foo[5];
+membuf mb(foo, sizeof(foo));
+std::istream reader(&mb);
+\endcode
+*/
+struct membuf : public std::streambuf
+{
+    membuf(char *s, size_t n)
+    {
+        setg(s, s, s + n);
+    }
+};
 
 namespace Impl {
 	template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const noexcept { return !c; } };
@@ -186,7 +211,7 @@ auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
 resetpos.dismiss();
 \endcode
 */
-template<typename callable> UndoerImpl<callable> Undoer(callable &&c)
+template<typename callable> inline UndoerImpl<callable> Undoer(callable &&c)
 {
 	//static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
 	auto foo=UndoerImpl<callable>(std::move(c));
@@ -211,10 +236,14 @@ namespace Impl {
 				// This deliberately and intentionally leaks because we have no way of knowing when to clean it up
 				if(!static_type_registry_storage)
 					static_type_registry_storage=new ErasedTypeRegistryMapType;
-				auto typemap=(*static_type_registry_storage)[typeinfo.hash_code()];
-				auto containerstorage=typemap[typeinfo.name()];
+				auto &typemap=(*static_type_registry_storage)[typeinfo.hash_code()];
+				auto &containerstorage=typemap[typeinfo.name()];
 				if(!containerstorage)
-					containerstorage=static_cast<void *>(new containertype());
+				{
+					auto container=new containertype();
+					containerstorage=static_cast<void *>(container);
+					//assert(typemap[typeinfo.name()]==static_cast<void *>(container));
+				}
 				_registryStorage=(containertype **) &containerstorage;
 			}
 			return _registryStorage;
@@ -249,6 +278,8 @@ for(auto n : MakeablesRegistry())
    ...
 \endcode
 
+To use this you must compile StaticTypeRegistry.cpp.
+
 \sa NiallsCPP11Utilities::RegisterData(), NiallsCPP11Utilities::AutoDataRegistration()
 */
 template<class _registry, class _type, class _containertype=std::vector<_type>> struct StaticTypeRegistry
@@ -259,8 +290,10 @@ private:
 public:
 	operator _containertype &() { return __me(); }
 	operator const _containertype &() const { return __me(); }
-	typename _containertype::iterator &&begin() { return std::move(__me().begin()); }
-	typename _containertype::iterator &&end() { return std::move(__me().end()); }
+	typename _containertype::iterator begin() { return __me().begin(); }
+	typename _containertype::const_iterator begin() const { return __me().begin(); }
+	typename _containertype::iterator end() { return __me().end(); }
+	typename _containertype::const_iterator end() const { return __me().end(); }
 };
 
 namespace Impl {
@@ -288,12 +321,12 @@ namespace Impl {
 	};
 }
 //! Registers a piece of data with the specified type registry
-template<class typeregistry> void RegisterData(typename Impl::RegisterDataImpl<typeregistry>::type &&v)
+template<class typeregistry> inline void RegisterData(typename Impl::RegisterDataImpl<typeregistry>::type &&v)
 {
 	Impl::RegisterDataImpl<typeregistry>::Do(std::forward<typename Impl::RegisterDataImpl<typeregistry>::type>(v));
 }
 //! Unregisters a piece of data with the specified type registry
-template<class typeregistry> void UnregisterData(typename Impl::UnregisterDataImpl<typeregistry>::type &&v)
+template<class typeregistry> inline void UnregisterData(typename Impl::UnregisterDataImpl<typeregistry>::type &&v)
 {
 	Impl::UnregisterDataImpl<typeregistry>::Do(std::forward<typename Impl::UnregisterDataImpl<typeregistry>::type>(v));
 }
@@ -324,11 +357,51 @@ for(auto n : StaticTypeRegistry<MakeablesRegistry>())
    ...
 \endcode
 */
-template<class _typeregistry, class _type> Impl::DataRegistration<_typeregistry> AutoDataRegistration(_type &&c)
+template<class _typeregistry, class _type> inline Impl::DataRegistration<_typeregistry> AutoDataRegistration(_type &&c)
 {
 	return Impl::DataRegistration<_typeregistry>(std::move(c));
 }
 
+/*! \brief Information about mapped files in the process
+
+This is not a fast call, on any system. On Linux and FreeBSD this call returns
+a perfect snapshot - on Windows and Mac OS X, there is a slight possibility that
+data returned is incomplete or contains spurious data as the set of mapped files
+may change mid-traversal.
+
+To use this you must compile MappedFileInfo.cpp and ErrorHandling.cpp.
+
+\sa NiallsCPP11Utilities::FromCodePoint()
+*/
+struct NIALLSCPP11UTILITIES_API MappedFileInfo
+{
+	std::string path;				//!< Full path to the binary.
+	size_t startaddr, endaddr;		//!< Start and end addresses of where it's mapped to
+	off_t offset;					//!< From which offset in the file
+	size_t length;					//!< Length of mapped section (basically \c endaddr-startaddr)
+	bool read, write, execute, copyonwrite;	//!< Reflecting if the section is readable, writeable, executable and/or copy-on-write
+
+	bool operator<(const MappedFileInfo &o) const noexcept { return startaddr<o.startaddr; }
+	bool operator==(const MappedFileInfo &o) const noexcept { return startaddr==o.startaddr && endaddr==o.endaddr && read==o.read && write==o.write && execute==o.execute && copyonwrite==o.copyonwrite && path==o.path; }
+	//! Returns a snapshot of mapped sections in the process
+	static std::map<size_t, MappedFileInfo> mappedFiles();
+};
+//! \brief Finds the MappedFileInfo containing code point \codepoint, if any
+template<class R, class... Pars> inline std::map<size_t, MappedFileInfo>::const_iterator FromCodePoint(const std::map<size_t, MappedFileInfo> &list, R(*codepoint)(Pars...))
+{
+	size_t addr=(size_t)(void *)codepoint;
+	auto it=list.lower_bound(addr);
+	if(it->first>addr) --it;
+	if(it->second.startaddr<=addr && it->second.endaddr>addr)
+		return it;
+	return list.cend();
+}
+
 } // namespace
+
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif

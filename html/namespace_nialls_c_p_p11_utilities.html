@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,8 +92,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1membuf.html">membuf</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a byte buffer processing std::streambuf.  <a href="struct_nialls_c_p_p11_utilities_1_1membuf.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html">StaticTypeRegistry</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterable, statically stored registry of items associated with a type.  <a href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Information about mapped files in the process.  <a href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -119,6 +125,12 @@ Functions</h2></td></tr>
 &lt; _typeregistry &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb">AutoDataRegistration</a> (_type &amp;&amp;c)</td></tr>
 <tr class="memdesc:a8fccad514b7b090e9f144752792001eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auto registers a data item with a type registry. Typically used at static init/deinit time.  <a href="#a8fccad514b7b090e9f144752792001eb"></a><br/></td></tr>
 <tr class="separator:a8fccad514b7b090e9f144752792001eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e49d46a2c01335da95e0ad634091728"><td class="memTemplParams" colspan="2">template&lt;class R , class... Pars&gt; </td></tr>
+<tr class="memitem:a9e49d46a2c01335da95e0ad634091728"><td class="memTemplItemLeft" align="right" valign="top">std::map&lt; size_t, <br class="typebreak"/>
+<a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a> &gt;<br class="typebreak"/>
+::const_iterator&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9e49d46a2c01335da95e0ad634091728">FromCodePoint</a> (const std::map&lt; size_t, <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a> &gt; &amp;list, R(*codepoint)(Pars...))</td></tr>
+<tr class="memdesc:a9e49d46a2c01335da95e0ad634091728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any.  <a href="#a9e49d46a2c01335da95e0ad634091728"></a><br/></td></tr>
+<tr class="separator:a9e49d46a2c01335da95e0ad634091728"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Where Niall's useful C++ 11 utilities live. </p>
@@ -128,6 +140,9 @@ Functions</h2></td></tr>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class _typeregistry , class _type &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Impl::DataRegistration&lt;_typeregistry&gt; NiallsCPP11Utilities::AutoDataRegistration </td>
@@ -137,6 +152,11 @@ template&lt;class _typeregistry , class _type &gt; </div>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Auto registers a data item with a type registry. Typically used at static init/deinit time. </p>
@@ -148,6 +168,44 @@ template&lt;class _typeregistry , class _type &gt; </div>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span>(<span class="keyword">auto</span> n : StaticTypeRegistry&lt;MakeablesRegistry&gt;())</div>
 <div class="line">   ...</div>
 </div><!-- fragment --> 
+</div>
+</div>
+<a class="anchor" id="a9e49d46a2c01335da95e0ad634091728"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class R , class... Pars&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;size_t, <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a>&gt;::const_iterator NiallsCPP11Utilities::FromCodePoint </td>
+          <td>(</td>
+          <td class="paramtype">const std::map&lt; size_t, MappedFileInfo &gt; &amp;&#160;</td>
+          <td class="paramname"><em>list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">R(*)(Pars...)&#160;</td>
+          <td class="paramname"><em>codepoint</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any. </p>
+
 </div>
 </div>
 <a class="anchor" id="a692689edd5864b5912e568dc714b3b1c"></a>
@@ -183,6 +241,9 @@ template&lt;typename T &gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class typeregistry &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void NiallsCPP11Utilities::RegisterData </td>
@@ -192,6 +253,11 @@ template&lt;class typeregistry &gt; </div>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Registers a piece of data with the specified type registry. </p>
@@ -203,6 +269,9 @@ template&lt;class typeregistry &gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename callable &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">UndoerImpl&lt;callable&gt; NiallsCPP11Utilities::Undoer </td>
@@ -212,6 +281,11 @@ template&lt;typename callable &gt; </div>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Alexandrescu style rollbacks, a la C++ 11. </p>
@@ -227,6 +301,9 @@ template&lt;typename callable &gt; </div>
 <div class="memproto">
 <div class="memtemplate">
 template&lt;class typeregistry &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void NiallsCPP11Utilities::UnregisterData </td>
@@ -236,6 +313,11 @@ template&lt;class typeregistry &gt; </div>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Unregisters a piece of data with the specified type registry. </p>
