@@ -42,6 +42,9 @@ Tested on the following compilers:
 #if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(noexcept)
 #define noexcept throw()
 #endif
+#if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(constexpr)
+#define constexpr const
+#endif
 #if defined(__GNUC__) && !defined(GCC_VERSION)
 #define GCC_VERSION (__GNUC__ * 10000 \
 				   + __GNUC_MINOR__ * 100 \
