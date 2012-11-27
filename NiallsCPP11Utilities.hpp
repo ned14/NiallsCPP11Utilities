@@ -123,7 +123,7 @@ struct membuf : public std::streambuf
 
 namespace Impl {
 	template<typename T, bool iscomparable> struct is_nullptr { bool operator()(T c) const noexcept { return !c; } };
-	template<typename T> struct is_nullptr<T, false> { bool operator()(T c) const noexcept { return false; } };
+	template<typename T> struct is_nullptr<T, false> { bool operator()(T) const noexcept { return false; } };
 }
 //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
 #if defined(__GNUC__) && GCC_VERSION<40700
@@ -191,7 +191,7 @@ template<typename callable> class UndoerImpl
 public:
 	UndoerImpl(UndoerImpl &&o) : undoer(std::move(o.undoer)), _dismissed(o._dismissed) { o._dismissed=true; }
 	UndoerImpl &operator=(UndoerImpl &&o) { int_trigger(); undoer=std::move(o.undoer); _dismissed=o._dismissed; o._dismissed=true; return *this; }
-	template<typename _callable> friend UndoerImpl<_callable> Undoer(_callable &&c);
+	template<typename _callable> friend UndoerImpl<_callable> Undoer(_callable c);
 	~UndoerImpl() { int_trigger(); }
 	//! Returns if the Undoer is dismissed
 	bool dismissed() const { return _dismissed; }
@@ -211,7 +211,7 @@ auto resetpos=Undoer([&s]() { s.seekg(0, std::ios::beg); });
 resetpos.dismiss();
 \endcode
 */
-template<typename callable> inline UndoerImpl<callable> Undoer(callable &&c)
+template<typename callable> inline UndoerImpl<callable> Undoer(callable c)
 {
 	//static_assert(!std::is_function<callable>::value && !std::is_member_function_pointer<callable>::value && !std::is_member_object_pointer<callable>::value && !has_call_operator<callable>::value, "Undoer applied to a type not providing a call operator");
 	auto foo=UndoerImpl<callable>(std::move(c));
@@ -248,11 +248,15 @@ namespace Impl {
 			}
 			return _registryStorage;
 		}
+		static void RegisterData(const type &c)
+		{
+			(*registryStorage())->push_back(c);
+		}
 		static void RegisterData(type &&c)
 		{
 			(*registryStorage())->push_back(std::move(c));
 		}
-		static void UnregisterData(type &&c)
+		static void UnregisterData(const type &c)
 		{
 			auto _r=registryStorage();
 			auto r=*_r;
@@ -260,7 +264,7 @@ namespace Impl {
 			if(*r->rbegin()==c)
 				r->erase(--r->end());
 			else
-				r->erase(std::remove(r->begin(), r->end(), std::forward<type>(c)), r->end());
+				r->erase(std::remove(r->begin(), r->end(), c), r->end());
 			if(r->empty())
 			{
 				delete r;
@@ -292,8 +296,17 @@ public:
 	operator const _containertype &() const { return __me(); }
 	typename _containertype::iterator begin() { return __me().begin(); }
 	typename _containertype::const_iterator begin() const { return __me().begin(); }
+	typename _containertype::const_iterator cbegin() const { return __me().cbegin(); }
 	typename _containertype::iterator end() { return __me().end(); }
 	typename _containertype::const_iterator end() const { return __me().end(); }
+	typename _containertype::const_iterator cend() const { return __me().cend(); }
+	typename _containertype::iterator rbegin() { return __me().rbegin(); }
+	typename _containertype::const_iterator rbegin() const { return __me().rbegin(); }
+	typename _containertype::iterator rend() { return __me().rend(); }
+	typename _containertype::const_iterator rend() const { return __me().rend(); }
+	typename _containertype::size_type size() const { return __me().size(); }
+	typename _containertype::size_type max_size() const { return __me().max_size(); }
+	bool empty() const { return __me().empty(); }
 };
 
 namespace Impl {
@@ -314,11 +327,16 @@ namespace Impl {
 		typedef _registry registry;
 		typedef _type type;
 		typedef _containertype containertype;
-		static void Do(_type &&v)
+		static void Do(const _type &v)
 		{
-			Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::UnregisterData(std::forward<_type>(v));
+			Impl::StaticTypeRegistryStorage<_registry, _type, _containertype>::UnregisterData(v);
 		}
 	};
+}
+//! Registers a piece of data with the specified type registry
+template<class typeregistry> inline void RegisterData(const typename Impl::RegisterDataImpl<typeregistry>::type &v)
+{
+	Impl::RegisterDataImpl<typeregistry>::Do(v);
 }
 //! Registers a piece of data with the specified type registry
 template<class typeregistry> inline void RegisterData(typename Impl::RegisterDataImpl<typeregistry>::type &&v)
@@ -326,9 +344,9 @@ template<class typeregistry> inline void RegisterData(typename Impl::RegisterDat
 	Impl::RegisterDataImpl<typeregistry>::Do(std::forward<typename Impl::RegisterDataImpl<typeregistry>::type>(v));
 }
 //! Unregisters a piece of data with the specified type registry
-template<class typeregistry> inline void UnregisterData(typename Impl::UnregisterDataImpl<typeregistry>::type &&v)
+template<class typeregistry> inline void UnregisterData(const typename Impl::UnregisterDataImpl<typeregistry>::type &v)
 {
-	Impl::UnregisterDataImpl<typeregistry>::Do(std::forward<typename Impl::UnregisterDataImpl<typeregistry>::type>(v));
+	Impl::UnregisterDataImpl<typeregistry>::Do(v);
 }
 
 namespace Impl {

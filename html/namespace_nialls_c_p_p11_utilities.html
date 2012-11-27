@@ -108,18 +108,22 @@ Functions</h2></td></tr>
 <tr class="memitem:a692689edd5864b5912e568dc714b3b1c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a692689edd5864b5912e568dc714b3b1c">is_nullptr</a> (T v) noexcept</td></tr>
 <tr class="memdesc:a692689edd5864b5912e568dc714b3b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time safe detector of if <em>v</em> is nullptr (can cope with non-pointer convertibles)  <a href="#a692689edd5864b5912e568dc714b3b1c"></a><br/></td></tr>
 <tr class="separator:a692689edd5864b5912e568dc714b3b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4664a735356e378b0658367a7f1358c2"><td class="memTemplParams" colspan="2">template&lt;typename callable &gt; </td></tr>
-<tr class="memitem:a4664a735356e378b0658367a7f1358c2"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a4664a735356e378b0658367a7f1358c2">Undoer</a> (callable &amp;&amp;c)</td></tr>
-<tr class="memdesc:a4664a735356e378b0658367a7f1358c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a4664a735356e378b0658367a7f1358c2"></a><br/></td></tr>
-<tr class="separator:a4664a735356e378b0658367a7f1358c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memTemplParams" colspan="2">template&lt;typename callable &gt; </td></tr>
+<tr class="memitem:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a4b0a143d1ff6792ff1e21f24e8de3457">Undoer</a> (callable c)</td></tr>
+<tr class="memdesc:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a4b0a143d1ff6792ff1e21f24e8de3457"></a><br/></td></tr>
+<tr class="separator:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a965f0292f7637ed4ebc7fd80868cfa32"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
+<tr class="memitem:a965f0292f7637ed4ebc7fd80868cfa32"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a965f0292f7637ed4ebc7fd80868cfa32">RegisterData</a> (const typename Impl::RegisterDataImpl&lt; typeregistry &gt;::type &amp;v)</td></tr>
+<tr class="memdesc:a965f0292f7637ed4ebc7fd80868cfa32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a piece of data with the specified type registry.  <a href="#a965f0292f7637ed4ebc7fd80868cfa32"></a><br/></td></tr>
+<tr class="separator:a965f0292f7637ed4ebc7fd80868cfa32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
 <tr class="memitem:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a143d79eb9062a1f4f0daa5128d42d29b">RegisterData</a> (typename Impl::RegisterDataImpl&lt; typeregistry &gt;::type &amp;&amp;v)</td></tr>
 <tr class="memdesc:a143d79eb9062a1f4f0daa5128d42d29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a piece of data with the specified type registry.  <a href="#a143d79eb9062a1f4f0daa5128d42d29b"></a><br/></td></tr>
 <tr class="separator:a143d79eb9062a1f4f0daa5128d42d29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58a554c82c203eae75acb8318a5bc5be"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
-<tr class="memitem:a58a554c82c203eae75acb8318a5bc5be"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a58a554c82c203eae75acb8318a5bc5be">UnregisterData</a> (typename Impl::UnregisterDataImpl&lt; typeregistry &gt;::type &amp;&amp;v)</td></tr>
-<tr class="memdesc:a58a554c82c203eae75acb8318a5bc5be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unregisters a piece of data with the specified type registry.  <a href="#a58a554c82c203eae75acb8318a5bc5be"></a><br/></td></tr>
-<tr class="separator:a58a554c82c203eae75acb8318a5bc5be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab98fd771b551337d720d5d58cbde7cde"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
+<tr class="memitem:ab98fd771b551337d720d5d58cbde7cde"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab98fd771b551337d720d5d58cbde7cde">UnregisterData</a> (const typename Impl::UnregisterDataImpl&lt; typeregistry &gt;::type &amp;v)</td></tr>
+<tr class="memdesc:ab98fd771b551337d720d5d58cbde7cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unregisters a piece of data with the specified type registry.  <a href="#ab98fd771b551337d720d5d58cbde7cde"></a><br/></td></tr>
+<tr class="separator:ab98fd771b551337d720d5d58cbde7cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fccad514b7b090e9f144752792001eb"><td class="memTemplParams" colspan="2">template&lt;class _typeregistry , class _type &gt; </td></tr>
 <tr class="memitem:a8fccad514b7b090e9f144752792001eb"><td class="memTemplItemLeft" align="right" valign="top">Impl::DataRegistration<br class="typebreak"/>
 &lt; _typeregistry &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb">AutoDataRegistration</a> (_type &amp;&amp;c)</td></tr>
@@ -236,6 +240,34 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a965f0292f7637ed4ebc7fd80868cfa32"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class typeregistry &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void NiallsCPP11Utilities::RegisterData </td>
+          <td>(</td>
+          <td class="paramtype">const typename Impl::RegisterDataImpl&lt; typeregistry &gt;::type &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers a piece of data with the specified type registry. </p>
+
+</div>
+</div>
 <a class="anchor" id="a143d79eb9062a1f4f0daa5128d42d29b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -264,7 +296,7 @@ template&lt;class typeregistry &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a4664a735356e378b0658367a7f1358c2"></a>
+<a class="anchor" id="a4b0a143d1ff6792ff1e21f24e8de3457"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -276,7 +308,7 @@ template&lt;typename callable &gt; </div>
         <tr>
           <td class="memname">UndoerImpl&lt;callable&gt; NiallsCPP11Utilities::Undoer </td>
           <td>(</td>
-          <td class="paramtype">callable &amp;&amp;&#160;</td>
+          <td class="paramtype">callable&#160;</td>
           <td class="paramname"><em>c</em></td><td>)</td>
           <td></td>
         </tr>
@@ -290,13 +322,13 @@ template&lt;typename callable &gt; </div>
 
 <p>Alexandrescu style rollbacks, a la C++ 11. </p>
 <p>Example of usage: </p>
-<div class="fragment"><div class="line"><span class="keyword">auto</span> resetpos=<a class="code" href="namespace_nialls_c_p_p11_utilities.html#a4664a735356e378b0658367a7f1358c2" title="Alexandrescu style rollbacks, a la C++ 11.">Undoer</a>([&amp;s]() { s.seekg(0, std::ios::beg); });</div>
+<div class="fragment"><div class="line"><span class="keyword">auto</span> resetpos=<a class="code" href="namespace_nialls_c_p_p11_utilities.html#a4b0a143d1ff6792ff1e21f24e8de3457" title="Alexandrescu style rollbacks, a la C++ 11.">Undoer</a>([&amp;s]() { s.seekg(0, std::ios::beg); });</div>
 <div class="line">...</div>
 <div class="line">resetpos.dismiss();</div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a class="anchor" id="a58a554c82c203eae75acb8318a5bc5be"></a>
+<a class="anchor" id="ab98fd771b551337d720d5d58cbde7cde"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -308,7 +340,7 @@ template&lt;class typeregistry &gt; </div>
         <tr>
           <td class="memname">void NiallsCPP11Utilities::UnregisterData </td>
           <td>(</td>
-          <td class="paramtype">typename Impl::UnregisterDataImpl&lt; typeregistry &gt;::type &amp;&amp;&#160;</td>
+          <td class="paramtype">const typename Impl::UnregisterDataImpl&lt; typeregistry &gt;::type &amp;&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
           <td></td>
         </tr>
