@@ -147,6 +147,14 @@ Functions</h2></td></tr>
 <tr class="memitem:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a4b0a143d1ff6792ff1e21f24e8de3457">NiallsCPP11Utilities::Undoer</a> (callable c)</td></tr>
 <tr class="memdesc:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a4b0a143d1ff6792ff1e21f24e8de3457"></a><br/></td></tr>
 <tr class="separator:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbba81f759ed968d4766a454af0e77e5"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:abbba81f759ed968d4766a454af0e77e5"><td class="memTemplItemLeft" align="right" valign="top">TextDumpImpl&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#abbba81f759ed968d4766a454af0e77e5">NiallsCPP11Utilities::TextDump</a> (const T &amp;_inst)</td></tr>
+<tr class="memdesc:abbba81f759ed968d4766a454af0e77e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A textual dumper of types.  <a href="#abbba81f759ed968d4766a454af0e77e5"></a><br/></td></tr>
+<tr class="separator:abbba81f759ed968d4766a454af0e77e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae17b921a0f1b42285287c5b128240f9d"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
+<tr class="memitem:ae17b921a0f1b42285287c5b128240f9d"><td class="memTemplItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ae17b921a0f1b42285287c5b128240f9d">NiallsCPP11Utilities::operator&lt;&lt;</a> (std::ostream &amp;s, const TextDumpImpl&lt; T &gt; &amp;v)</td></tr>
+<tr class="memdesc:ae17b921a0f1b42285287c5b128240f9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default stream overloader for TextDump.  <a href="#ae17b921a0f1b42285287c5b128240f9d"></a><br/></td></tr>
+<tr class="separator:ae17b921a0f1b42285287c5b128240f9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a965f0292f7637ed4ebc7fd80868cfa32"><td class="memTemplParams" colspan="2">template&lt;class typeregistry &gt; </td></tr>
 <tr class="memitem:a965f0292f7637ed4ebc7fd80868cfa32"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a965f0292f7637ed4ebc7fd80868cfa32">NiallsCPP11Utilities::RegisterData</a> (const typename Impl::RegisterDataImpl&lt; typeregistry &gt;::type &amp;v)</td></tr>
 <tr class="memdesc:a965f0292f7637ed4ebc7fd80868cfa32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a piece of data with the specified type registry.  <a href="#a965f0292f7637ed4ebc7fd80868cfa32"></a><br/></td></tr>
@@ -164,6 +172,9 @@ Functions</h2></td></tr>
 &lt; _typeregistry &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8fccad514b7b090e9f144752792001eb">NiallsCPP11Utilities::AutoDataRegistration</a> (_type &amp;&amp;c)</td></tr>
 <tr class="memdesc:a8fccad514b7b090e9f144752792001eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auto registers a data item with a type registry. Typically used at static init/deinit time.  <a href="#a8fccad514b7b090e9f144752792001eb"></a><br/></td></tr>
 <tr class="separator:a8fccad514b7b090e9f144752792001eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11f7d64eb51d888016a4f3c345031930"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a11f7d64eb51d888016a4f3c345031930">NiallsCPP11Utilities::operator&lt;&lt;</a> (std::ostream &amp;s, const TextDumpImpl&lt; std::map&lt; size_t, MappedFileInfo &gt;&gt; &amp;v)</td></tr>
+<tr class="memdesc:a11f7d64eb51d888016a4f3c345031930"><td class="mdescLeft">&#160;</td><td class="mdescRight">Text dumps a std::map&lt;size_t, MappedFileInfo&gt;  <a href="#a11f7d64eb51d888016a4f3c345031930"></a><br/></td></tr>
+<tr class="separator:a11f7d64eb51d888016a4f3c345031930"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e49d46a2c01335da95e0ad634091728"><td class="memTemplParams" colspan="2">template&lt;class R , class... Pars&gt; </td></tr>
 <tr class="memitem:a9e49d46a2c01335da95e0ad634091728"><td class="memTemplItemLeft" align="right" valign="top">std::map&lt; size_t, <br class="typebreak"/>
 MappedFileInfo &gt;<br class="typebreak"/>

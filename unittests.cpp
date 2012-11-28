@@ -80,5 +80,14 @@ TEST_CASE("StaticTypeRegistry/works", "Tests that StaticTypeRegistry works")
 	REQUIRE(l[0]==6);
 	REQUIRE(l[1]==7);
 	l.clear();
+	cout << TextDump(MakeablesRegistry()) << endl;
 }
 
+TEST_CASE("MappedFileInfo/works", "Tests that MappedFileInfo works")
+{
+	auto mfs=MappedFileInfo::mappedFiles();
+	cout << "Mapped files in this process:" << endl;
+	cout << TextDump(mfs) << endl;
+	cout << endl << "Of these, I (" << hex << (void *) main << ") live in:" << endl;
+	cout << TextDump(FromCodePoint(mfs, main)->second);
+}

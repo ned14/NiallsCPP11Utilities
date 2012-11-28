@@ -115,10 +115,21 @@ std::istream reader(&mb);
 */
 struct membuf : public std::streambuf
 {
-    membuf(char *s, size_t n)
+	char *s;
+	size_t n;
+    membuf(char *_s, size_t _n) : s(_s), n(_n)
     {
         setg(s, s, s + n);
     }
+protected:
+	virtual pos_type seekoff( off_type off, std::ios_base::seekdir dir,
+                          std::ios_base::openmode which = std::ios_base::in | std::ios_base::out )
+	{
+		(void) which;
+		off_type offset=(std::ios::beg==dir) ? off : (std::ios::end==dir) ? n-off : (gptr()-s)+off;
+		setg(s, s+offset, s+n);
+		return gptr()-s;
+	}
 };
 
 namespace Impl {
@@ -218,6 +229,42 @@ template<typename callable> inline UndoerImpl<callable> Undoer(callable c)
 	return foo;
 }
 
+template<class T> struct TextDumpImpl
+{
+	const T *inst;
+	TextDumpImpl(const T &_inst) : inst(&_inst) { }
+};
+/*! \brief A textual dumper of types
+
+Use this to signify that you wish to dump a textual representation of the given object instance
+to a std::ostream, like this:
+\code
+s << TextDump(obj) << std::endl;
+\endcode
+
+To add text dumpers for your particular type, overload operator<< as follows:
+\code
+template<class _registry, class _type, class _containertype> inline std::ostream &operator<<(std::ostream &s, const TextDumpImpl<StaticTypeRegistry<_registry, _type, _containertype>> &v)
+{
+	for(const auto &i : *v.inst)
+		s << "* " << i << std::endl;
+	return s;
+}
+\endcode
+
+An alternative is to provide a textDump() method for your object like this:
+\code
+struct Foo
+{
+	std::ostream &textDump(std::ostream &s) const;
+};
+\endcode
+*/
+template<class T> inline TextDumpImpl<T> TextDump(const T &_inst) { return TextDumpImpl<T>(_inst); }
+//! Default stream overloader for TextDump
+template<class T> inline std::ostream &operator<<(std::ostream &s, const TextDumpImpl<T> &v) { return v.inst->textDump(s); }
+
+
 namespace Impl {
 	typedef std::unordered_map<size_t, std::map<std::string, void *>> ErasedTypeRegistryMapType;
 	extern NIALLSCPP11UTILITIES_API ErasedTypeRegistryMapType *static_type_registry_storage;
@@ -308,6 +355,12 @@ public:
 	typename _containertype::size_type max_size() const { return __me().max_size(); }
 	bool empty() const { return __me().empty(); }
 };
+template<class _registry, class _type, class _containertype> inline std::ostream &operator<<(std::ostream &s, const TextDumpImpl<StaticTypeRegistry<_registry, _type, _containertype>> &v)
+{
+	for(const auto &i : *v.inst)
+		s << "* " << i << std::endl;
+	return s;
+}
 
 namespace Impl {
 	template<class typeregistry> struct RegisterDataImpl;
@@ -403,7 +456,22 @@ struct NIALLSCPP11UTILITIES_API MappedFileInfo
 	bool operator==(const MappedFileInfo &o) const noexcept { return startaddr==o.startaddr && endaddr==o.endaddr && read==o.read && write==o.write && execute==o.execute && copyonwrite==o.copyonwrite && path==o.path; }
 	//! Returns a snapshot of mapped sections in the process
 	static std::map<size_t, MappedFileInfo> mappedFiles();
+	//! Returns a text dump of this item
+	std::ostream &textDump(std::ostream &s) const
+	{
+		s << std::hex << startaddr << "-" << endaddr << " ";
+		s << (read ? 'R' : 'r') << (write ? 'W' : 'w') << (execute ? 'X' : 'x') << (copyonwrite ? 'C' : 'c');
+		s << " +" << offset << " : " << path << std::endl;
+		return s;
+	}
 };
+//! Text dumps a std::map<size_t, MappedFileInfo>
+inline std::ostream &operator<<(std::ostream &s, const TextDumpImpl<std::map<size_t, MappedFileInfo>> &v)
+{
+	for(const auto &i : *v.inst)
+		s << "   " << TextDump(i.second);
+	return s;
+}
 //! \brief Finds the MappedFileInfo containing code point \codepoint, if any
 template<class R, class... Pars> inline std::map<size_t, MappedFileInfo>::const_iterator FromCodePoint(const std::map<size_t, MappedFileInfo> &list, R(*codepoint)(Pars...))
 {
