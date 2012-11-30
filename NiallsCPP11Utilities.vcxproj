@@ -41,9 +41,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\ObjCompPrototype\deps\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\ObjCompPrototype\deps\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -79,6 +81,7 @@
     <ClCompile Include="ErrorHandling.cpp" />
     <ClCompile Include="MappedFileInfo.cpp" />
     <ClCompile Include="StaticTypeRegistry.cpp" />
+    <ClCompile Include="SymbolMangler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorHandling.hpp" />

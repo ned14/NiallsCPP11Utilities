@@ -483,6 +483,139 @@ template<class R, class... Pars> inline std::map<size_t, MappedFileInfo>::const_
 	return list.cend();
 }
 
+//! The type of a symbol type
+enum class SymbolTypeType
+{
+	Constant,
+	Void,
+	Bool,
+	Char,
+	SignedChar,
+	UnsignedChar,
+	ShortInt,
+	UnsignedShortInt,
+	Int,
+	UnsignedInt,
+	LongInt,
+	UnsignedLongInt,
+	LongLong,
+	UnsignedLongLong,
+	Wchar_t,
+	Float,
+	Double,
+	LongDouble,
+	Vect64,
+	Vect128f,
+	Vect128d,
+	Vect128i,
+	Vect256f,
+	Vect256d,
+	Vect256i,
+	Varargs,
+
+	// The following have names
+	Namespace,
+	Union,
+	Struct,
+	Class,
+	Enum,
+	EnumMember,
+
+	Function,
+	StaticMemberFunction,
+	StaticMemberFunctionProtected,
+	StaticMemberFunctionPrivate,
+	MemberFunction,
+	MemberFunctionProtected,
+	MemberFunctionPrivate,
+	VirtualMemberFunction,
+	VirtualMemberFunctionProtected,
+	VirtualMemberFunctionPrivate,
+
+	Unknown
+};
+//! The qualifiers of a symbol type
+enum class SymbolTypeQualifier
+{
+	None,
+	Const,
+	Pointer,
+	ConstPointer,
+	VolatilePointer,
+	ConstVolatilePointer,
+	PointerConst,
+	PointerVolatile,
+	PointerConstVolatile,
+	ConstPointerConst,
+	PointerRestrict,
+	LValueRef,
+	RValueRef,
+	ConstLValueRef,
+	VolatileLValueRef,
+	ConstVolatileLValueRef,
+
+	Array,
+	ConstArray,
+
+	Unknown
+};
+//! A type potentially containing other types
+struct NIALLSCPP11UTILITIES_API SymbolType
+{
+	const SymbolType *returns;					//!< The type returned, if a type is a function type
+	SymbolTypeQualifier qualifier;				//!< The qualifier of the type (const, volatile etc)
+	SymbolTypeType type;						//!< The type of the type (int, struct, namespace etc)
+	std::list<const SymbolType *> dependents;	//!< The dependent types of the type (namespaces, member functions)
+	std::string name;							//!< The name of the type (union/struct/class/enum/functions)
+	std::list<const SymbolType *> templ_params;	//!< The template parameters of the type
+	std::list<const SymbolType *> func_params;	//!< The parameters of the function type
+	SymbolType(SymbolTypeQualifier _qualifiers, SymbolTypeType _type, const std::string &_name=std::string()) : returns(nullptr), qualifier(_qualifiers), type(_type), name(_name) { }
+	std::string prettyText(bool withTypeType=true) const;
+};
+} // namespace
+
+namespace std { template<> struct hash<const NiallsCPP11Utilities::SymbolType> {
+	size_t operator()(const NiallsCPP11Utilities::SymbolType &v) const {
+		size_t ret=hash<int>()(static_cast<int>(v.qualifier)) ^ hash<int>()(static_cast<int>(v.type)) ^ hash<decltype(v.name)>()(v.name);
+		if(v.returns) ret^=hash<size_t>()((size_t) v.returns);
+		for(auto p : v.dependents)
+			ret^=hash<size_t>()((size_t) p);
+		for(auto p : v.templ_params)
+			ret^=hash<size_t>()((size_t) p);
+		for(auto p : v.func_params)
+			ret^=hash<size_t>()((size_t) p);
+		return ret;
+	}
+}; }
+
+namespace NiallsCPP11Utilities {
+
+//! A dictionary of known symbol types. Used to store types across mangles/demangles.
+typedef std::unordered_set<const SymbolType> SymbolTypeDict;
+
+namespace Private { struct SymbolDemangler; }
+/*! \brief A symbol demangler
+
+To use this you must compile SymbolMangler.cpp.
+*/
+class NIALLSCPP11UTILITIES_API SymbolDemangler
+{
+	Private::SymbolDemangler *p;
+public:
+	SymbolDemangler();
+	//! Demangles the supplied symbol
+	SymbolDemangler(SymbolTypeDict &dict, const std::string &mangled);
+
+	//! Returns the mangled symbol as pretty text
+	std::string prettyText() const;
+};
+//! \brief Demangles a single mangled symbol. Use the object directly with a stored TypeDict if you're doing more than one.
+inline std::string Demangle(const std::string &mangled)
+{
+	SymbolTypeDict typedict;
+	return SymbolDemangler(typedict, mangled).prettyText();
+}
+
 } // namespace
 
 

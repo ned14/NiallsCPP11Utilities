@@ -68,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -83,6 +83,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">NiallsCPP11Utilities.hpp File Reference</div>  </div>
@@ -115,6 +117,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">NiallsCPP11Utilities::MappedFileInfo</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Information about mapped files in the process.  <a href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">NiallsCPP11Utilities::SymbolType</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type potentially containing other types.  <a href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangler.html">NiallsCPP11Utilities::SymbolDemangler</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A symbol demangler.  <a href="class_nialls_c_p_p11_utilities_1_1_symbol_demangler.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -136,6 +144,22 @@ Macros</h2></td></tr>
 <tr class="memitem:a7eed15c4920ee413e81d42711b765166"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a7eed15c4920ee413e81d42711b765166">RETURNS</a>(...)&#160;&#160;&#160;-&gt; decltype(__VA_ARGS__) { return (__VA_ARGS__); }</td></tr>
 <tr class="memdesc:a7eed15c4920ee413e81d42711b765166"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEFINES Defines RETURNS to automatically figure out your return type  <a href="#a7eed15c4920ee413e81d42711b765166"></a><br/></td></tr>
 <tr class="separator:a7eed15c4920ee413e81d42711b765166"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a72052eed05180e9f143035e0edb266f1"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_set<br class="typebreak"/>
+&lt; const SymbolType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a72052eed05180e9f143035e0edb266f1">NiallsCPP11Utilities::SymbolTypeDict</a></td></tr>
+<tr class="memdesc:a72052eed05180e9f143035e0edb266f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A dictionary of known symbol types. Used to store types across mangles/demangles.  <a href="#a72052eed05180e9f143035e0edb266f1"></a><br/></td></tr>
+<tr class="separator:a72052eed05180e9f143035e0edb266f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:acc9e34ac457a82a88ad4bc675a1de73a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">NiallsCPP11Utilities::SymbolTypeType</a> </td></tr>
+<tr class="memdesc:acc9e34ac457a82a88ad4bc675a1de73a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a symbol type.  <a href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">More...</a><br/></td></tr>
+<tr class="separator:acc9e34ac457a82a88ad4bc675a1de73a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60b4b88adf0fb9327bf4cd9c5e31bca3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a60b4b88adf0fb9327bf4cd9c5e31bca3">NiallsCPP11Utilities::SymbolTypeQualifier</a> </td></tr>
+<tr class="memdesc:a60b4b88adf0fb9327bf4cd9c5e31bca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The qualifiers of a symbol type.  <a href="namespace_nialls_c_p_p11_utilities.html#a60b4b88adf0fb9327bf4cd9c5e31bca3">More...</a><br/></td></tr>
+<tr class="separator:a60b4b88adf0fb9327bf4cd9c5e31bca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -181,6 +205,9 @@ MappedFileInfo &gt;<br class="typebreak"/>
 ::const_iterator&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9e49d46a2c01335da95e0ad634091728">NiallsCPP11Utilities::FromCodePoint</a> (const std::map&lt; size_t, MappedFileInfo &gt; &amp;list, R(*codepoint)(Pars...))</td></tr>
 <tr class="memdesc:a9e49d46a2c01335da95e0ad634091728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any.  <a href="#a9e49d46a2c01335da95e0ad634091728"></a><br/></td></tr>
 <tr class="separator:a9e49d46a2c01335da95e0ad634091728"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab098ff5e761c2d985be944a37bb70272"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">NiallsCPP11Utilities::Demangle</a> (const std::string &amp;mangled)</td></tr>
+<tr class="memdesc:ab098ff5e761c2d985be944a37bb70272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Demangles a single mangled symbol. Use the object directly with a stored TypeDict if you're doing more than one.  <a href="#ab098ff5e761c2d985be944a37bb70272"></a><br/></td></tr>
+<tr class="separator:ab098ff5e761c2d985be944a37bb70272"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declares Niall's useful C++ 11 utilities. </p>
