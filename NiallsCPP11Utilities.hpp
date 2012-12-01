@@ -44,6 +44,7 @@ Tested on the following compilers:
 #include <algorithm>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include <typeinfo>
 #include <string>
 
@@ -559,9 +560,25 @@ enum class SymbolTypeQualifier
 
 	Unknown
 };
-//! A type potentially containing other types
+//! The storage class of a symbol type
+enum class SymbolTypeStorage
+{
+	None,
+	Const,
+	Volatile,
+	ConstVolatile,
+
+	Unknown
+};
+/*! \brief A type potentially containing other types
+
+To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.
+
+\sa NiallsCPP11Utilities::Demangle(), NiallsCPP11Utilities::Mangle()
+*/
 struct NIALLSCPP11UTILITIES_API SymbolType
 {
+	SymbolTypeStorage storage;					//!< The storage class of the variable, or the type returned by a function
 	const SymbolType *returns;					//!< The type returned, if a type is a function type
 	SymbolTypeQualifier qualifier;				//!< The qualifier of the type (const, volatile etc)
 	SymbolTypeType type;						//!< The type of the type (int, struct, namespace etc)
@@ -569,7 +586,16 @@ struct NIALLSCPP11UTILITIES_API SymbolType
 	std::string name;							//!< The name of the type (union/struct/class/enum/functions)
 	std::list<const SymbolType *> templ_params;	//!< The template parameters of the type
 	std::list<const SymbolType *> func_params;	//!< The parameters of the function type
-	SymbolType(SymbolTypeQualifier _qualifiers, SymbolTypeType _type, const std::string &_name=std::string()) : returns(nullptr), qualifier(_qualifiers), type(_type), name(_name) { }
+	SymbolType() : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), type(SymbolTypeType::Unknown) { }
+	bool operator==(const SymbolType &o) const
+	{
+		return storage==o.storage && returns==o.returns && qualifier==o.qualifier && type==o.type
+			&& dependents==o.dependents && name==o.name && templ_params==o.templ_params && func_params==o.func_params;
+	}
+	//! Constructor for a variable
+	SymbolType(SymbolTypeStorage _storage, SymbolTypeType _type, const std::string &_name) : storage(_storage), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), type(_type), name(_name) { }
+	//! Constructor for a type
+	SymbolType(SymbolTypeQualifier _qualifiers, SymbolTypeType _type, const std::string &_name=std::string()) : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(_qualifiers), type(_type), name(_name) { }
 	std::string prettyText(bool withTypeType=true) const;
 };
 } // namespace
@@ -593,27 +619,16 @@ namespace NiallsCPP11Utilities {
 //! A dictionary of known symbol types. Used to store types across mangles/demangles.
 typedef std::unordered_set<const SymbolType> SymbolTypeDict;
 
-namespace Private { struct SymbolDemangler; }
 /*! \brief A symbol demangler
 
-To use this you must compile SymbolMangler.cpp.
+To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.
 */
-class NIALLSCPP11UTILITIES_API SymbolDemangler
-{
-	Private::SymbolDemangler *p;
-public:
-	SymbolDemangler();
-	//! Demangles the supplied symbol
-	SymbolDemangler(SymbolTypeDict &dict, const std::string &mangled);
-
-	//! Returns the mangled symbol as pretty text
-	std::string prettyText() const;
-};
-//! \brief Demangles a single mangled symbol. Use the object directly with a stored TypeDict if you're doing more than one.
+extern NIALLSCPP11UTILITIES_API SymbolType Demangle(SymbolTypeDict &typedict, const std::string &mangled);
+//! \brief Convenience overload which demangles a single mangled symbol. Use the other function if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled)
 {
 	SymbolTypeDict typedict;
-	return SymbolDemangler(typedict, mangled).prettyText();
+	return Demangle(typedict, mangled).prettyText();
 }
 
 } // namespace

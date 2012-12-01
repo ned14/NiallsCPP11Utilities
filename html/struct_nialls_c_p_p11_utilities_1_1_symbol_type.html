@@ -85,6 +85,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="struct_nialls_c_p_p11_utilities_1_1_symbol_type-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -97,8 +98,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="_nialls_c_p_p11_utilities_8hpp_source.html">NiallsCPP11Utilities.hpp</a>&gt;</code></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:abcfb6ee94a463d20cdb282a11f317642"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#abcfb6ee94a463d20cdb282a11f317642">SymbolType</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">SymbolTypeStorage</a> _storage, <a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">SymbolTypeType</a> _type, const std::string &amp;_name)</td></tr>
+<tr class="memdesc:abcfb6ee94a463d20cdb282a11f317642"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a variable.  <a href="#abcfb6ee94a463d20cdb282a11f317642"></a><br/></td></tr>
+<tr class="separator:abcfb6ee94a463d20cdb282a11f317642"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af548918160e0729a85603cf616dcb9d6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#af548918160e0729a85603cf616dcb9d6">SymbolType</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#a60b4b88adf0fb9327bf4cd9c5e31bca3">SymbolTypeQualifier</a> _qualifiers, <a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">SymbolTypeType</a> _type, const std::string &amp;_name=std::string())</td></tr>
+<tr class="memdesc:af548918160e0729a85603cf616dcb9d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for a type.  <a href="#af548918160e0729a85603cf616dcb9d6"></a><br/></td></tr>
+<tr class="separator:af548918160e0729a85603cf616dcb9d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:a93a3a09dca6b7a6587dab411f8670adc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">SymbolTypeStorage</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#a93a3a09dca6b7a6587dab411f8670adc">storage</a></td></tr>
+<tr class="memdesc:a93a3a09dca6b7a6587dab411f8670adc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The storage class of the variable, or the type returned by a function.  <a href="#a93a3a09dca6b7a6587dab411f8670adc"></a><br/></td></tr>
+<tr class="separator:a93a3a09dca6b7a6587dab411f8670adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada6e069d10082f6e7e1800c59b601619"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#ada6e069d10082f6e7e1800c59b601619">returns</a></td></tr>
 <tr class="memdesc:ada6e069d10082f6e7e1800c59b601619"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type returned, if a type is a function type.  <a href="#ada6e069d10082f6e7e1800c59b601619"></a><br/></td></tr>
 <tr class="separator:ada6e069d10082f6e7e1800c59b601619"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,7 +136,94 @@ Public Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A type potentially containing other types. </p>
-</div><h2 class="groupheader">Member Data Documentation</h2>
+<p>To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.</p>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9ad829888894f455e81af3d5e0bab3da" title="A symbol demangler.">NiallsCPP11Utilities::Demangle()</a>, NiallsCPP11Utilities::Mangle() </dd></dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="abcfb6ee94a463d20cdb282a11f317642"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">NiallsCPP11Utilities::SymbolType::SymbolType </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">SymbolTypeStorage</a>&#160;</td>
+          <td class="paramname"><em>_storage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">SymbolTypeType</a>&#160;</td>
+          <td class="paramname"><em>_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor for a variable. </p>
+
+</div>
+</div>
+<a class="anchor" id="af548918160e0729a85603cf616dcb9d6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">NiallsCPP11Utilities::SymbolType::SymbolType </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a60b4b88adf0fb9327bf4cd9c5e31bca3">SymbolTypeQualifier</a>&#160;</td>
+          <td class="paramname"><em>_qualifiers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">SymbolTypeType</a>&#160;</td>
+          <td class="paramname"><em>_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>_name</em> = <code>std::string()</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor for a type. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
 <a class="anchor" id="a05a20a589436ac2c1c77bb3fef513961"></a>
 <div class="memitem">
 <div class="memproto">
@@ -191,6 +291,20 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>The type returned, if a type is a function type. </p>
+
+</div>
+</div>
+<a class="anchor" id="a93a3a09dca6b7a6587dab411f8670adc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">SymbolTypeStorage</a> NiallsCPP11Utilities::SymbolType::storage</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The storage class of the variable, or the type returned by a function. </p>
 
 </div>
 </div>
