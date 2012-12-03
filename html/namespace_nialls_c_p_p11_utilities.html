@@ -109,10 +109,11 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a72052eed05180e9f143035e0edb266f1"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_set<br class="typebreak"/>
-&lt; const <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a72052eed05180e9f143035e0edb266f1">SymbolTypeDict</a></td></tr>
-<tr class="memdesc:a72052eed05180e9f143035e0edb266f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">A dictionary of known symbol types. Used to store types across mangles/demangles.  <a href="#a72052eed05180e9f143035e0edb266f1"></a><br/></td></tr>
-<tr class="separator:a72052eed05180e9f143035e0edb266f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9b33658f9f7a0da430ebfef439ab298"><td class="memItemLeft" align="right" valign="top">typedef std::unordered_map<br class="typebreak"/>
+&lt; std::string, const <br class="typebreak"/>
+<a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a></td></tr>
+<tr class="memdesc:af9b33658f9f7a0da430ebfef439ab298"><td class="mdescLeft">&#160;</td><td class="mdescRight">A dictionary of known symbol types. Used to store types across mangles/demangles.  <a href="#af9b33658f9f7a0da430ebfef439ab298"></a><br/></td></tr>
+<tr class="separator:af9b33658f9f7a0da430ebfef439ab298"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -170,7 +171,7 @@ Functions</h2></td></tr>
 ::const_iterator&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9e49d46a2c01335da95e0ad634091728">FromCodePoint</a> (const std::map&lt; size_t, <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a> &gt; &amp;list, R(*codepoint)(Pars...))</td></tr>
 <tr class="memdesc:a9e49d46a2c01335da95e0ad634091728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any.  <a href="#a9e49d46a2c01335da95e0ad634091728"></a><br/></td></tr>
 <tr class="separator:a9e49d46a2c01335da95e0ad634091728"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ad829888894f455e81af3d5e0bab3da"><td class="memItemLeft" align="right" valign="top">NIALLSCPP11UTILITIES_API <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9ad829888894f455e81af3d5e0bab3da">Demangle</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#a72052eed05180e9f143035e0edb266f1">SymbolTypeDict</a> &amp;typedict, const std::string &amp;mangled)</td></tr>
+<tr class="memitem:a9ad829888894f455e81af3d5e0bab3da"><td class="memItemLeft" align="right" valign="top">NIALLSCPP11UTILITIES_API <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9ad829888894f455e81af3d5e0bab3da">Demangle</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;typedict, const std::string &amp;mangled)</td></tr>
 <tr class="memdesc:a9ad829888894f455e81af3d5e0bab3da"><td class="mdescLeft">&#160;</td><td class="mdescRight">A symbol demangler.  <a href="#a9ad829888894f455e81af3d5e0bab3da"></a><br/></td></tr>
 <tr class="separator:a9ad829888894f455e81af3d5e0bab3da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab098ff5e761c2d985be944a37bb70272"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">Demangle</a> (const std::string &amp;mangled)</td></tr>
@@ -180,12 +181,12 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Where Niall's useful C++ 11 utilities live. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a class="anchor" id="a72052eed05180e9f143035e0edb266f1"></a>
+<a class="anchor" id="af9b33658f9f7a0da430ebfef439ab298"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::unordered_set&lt;const <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&gt; <a class="el" href="namespace_nialls_c_p_p11_utilities.html#a72052eed05180e9f143035e0edb266f1">NiallsCPP11Utilities::SymbolTypeDict</a></td>
+          <td class="memname">typedef std::unordered_map&lt;std::string, const <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&gt; <a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">NiallsCPP11Utilities::SymbolTypeDict</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

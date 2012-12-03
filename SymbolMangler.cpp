@@ -27,6 +27,7 @@ File Created: Nov 2012
 #pragma warning(pop)
 #endif
 
+#if 0
 BOOST_FUSION_ADAPT_STRUCT(NiallsCPP11Utilities::SymbolType,
 	(NiallsCPP11Utilities::SymbolTypeStorage, storage)
 	(const NiallsCPP11Utilities::SymbolType *, returns)
@@ -37,6 +38,7 @@ BOOST_FUSION_ADAPT_STRUCT(NiallsCPP11Utilities::SymbolType,
 	(std::list<const NiallsCPP11Utilities::SymbolType *>, templ_params)
 	(std::list<const NiallsCPP11Utilities::SymbolType *>, func_params)
 )
+#endif
 
 namespace NiallsCPP11Utilities {
 
@@ -303,14 +305,10 @@ template<class outputtype> struct FillMapR<spirit::qi::symbols<char, outputtype>
 		map->add(mpl::c_str<typename T::second::first>::value, T::first::value);
 	}
 };
-} // namespace
-BOOST_FUSION_ADAPT_STRUCT_NAMED(NiallsCPP11Utilities::SymbolType, msvc_variable_parse_format,
-	(NiallsCPP11Utilities::SymbolTypeType, type)
-	(NiallsCPP11Utilities::SymbolTypeStorage, storage)
-)
-namespace NiallsCPP11Utilities {
+
 namespace qi {
 	using namespace boost::spirit::qi;
+	using std::string;
 
 	struct msvc_type : symbols<char, SymbolTypeType>
 	{
@@ -337,20 +335,124 @@ namespace qi {
 				;
 		}
 	};
+	// FIXME: This parser can't cope with unsigned long long constants. We need to be more intelligent here.
+	template<typename iterator> struct msvc_constant : grammar<iterator, long long()>
+	{
+		void zero(long long &val) const { val=0; }
+		void digit(long long &val, char i, bool neg) const
+		{
+			val=i-'0'+1;
+			if(neg) val=-val;
+		}
+		void decoder(long long &val, const string &i, bool neg) const
+		{	// Hexadecimal, but encoded A-P instead of 0-F
+			string v(i);
+			for(auto &c : v)
+				c=(c-'A'+'0');
+			val=stoll(v, 0, 16);
+			if(neg) val=-val;
+		}
+		msvc_constant() : msvc_constant::base_type(start)
+		{
+			hexencoding=+char_("A-P");
+			start = lit("A@") [ boost::phoenix::bind(&msvc_constant::zero, this, _val) ]
+				| ( "?" > (char_("0-9") [ boost::phoenix::bind(&msvc_constant::digit, this, _val, _1, true) ]
+					| hexencoding [ boost::phoenix::bind(&msvc_constant::decoder, this, _val, _1, true) ]))
+				| (char_("0-9") [ boost::phoenix::bind(&msvc_constant::digit, this, _val, _1, false) ]
+					| hexencoding [ boost::phoenix::bind(&msvc_constant::decoder, this, _val, _1, false) ]);
+		}
+
+		rule<iterator, long long()> start;
+		rule<iterator, string()> hexencoding;
+	};
 	// This grammar is for a MSVC mangled global variable or static member variable
-	template<typename iterator> struct msvc_variable : grammar<iterator, fusion::adapted::msvc_variable_parse_format()>
+	template<typename iterator> struct msvc_variable : grammar<iterator, SymbolType()>
 	{
 		SymbolTypeDict &typedict;
+		void type_writer(SymbolType &val, SymbolTypeType i) const { val.type=i; }
+		void storage_writer(SymbolType &val, SymbolTypeStorage i) const { val.storage=i; }
 		msvc_variable(SymbolTypeDict &_typedict) : msvc_variable::base_type(start), typedict(_typedict)
 		{
 			start = (lit('3')/*variable*/ | lit('2')/*static member variable*/)
-			> type
-			> storageclass;
+			> type [ boost::phoenix::bind(&msvc_variable::type_writer, this, _val, _1)]
+			> storageclass [ boost::phoenix::bind(&msvc_variable::storage_writer, this, _val, _1) ];
 		}
 
-		rule<iterator, fusion::adapted::msvc_variable_parse_format()> start;
+		rule<iterator, SymbolType()> start;
 		msvc_type type;
 		msvc_storage storageclass;
+	};
+	// This grammar is for a MSVC mangled identifier
+	template<typename iterator> struct msvc_name : grammar<iterator, SymbolType(), locals<SymbolType, string>>
+	{
+		SymbolTypeDict &typedict;
+		void name_writer(SymbolType &val, const string &i) const { val.name=i; }
+		void dependent_writer(SymbolType &val, const string &i) const
+		{
+			SymbolTypeDict::const_iterator dt=typedict.find(i);
+			if(dt==typedict.end())
+			{
+				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Namespace, i)));
+				dt=_dt.first;
+			}
+			val.dependents.push_back(&dt->second);
+		}
+		// These work by spreading the building of a templated type over multiple calls using local variables _a and _b
+		// We accumulate template parameters into _a and accumulate mangled symbolness into _b
+		void begin_template_dependent_writer(SymbolType &, SymbolType &a, string &b, const string &i) const
+		{
+			a=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Class, i);
+			b=i;
+		}
+		void add_template_constant_dependent_writer(SymbolType &a, string &b, long long constant) const
+		{
+			string i("_c"+to_string(constant));
+			SymbolTypeDict::const_iterator dt=typedict.find(i);
+			if(dt==typedict.end())
+			{
+				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Constant, to_string(constant))));
+				dt=_dt.first;
+			}
+			a.templ_params.push_back(&dt->second);
+			b.append(i);
+		}
+		void add_template_type_dependent_writer(SymbolType &a, string &b, SymbolTypeType type) const
+		{
+			string i("_t"+to_string(static_cast<int>(type)));
+			SymbolTypeDict::const_iterator dt=typedict.find(i);
+			if(dt==typedict.end())
+			{
+				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, type)));
+				dt=_dt.first;
+			}
+			a.templ_params.push_back(&dt->second);
+			b.append(i);
+		}
+		void finish_template_dependent_writer(SymbolType &val, SymbolType &a, string &b) const
+		{
+			SymbolTypeDict::const_iterator dt=typedict.find(b);
+			if(dt==typedict.end())
+			{
+				auto _dt=typedict.emplace(make_pair(b, a));
+				dt=_dt.first;
+			}
+			val.dependents.push_back(&dt->second);
+		}
+		msvc_name(SymbolTypeDict &_typedict) : msvc_name::base_type(start), typedict(_typedict)
+		{
+			identifier=+(char_ - '@');
+			start = identifier [ boost::phoenix::bind(&msvc_name::name_writer, this, _val, _1) ] > (
+				(*("@?$" > identifier [ boost::phoenix::bind(&msvc_name::begin_template_dependent_writer, this, _val, _a, _b, _1) ])
+					> "@" > +(( "$0" > constant [ boost::phoenix::bind(&msvc_name::add_template_constant_dependent_writer, this, _a, _b, _1) ])
+						| type [ boost::phoenix::bind(&msvc_name::add_template_type_dependent_writer, this, _a, _b, _1) ])
+					>> eps [ boost::phoenix::bind(&msvc_name::finish_template_dependent_writer, this, _val, _a, _b) ])
+				| *("@" > identifier [ boost::phoenix::bind(&msvc_name::dependent_writer, this, _val, _1) ]));
+		}
+
+		rule<iterator, SymbolType(), locals<SymbolType, string>> start;
+		rule<iterator, string()> identifier;
+		msvc_type type;
+		msvc_constant<iterator> constant;
 	};
 	template<typename iterator> struct msvc_symbol : grammar<iterator, SymbolType()>
 	{
@@ -368,14 +470,13 @@ namespace qi {
 		<protection>[<const>]<calling conv>[<stor ret>]   <return type>[<parameter type>...]<term>Z
 		<A-V       >[<A-D>  ]<A|E|G       >[<?A|?B|?C|?D>]<MangledToSymbolTypeType...>      <@>Z
 		*/
-		msvc_symbol(SymbolTypeDict &_typedict) : msvc_symbol::base_type(symbol), typedict(_typedict), variable(_typedict)
+		msvc_symbol(SymbolTypeDict &_typedict) : msvc_symbol::base_type(symbol), typedict(_typedict), name(_typedict), variable(_typedict)
 		{
-			text%=+char_;
-			symbol%=("@@" > variable);
+			symbol="?" > name > "@@" > variable;
 		}
 
 		rule<iterator, SymbolType()> symbol;
-		rule<iterator, std::string> text;
+		msvc_name<iterator> name;
 		msvc_variable<iterator> variable;
 	};
 } // namespace

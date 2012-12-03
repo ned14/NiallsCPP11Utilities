@@ -44,7 +44,6 @@ Tested on the following compilers:
 #include <algorithm>
 #include <map>
 #include <unordered_map>
-#include <unordered_set>
 #include <typeinfo>
 #include <string>
 
@@ -617,7 +616,7 @@ namespace std { template<> struct hash<const NiallsCPP11Utilities::SymbolType> {
 namespace NiallsCPP11Utilities {
 
 //! A dictionary of known symbol types. Used to store types across mangles/demangles.
-typedef std::unordered_set<const SymbolType> SymbolTypeDict;
+typedef std::unordered_map<std::string, const SymbolType> SymbolTypeDict;
 
 /*! \brief A symbol demangler
 
