@@ -129,7 +129,6 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 	struct test_symbol { const char *mangled, *demangled; };
 	static const test_symbol test_symbols[]={
 		{"?alpha@@3HA", "int alpha"},
-#if 0
 		{"?myStaticMember@myclass@@2HA", 	"static int myclass::myStaticMember"},
 		{"?myconstStaticMember@myclass@@2HB", 	"const int myclass::myconstStaticMember"},
 		{"?myvolatileStaticMember@myclass@@2HC", 	"volatile int myclass::myvolatileStaticMember"},
@@ -195,12 +194,12 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 		{"??0nested@@QAE@XZ", 	"nested::nested(void)"},
 		{"??1nested@@QAE@XZ", 	"nested::~nested()"},
 		{"??2myclass@@SAPAXI@Z", 	"void* myclass::operator new(size_t size)"},
-#endif
 		{ NULL, NULL }
 	};
 	for(const test_symbol *i=test_symbols; i->mangled; i++)
 	{
+		cout << "'" << i->mangled << "' ..." << endl;
 		const auto &demangled=Demangle(i->mangled);
-		cout << demangled << endl;
+		cout << "'" << i->mangled << "' = " << demangled << endl;
 	}
 }
