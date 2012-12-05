@@ -52,6 +52,7 @@ using namespace boost;
 
 template<SymbolTypeType type> struct SymbolTypeType_ { static const SymbolTypeType value=type; };
 template<SymbolTypeQualifier type> struct SymbolTypeQualifiers_ { static const SymbolTypeQualifier value=type; };
+template<SymbolTypeStorage type> struct SymbolTypeStorage_ { static const SymbolTypeStorage value=type; };
 
 // Format is of pair<SymbolTypeType::X, pair<preamble, postamble>>
 typedef mpl::map< 
@@ -127,6 +128,17 @@ mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstArray>,			mpl::pair<mp
 mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Unknown>,				mpl::pair<mpl::string<'unkn', 'own'>::type,							mpl::string<>::type>::type>::type
 >::type SymbolTypeQualifierStringMap;
 
+typedef mpl::map< 
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::None>,						mpl::pair<mpl::string<>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::Const>,						mpl::pair<mpl::string<'cons', 't'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::Volatile>,					mpl::pair<mpl::string<'vola', 'tile'>::type,						mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::ConstVolatile>,				mpl::pair<mpl::string<'cons', 't vo', 'lati', 'le'>::type,			mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::Static>,					mpl::pair<mpl::string<'stat', 'ic'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::StaticConst>,				mpl::pair<mpl::string<'stat', 'ic c', 'onst'>::type,				mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::StaticVolatile>,			mpl::pair<mpl::string<'stat', 'ic v', 'olit', 'ile'>::type,			mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeStorage_<SymbolTypeStorage::StaticConstVolatile>,		mpl::pair<mpl::string<'stat', 'ic c', 'onst', ' vol', 'atil', 'e'>::type, mpl::string<>::type>::type>::type
+>::type SymbolTypeStorageStringMap;
+
 template<class maptype> struct FillMap
 {
 	typedef maptype type;
@@ -155,14 +167,14 @@ template<class fillmaptype, class sourcemaptype, typename T=fillmaptype::type> T
 }
 
 static auto SymbolTypeTypeToString=MakeStringMap<FillMap<unordered_map<SymbolTypeType, pair<string, string>>>, SymbolTypeTypeStringMap>();
-static auto StringToSymbolTypeType=MakeStringMap<FillMapR<unordered_map<string, SymbolTypeType>>, SymbolTypeTypeStringMap>();
 static auto SymbolTypeQualifierToString=MakeStringMap<FillMap<unordered_map<SymbolTypeQualifier, pair<string, string>>>, SymbolTypeQualifierStringMap>();
-static auto StringToSymbolTypeQualifer=MakeStringMap<FillMapR<unordered_map<string, SymbolTypeQualifier>>, SymbolTypeQualifierStringMap>();
+static auto SymbolTypeStorageToString=MakeStringMap<FillMap<unordered_map<SymbolTypeStorage, pair<string, string>>>, SymbolTypeStorageStringMap>();
 
 std::string SymbolType::prettyText(bool withTypeType) const
 {	// <qualifiers> [union|struct|class|enum] <name> [*|&] [<qualifiers>]
 	const auto &stq=SymbolTypeQualifierToString[qualifier];
 	const auto &stt=SymbolTypeTypeToString[type];
+	const auto &sts=SymbolTypeStorageToString[storage];
 	string ret;
 	bool appendbracket=false, isFunction=(SymbolTypeType::Function<=type && SymbolTypeType::VirtualMemberFunctionPrivate>=type);
 	auto PrintParams=[this, &ret](const std::list<const SymbolType *> &params) {
@@ -175,20 +187,24 @@ std::string SymbolType::prettyText(bool withTypeType) const
 			ret.append(p->prettyText());
 		}
 	};
+	if(!sts.first.empty()) ret.append(sts.first).append(" ");
 	if(isFunction)
 	{
-		ret.append(stt.first).append(" ");
+		if(!stt.first.empty()) ret.append(stt.first).append(" ");
 		if(returns)
 			ret.append(std::move(returns->prettyText())).append(" ");
-		if(SymbolTypeType::Function==type)
+		else
 		{
-			ret.append("(*");
-			appendbracket=true;
-		}
-		else if(SymbolTypeType::MemberFunction<=type && SymbolTypeType::MemberFunctionPrivate>=type)
-		{
-			ret.append("(");
-			appendbracket=true;
+			if(SymbolTypeType::Function==type)
+			{
+				ret.append("(*");
+				appendbracket=true;
+			}
+			else if(SymbolTypeType::MemberFunction<=type && SymbolTypeType::MemberFunctionPrivate>=type)
+			{
+				ret.append("(");
+				appendbracket=true;
+			}
 		}
 	}
 	if(!stq.first.empty()) ret.append(stq.first).append(" ");
@@ -207,7 +223,7 @@ std::string SymbolType::prettyText(bool withTypeType) const
 		PrintParams(templ_params);
 		ret.append(">");
 	}
-	if(!stq.second.empty()) ret.append(" ").append(stq.second);
+	if(!stq.second.empty()) for(int n=0; n<indirectioncount; n++) ret.append(" ").append(stq.second);
 	if(isFunction)
 	{
 		if(appendbracket) ret.append(")");
@@ -259,9 +275,9 @@ mpl::pair<SymbolTypeType_<SymbolTypeType::Enum>,				mpl::pair<mpl::string<'W4'>:
 mpl::pair<SymbolTypeType_<SymbolTypeType::EnumMember>,			mpl::pair<mpl::string<'W4'>::type,							mpl::string<>::type>::type>::type,
 
 mpl::pair<SymbolTypeType_<SymbolTypeType::Function>,						mpl::pair<mpl::string<'P6A'>::type,				mpl::string<'@Z'>::type>::type>::type,
-mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunction>,			mpl::pair<mpl::string<'PEQ'>::type,				mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunctionProtected>,	mpl::pair<mpl::string<'PEQ'>::type,				mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunctionPrivate>,		mpl::pair<mpl::string<'PEQ'>::type,				mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunction>,			mpl::pair<mpl::string<'PQ'>::type,				mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunctionProtected>,	mpl::pair<mpl::string<'PQ'>::type,				mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeType_<SymbolTypeType::StaticMemberFunctionPrivate>,		mpl::pair<mpl::string<'PQ'>::type,				mpl::string<>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::MemberFunction>,					mpl::pair<mpl::string<'P8'>::type,				mpl::string<'@Z'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::MemberFunctionProtected>,			mpl::pair<mpl::string<'P8'>::type,				mpl::string<'@Z'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::MemberFunctionPrivate>,			mpl::pair<mpl::string<'P8'>::type,				mpl::string<'@Z'>::type>::type>::type,
@@ -275,23 +291,23 @@ mpl::pair<SymbolTypeType_<SymbolTypeType::Unknown>,							mpl::pair<mpl::string<
 typedef mpl::map< 
 mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::None>,					mpl::pair<mpl::string<>::type,										mpl::string<>::type>::type>::type,
 mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Const>,				mpl::pair<mpl::string<>::type,							mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Pointer>,				mpl::pair<mpl::string<'PEA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstPointer>,			mpl::pair<mpl::string<'PEB'>::type,							mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::VolatilePointer>,		mpl::pair<mpl::string<'PEC'>::type,						mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstVolatilePointer>,	mpl::pair<mpl::string<'PED'>::type,			mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerConst>,			mpl::pair<mpl::string<'QEA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerVolatile>,		mpl::pair<mpl::string<'REA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerConstVolatile>,	mpl::pair<mpl::string<'SEA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstPointerConst>,	mpl::pair<mpl::string<'QEB'>::type,							mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerRestrict>,		mpl::pair<mpl::string<'PEIA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::LValueRef>,			mpl::pair<mpl::string<'AEA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Pointer>,				mpl::pair<mpl::string<'PA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstPointer>,			mpl::pair<mpl::string<'PB'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::VolatilePointer>,		mpl::pair<mpl::string<'PC'>::type,						mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstVolatilePointer>,	mpl::pair<mpl::string<'PD'>::type,			mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerConst>,			mpl::pair<mpl::string<'QA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerVolatile>,		mpl::pair<mpl::string<'RA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerConstVolatile>,	mpl::pair<mpl::string<'SA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstPointerConst>,	mpl::pair<mpl::string<'QB'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::PointerRestrict>,		mpl::pair<mpl::string<'PIA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::LValueRef>,			mpl::pair<mpl::string<'AA'>::type,										mpl::string<>::type>::type>::type,
 mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::RValueRef>,			mpl::pair<mpl::string<>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstLValueRef>,		mpl::pair<mpl::string<'AEB'>::type,							mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::VolatileLValueRef>,	mpl::pair<mpl::string<'AEC'>::type,						mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstVolatileLValueRef>,mpl::pair<mpl::string<'AED'>::type,			mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstLValueRef>,		mpl::pair<mpl::string<'AB'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::VolatileLValueRef>,	mpl::pair<mpl::string<'AC'>::type,						mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstVolatileLValueRef>,mpl::pair<mpl::string<'AD'>::type,			mpl::string<>::type>::type>::type,
 
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Array>,				mpl::pair<mpl::string<'QEA'>::type,										mpl::string<>::type>::type>::type,
-mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstArray>,			mpl::pair<mpl::string<'QEB'>::type,							mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Array>,				mpl::pair<mpl::string<'QA'>::type,										mpl::string<>::type>::type>::type,
+mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::ConstArray>,			mpl::pair<mpl::string<'QB'>::type,							mpl::string<>::type>::type>::type,
 
 mpl::pair<SymbolTypeQualifiers_<SymbolTypeQualifier::Unknown>,				mpl::pair<mpl::string<'unkn', 'own'>::type,							mpl::string<>::type>::type>::type
 >::type SymbolTypeQualifierManglingMap_MSVC;
@@ -321,11 +337,11 @@ namespace qi {
 	using namespace boost::spirit::qi;
 	using std::string;
 
-	struct msvc_type : symbols<char, SymbolTypeType>
+	struct msvc_simpletype : symbols<char, SymbolTypeType>
 	{
-		msvc_type()
+		msvc_simpletype()
 		{
-			name("msvc_type");
+			name("msvc_simpletype");
 			mpl::for_each<SymbolTypeTypeManglingMap_MSVC>(FillMapR<symbols<char, SymbolTypeType>>(this));
 		}
 	};
@@ -384,19 +400,82 @@ namespace qi {
 		rule<iterator, long long()> start;
 		rule<iterator, string()> hexencoding;
 	};
+	/* This grammar is for a MSVC mangled type
+	Right now it wraps msvc_simpletype and does no more :)
+
+	FIXME: Currently throws away intermediate qualifiers, so const void **volatile ***const **
+	will lose the intermediate bits
+	FIXME: Currently makes no attempt at templated types
+	*/
+	template<typename iterator> struct msvc_type : grammar<iterator, const SymbolType *()>
+	{
+		SymbolTypeDict &typedict;
+		// This is a nasty FIXME, but need to work around const volatile void ***** or worse
+		mutable SymbolTypeQualifier qualifier_;
+		mutable int qualifier_count;
+		void reset() const
+		{
+			qualifier_=SymbolTypeQualifier::None;
+		}
+		void qualifier_writer(const SymbolType *&, SymbolTypeQualifier qualifier) const
+		{
+			if(qualifier_==SymbolTypeQualifier::None)
+			{
+				qualifier_=qualifier;
+				qualifier_count=0;
+			}
+			qualifier_count+=(qualifier>=SymbolTypeQualifier::Pointer);
+		}
+		void simpletype_writer(const SymbolType *&val, SymbolTypeType type) const
+		{
+			string i("_t"+to_string(static_cast<int>(type))+"_"+to_string(static_cast<int>(qualifier_))+"_"+to_string(qualifier_count));
+			SymbolTypeDict::const_iterator dt=typedict.find(i);
+			if(dt==typedict.end())
+			{
+				SymbolType v(qualifier_, type);
+				v.indirectioncount=qualifier_count;
+				auto _dt=typedict.emplace(make_pair(i, v));
+				dt=_dt.first;
+			}
+			val=&dt->second;
+		}
+		msvc_type(SymbolTypeDict &_typedict) : msvc_type::base_type(start), typedict(_typedict)
+		{
+			start = eps [ boost::phoenix::bind(&msvc_type::reset, this)]
+				>> *qualifier [ boost::phoenix::bind(&msvc_type::qualifier_writer, this, _val, _1)]
+				>> simpletype [ boost::phoenix::bind(&msvc_type::simpletype_writer, this, _val, _1)];
+			BOOST_SPIRIT_DEBUG_NODE(start);
+			start.name("msvc_type");
+			on_error<boost::spirit::qi::fail, iterator>(start,
+				cerr << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\"") << endl);
+		}
+
+		rule<iterator, const SymbolType *()> start;
+		msvc_qualifier qualifier;
+		msvc_simpletype simpletype;
+	};
 	// This grammar is for a MSVC mangled global variable or static member variable
 	template<typename iterator> struct msvc_variable : grammar<iterator>
 	{
 		SymbolType &ret;
 		SymbolTypeDict &typedict;
-		void reset() const { ret.qualifier=SymbolTypeQualifier::None; ret.storage=SymbolTypeStorage::None; }
-		void type_writer(SymbolTypeType i) const { ret.type=i; }
-		void storage_writer(SymbolTypeStorage i) const { ret.storage=i; }
-		msvc_variable(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_variable::base_type(start), ret(_ret), typedict(_typedict)
+		void global() const { ret.qualifier=SymbolTypeQualifier::None; ret.storage=SymbolTypeStorage::None; }
+		void static_() const { ret.qualifier=SymbolTypeQualifier::None; ret.storage=SymbolTypeStorage::Static; }
+		void type_writer(const SymbolType *i) const { ret.type=i->type; }
+		void return_type_writer(const SymbolType *i) const { ret.returns=i; }
+		void parameter_type_writer(const SymbolType *i) const { ret.func_params.push_back(i); }
+		void storage_writer(SymbolTypeStorage i) const { ret.storage=static_cast<SymbolTypeStorage>(static_cast<int>(ret.storage)+static_cast<int>(i)); }
+		msvc_variable(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_variable::base_type(start), ret(_ret), typedict(_typedict), type(_typedict)
 		{
-			start = (lit('3')/*variable*/ | lit('2')/*static member variable*/) [ boost::phoenix::bind(&msvc_variable::reset, this)]
+			delimiter=lit("@") - "@@";
+			start = (lit('3')/*variable*/ [ boost::phoenix::bind(&msvc_variable::global, this)]
+				| lit('2')/*static member variable*/ [ boost::phoenix::bind(&msvc_variable::static_, this)])
 			> type [ boost::phoenix::bind(&msvc_variable::type_writer, this, _1)]
-			> storageclass [ boost::phoenix::bind(&msvc_variable::storage_writer, this, _1) ];
+			> (storageclass [ boost::phoenix::bind(&msvc_variable::storage_writer, this, _1) ]
+				| (type [ boost::phoenix::bind(&msvc_variable::return_type_writer, this, _1)]
+				> +("@Z" | type [ boost::phoenix::bind(&msvc_variable::parameter_type_writer, this, _1)])
+				> storageclass [ boost::phoenix::bind(&msvc_variable::storage_writer, this, _1) ]));
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_variable");
 			on_error<boost::spirit::qi::fail, iterator>(start,
@@ -405,7 +484,42 @@ namespace qi {
 		}
 
 		rule<iterator> start;
-		msvc_type type;
+		rule<iterator> delimiter;
+		msvc_type<iterator> type;
+		msvc_storage storageclass;
+	};
+	/* This grammar is for a MSVC mangled function
+		<near|far><calling conv>[<stor ret>]   <return type>[<parameter type>...]<term>Z
+		<Y   |Z  ><A|E|G       >[<?A|?B|?C|?D>]<MangledToSymbolTypeType...>      <@>Z
+	*/
+	template<typename iterator> struct msvc_function : grammar<iterator>
+	{
+		SymbolType &ret;
+		SymbolTypeDict &typedict;
+		void reset() const { ret.qualifier=SymbolTypeQualifier::None; ret.storage=SymbolTypeStorage::None; ret.type=SymbolTypeType::Function; }
+		void return_type_writer(const SymbolType *i) const { ret.returns=i; }
+		void storage_writer(SymbolTypeStorage i) const { ret.storage=i; }
+		void parameter_type_writer(const SymbolType *i) const { ret.func_params.push_back(i); }
+		void pop_last_parameter() const { ret.func_params.pop_back(); }
+		msvc_function(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_function::base_type(start), ret(_ret), typedict(_typedict), type(_typedict)
+		{
+			delimiter=lit("@") - "@@";
+			start = (lit('Y')/*near*/ | lit('Z')/*far*/) [ boost::phoenix::bind(&msvc_function::reset, this) ]
+			> char_ /* calling convention */
+			> -storageclass [ boost::phoenix::bind(&msvc_function::storage_writer, this, _1) ] /* optional storage class */
+			> type [ boost::phoenix::bind(&msvc_function::return_type_writer, this, _1) ]
+			> +type [ boost::phoenix::bind(&msvc_function::parameter_type_writer, this, _1) ]
+			> ("@Z" | eps [ boost::phoenix::bind(&msvc_function::pop_last_parameter, this) ]);
+			BOOST_SPIRIT_DEBUG_NODE(start);
+			start.name("msvc_function");
+			on_error<boost::spirit::qi::fail, iterator>(start,
+				cerr << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\"") << endl);
+		}
+
+		rule<iterator> start;
+		rule<iterator> delimiter;
+		msvc_type<iterator> type;
 		msvc_storage storageclass;
 	};
 	// This grammar is for a MSVC mangled identifier
@@ -443,16 +557,10 @@ namespace qi {
 			a.templ_params.push_back(&dt->second);
 			b.append(i);
 		}
-		void add_template_type_dependent_writer(SymbolType &a, string &b, SymbolTypeType type) const
+		void add_template_type_dependent_writer(SymbolType &a, string &b, const SymbolType *type) const
 		{
-			string i("_t"+to_string(static_cast<int>(type)));
-			SymbolTypeDict::const_iterator dt=typedict.find(i);
-			if(dt==typedict.end())
-			{
-				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, type)));
-				dt=_dt.first;
-			}
-			a.templ_params.push_back(&dt->second);
+			string i("_t"+to_string(static_cast<int>(type->type)));
+			a.templ_params.push_back(type);
 			b.append(i);
 		}
 		void finish_template_dependent_writer(SymbolType &a, string &b) const
@@ -465,8 +573,9 @@ namespace qi {
 			}
 			ret.dependents.push_back(&dt->second);
 		}
-		msvc_name(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_name::base_type(start), ret(_ret), typedict(_typedict)
+		msvc_name(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_name::base_type(start), ret(_ret), typedict(_typedict), type(_typedict)
 		{
+			delimiter=lit("@") - "@@";
 			identifier=+(char_ - '@');
 			identifier.name("identifier");
 			template_dependent_identifier=+(char_ - '@');
@@ -474,12 +583,11 @@ namespace qi {
 			dependent_identifier=+(char_ - '@');
 			dependent_identifier.name("dependent_identifier");
 			start = identifier [ boost::phoenix::bind(&msvc_name::name_writer, this, _1) ] >> *(
-				lit("@@") >> eps
-				| (("@?$" > template_dependent_identifier [ boost::phoenix::bind(&msvc_name::begin_template_dependent_writer, this, _a, _b, _1) ])
-					> "@" > +(( "$0" > constant [ boost::phoenix::bind(&msvc_name::add_template_constant_dependent_writer, this, _a, _b, _1) ])
+				(("@?$" > template_dependent_identifier [ boost::phoenix::bind(&msvc_name::begin_template_dependent_writer, this, _a, _b, _1) ])
+					> delimiter > +(( "$0" > constant [ boost::phoenix::bind(&msvc_name::add_template_constant_dependent_writer, this, _a, _b, _1) ])
 						| type [ boost::phoenix::bind(&msvc_name::add_template_type_dependent_writer, this, _a, _b, _1) ])
 					>> eps [ boost::phoenix::bind(&msvc_name::finish_template_dependent_writer, this, _a, _b) ])
-				| ("@" > dependent_identifier [ boost::phoenix::bind(&msvc_name::dependent_writer, this, _1) ]))
+				| (delimiter > dependent_identifier [ boost::phoenix::bind(&msvc_name::dependent_writer, this, _1) ]))
 				;
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_name");
@@ -489,8 +597,9 @@ namespace qi {
 		}
 
 		rule<iterator, locals<SymbolType, string>> start;
+		rule<iterator> delimiter;
 		rule<iterator, string()> identifier, template_dependent_identifier, dependent_identifier;
-		msvc_type type;
+		msvc_type<iterator> type;
 		msvc_constant<iterator> constant;
 	};
 	template<typename iterator> struct msvc_symbol : grammar<iterator>
@@ -510,10 +619,9 @@ namespace qi {
 		<protection>[<const>]<calling conv>[<stor ret>]   <return type>[<parameter type>...]<term>Z
 		<A-V       >[<A-D>  ]<A|E|G       >[<?A|?B|?C|?D>]<MangledToSymbolTypeType...>      <@>Z
 		*/
-		msvc_symbol(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_symbol::base_type(start), ret(_ret), typedict(_typedict), name(ret, _typedict), variable(ret, _typedict)
+		msvc_symbol(SymbolType &_ret, SymbolTypeDict &_typedict) : msvc_symbol::base_type(start), ret(_ret), typedict(_typedict), name(ret, _typedict), variable(ret, _typedict), function(ret, _typedict)
 		{
-			//start="?" >> name >> ("@@" >> variable);
-			start="?" >> name >> variable;
+			start="?" >> name >> "@@" >> (variable | function);
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			on_error<boost::spirit::qi::fail, iterator>(start,
 				cerr << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
@@ -523,37 +631,50 @@ namespace qi {
 		rule<iterator> start;
 		msvc_name<iterator> name;
 		msvc_variable<iterator> variable;
+		msvc_function<iterator> function;
 	};
 } // namespace
 
-SymbolType Demangle(SymbolTypeDict &typedict, const std::string &mangled)
+std::pair<std::vector<SymbolType>, std::vector<SymbolType>> Demangle(SymbolTypeDict &typedict, const std::vector<std::string> &mangleds)
 {
 	SymbolType ret;
-	switch(mangled[0])
+	auto symbolmsvc=qi::msvc_symbol<std::string::const_iterator>(ret, typedict);
+	vector<SymbolType> parsed, failed;
+	parsed.reserve(mangleds.size());
+	failed.reserve(mangleds.size());
+	for(const auto &mangled : mangleds)
 	{
-	case '?': // All MSVC mangles start with a ?
+		switch(mangled[0])
 		{
-#if 1
-			auto symbol=qi::msvc_symbol<decltype(mangled.begin())>(ret, typedict);
-			auto first=mangled.begin(), last=mangled.end();
-			bool r = qi::parse(first, last, symbol);
-			if(!r)
-				throw runtime_error("Mangled symbol '"+mangled+"' is malformed");
-#else
-			auto name=qi::msvc_name<decltype(mangled.begin())>(typedict);
-			auto type=qi::msvc_variable<decltype(mangled.begin())>(typedict);
-			auto first=++mangled.begin(), last=mangled.end();
-			auto atatidx=mangled.rfind("@@");
-			if((size_t)-1==atatidx)
-				throw runtime_error("Mangled symbol '"+mangled+"' does not contain '@@'");
-			auto atat=mangled.begin()+atatidx;
-			bool n = qi::parse(first, atat, name, ret);
-			bool t = qi::parse(atat+2, last, type, ret);
-#endif
-			break;
+		case '?': // All MSVC mangles start with a ?
+			{
+				ret=move(SymbolType());
+				auto first=mangled.begin(), last=mangled.end();
+				if(qi::parse(first, last, symbolmsvc))
+					parsed.push_back(move(ret));
+				else
+					failed.push_back(move(ret));
+				break;
+			}
+		case '_': // All Itanium (GCC) mangles start with a _
+			{
+				// TODO: Needs implementing
+				SymbolType ret;
+				ret.name=mangled;
+				failed.push_back(move(ret));
+				break;
+			}
+		default: // Probably a C symbol, so assume it's a function (we can't tell if it's a variable)
+			{
+				SymbolType ret(SymbolTypeQualifier::None, SymbolTypeType::Function, mangled);
+				parsed.push_back(move(ret));
+				break;
+			}
 		}
 	}
-	return ret;
+	parsed.reserve(parsed.size());
+	failed.reserve(failed.size());
+	return make_pair(move(parsed), move(failed));
 }
 
 

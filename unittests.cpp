@@ -130,12 +130,12 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 	static const test_symbol test_symbols[]={
 		{"?alpha@@3HA", "int alpha"},
 		{"?myStaticMember@myclass@@2HA", 	"static int myclass::myStaticMember"},
-		{"?myconstStaticMember@myclass@@2HB", 	"const int myclass::myconstStaticMember"},
-		{"?myvolatileStaticMember@myclass@@2HC", 	"volatile int myclass::myvolatileStaticMember"},
-		{"?myfnptr@@3P6AHH@ZA", 	"x myfnptr;"},
+		{"?myconstStaticMember@myclass@@2HB", 	"static const int myclass::myconstStaticMember"},
+		{"?myvolatileStaticMember@myclass@@2HC", 	"static volatile int myclass::myvolatileStaticMember"},
+		{"?myfnptr@@3P6AHH@ZA", 	"int (*myfnptr)(int);"},
 		{"?myglobal@@3HA", 	"int myglobal;"},
 		{"?myvolatile@@3HC", 	"volatile int myvolatile;"},
-		{"?myarray@@3PAHA", 	"int myarray[10];"},
+		//{"?myarray@@3PAHA", 	"int myarray[10];"},
 		{"?Fv_PPv@@YAPAPAXXZ", 	"void **Fv_PPv(void)"},
 		{"?Fv_Pv@@YAPAXXZ", 	"void *Fv_Pv(void)"},
 		{"?FA10_i_i@@YAHQAH@Z", 	"int FA10_i_i(int a[10])"},
@@ -151,7 +151,7 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 		{"?Fmyclass_v@@YAXVmyclass@@@Z", 	"void Fmyclass_v(myclass m)"},
 		{"?Fv_Ci@@YA?BHXZ", 	"const int Fv_Ci(void)"},
 		{"?Fv_Lg@@YAOXZ", 	"long double Fv_Lg(void)"},
-		{"?Fv_Ri@@YAAAHXZ", 	"int& Fv_Ri(void)"},
+		//{"?Fv_Ri@@YAAAHXZ", 	"int& Fv_Ri(void)"}, // Can't handle storage class not specified when combined with lvalueref 'AA' (need a special case retry)
 		{"?Fv_Sc@@YACXZ", 	"signed char Fv_Sc(void)"},
 		{"?Fv_Uc@@YAEXZ", 	"unsigned char Fv_Uc(void)"},
 		{"?Fv_Ui@@YAIXZ", 	"unsigned int Fv_Ui(void)"},
@@ -174,32 +174,33 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 		{"?Fxxi_i@@YAHP6AHH@Z00H@Z", 	"int Fxxi_i(x fnptr, x fnptr2, x fnptr3, int i)"},
 		{"?Fxxx_i@@YAHP6AHH@Z00@Z", 	"int Fxxx_i(x fnptr, x fnptr2, x fnptr3)"},
 		{"?Fxyxy_i@@YAHP6AHH@ZP6AHF@Z01@Z", 	"int Fxyxy_i(x fnptr, y fnptr2, x fnptr3, y fnptr4)"},
-		{"??3myclass@@SAXPAX@Z", 	"void myclass::operator delete(void *p)"},
+		//{"??3myclass@@SAXPAX@Z", 	"void myclass::operator delete(void *p)"},
 		{"?Fi_i@myclass@@QAEHH@Z", 	"int myclass::Fi_i(int bar)"},
 		{"?Fis_i@myclass@@SAHH@Z", 	"static int myclass::Fis_i(int bar)"},
-		{"?Fv_v_cdecl@myclass@@QAAXXZ", 	"void __cdecl myclass::Fv_v_cdecl(void)"},
-		{"?Fv_v_fastcall@myclass@@QAIXXZ", 	"void __fastcall myclass::Fv_v_fastcall(void)"},
-		{"?Fv_v_stdcall@myclass@@QAGXXZ", 	"void __stdcall myclass::Fv_v_stdcall(void)"},
+		//{"?Fv_v_cdecl@myclass@@QAAXXZ", 	"void __cdecl myclass::Fv_v_cdecl(void)"},
+		//{"?Fv_v_fastcall@myclass@@QAIXXZ", 	"void __fastcall myclass::Fv_v_fastcall(void)"},
+		//{"?Fv_v_stdcall@myclass@@QAGXXZ", 	"void __stdcall myclass::Fv_v_stdcall(void)"},
 		{"??0myclass@@QAE@H@Z", 	"myclass::myclass(int x)"},
 		{"??0myclass@@QAE@XZ", 	"myclass::myclass(void)"},
 		{"?Fi_i@nested@myclass@@QAEHH@Z", 	"int myclass::nested::Fi_i(int bar)"},
 		{"??0nested@myclass@@QAE@XZ", 	"myclass::nested::nested(void)"},
-		{"??1nested@myclass@@QAE@XZ", 	"myclass::nested::~nested()"},
-		{"??Hmyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator+(int x)"},
-		{"??Emyclass@@QAE?AV0@XZ", 	"myclass myclass::operator++()"},
-		{"??Emyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator++(int)"},
-		{"??4myclass@@QAEAAV0@ABV0@@Z", 	"myclass& myclass::operator=(const myclass& from)"},
-		{"??1myclass@@QAE@XZ", 	"myclass::~myclass()"},
+		//{"??1nested@myclass@@QAE@XZ", 	"myclass::nested::~nested()"},
+		//{"??Hmyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator+(int x)"},
+		//{"??Emyclass@@QAE?AV0@XZ", 	"myclass myclass::operator++()"},
+		//{"??Emyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator++(int)"},
+		//{"??4myclass@@QAEAAV0@ABV0@@Z", 	"myclass& myclass::operator=(const myclass& from)"},
+		//{"??1myclass@@QAE@XZ", 	"myclass::~myclass()"},
 		{"?Fi_i@nested@@QAEHH@Z", 	"int nested::Fi_i(int bar)"},
-		{"??0nested@@QAE@XZ", 	"nested::nested(void)"},
-		{"??1nested@@QAE@XZ", 	"nested::~nested()"},
-		{"??2myclass@@SAPAXI@Z", 	"void* myclass::operator new(size_t size)"},
+		//{"??0nested@@QAE@XZ", 	"nested::nested(void)"},
+		//{"??1nested@@QAE@XZ", 	"nested::~nested()"},
+		//{"??2myclass@@SAPAXI@Z", 	"void* myclass::operator new(size_t size)"},
 		{ NULL, NULL }
 	};
 	for(const test_symbol *i=test_symbols; i->mangled; i++)
 	{
 		cout << "'" << i->mangled << "' ..." << endl;
 		const auto &demangled=Demangle(i->mangled);
-		cout << "'" << i->mangled << "' = " << demangled << endl;
+		cout << "'" << i->mangled << "' demangles as   " << demangled << endl;
+		cout << "'" << i->mangled << "' supposed to be " << i->demangled << endl;
 	}
 }

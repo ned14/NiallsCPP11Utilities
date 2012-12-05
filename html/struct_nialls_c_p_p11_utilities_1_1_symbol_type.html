@@ -116,8 +116,11 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:ada6e069d10082f6e7e1800c59b601619"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type returned, if a type is a function type.  <a href="#ada6e069d10082f6e7e1800c59b601619"></a><br/></td></tr>
 <tr class="separator:ada6e069d10082f6e7e1800c59b601619"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b55ae542ce1f6ea78719b53365d2f2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a60b4b88adf0fb9327bf4cd9c5e31bca3">SymbolTypeQualifier</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#a9b55ae542ce1f6ea78719b53365d2f2e">qualifier</a></td></tr>
-<tr class="memdesc:a9b55ae542ce1f6ea78719b53365d2f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The qualifier of the type (const, volatile etc)  <a href="#a9b55ae542ce1f6ea78719b53365d2f2e"></a><br/></td></tr>
+<tr class="memdesc:a9b55ae542ce1f6ea78719b53365d2f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The qualifier of the type (const, volatile, pointer etc)  <a href="#a9b55ae542ce1f6ea78719b53365d2f2e"></a><br/></td></tr>
 <tr class="separator:a9b55ae542ce1f6ea78719b53365d2f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97ac9cfc874325609a1f50e7464c6178"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#a97ac9cfc874325609a1f50e7464c6178">indirectioncount</a></td></tr>
+<tr class="memdesc:a97ac9cfc874325609a1f50e7464c6178"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of indirections (e.g. void ** is 2)  <a href="#a97ac9cfc874325609a1f50e7464c6178"></a><br/></td></tr>
+<tr class="separator:a97ac9cfc874325609a1f50e7464c6178"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3776f4a7021a87eeac700d4e7a9c99f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">SymbolTypeType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#a3776f4a7021a87eeac700d4e7a9c99f1">type</a></td></tr>
 <tr class="memdesc:a3776f4a7021a87eeac700d4e7a9c99f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the type (int, struct, namespace etc)  <a href="#a3776f4a7021a87eeac700d4e7a9c99f1"></a><br/></td></tr>
 <tr class="separator:a3776f4a7021a87eeac700d4e7a9c99f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,7 +140,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A type potentially containing other types. </p>
 <p>To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.</p>
-<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9ad829888894f455e81af3d5e0bab3da" title="A symbol demangler.">NiallsCPP11Utilities::Demangle()</a>, NiallsCPP11Utilities::Mangle() </dd></dl>
+<dl class="section see"><dt>See Also</dt><dd><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a7b1aa445c3330b9116bc19d87148d383" title="An Abstract Syntax Tree generating C++ symbol demangler.">NiallsCPP11Utilities::Demangle()</a>, NiallsCPP11Utilities::Mangle() </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="abcfb6ee94a463d20cdb282a11f317642"></a>
 <div class="memitem">
@@ -252,6 +255,20 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a97ac9cfc874325609a1f50e7464c6178"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int NiallsCPP11Utilities::SymbolType::indirectioncount</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The number of indirections (e.g. void ** is 2) </p>
+
+</div>
+</div>
 <a class="anchor" id="a1f5c160597a5afd69a72f678239b7a38"></a>
 <div class="memitem">
 <div class="memproto">
@@ -276,7 +293,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>The qualifier of the type (const, volatile etc) </p>
+<p>The qualifier of the type (const, volatile, pointer etc) </p>
 
 </div>
 </div>

@@ -566,6 +566,10 @@ enum class SymbolTypeStorage
 	Const,
 	Volatile,
 	ConstVolatile,
+	Static,
+	StaticConst,
+	StaticVolatile,
+	StaticConstVolatile,
 
 	Unknown
 };
@@ -579,13 +583,14 @@ struct NIALLSCPP11UTILITIES_API SymbolType
 {
 	SymbolTypeStorage storage;					//!< The storage class of the variable, or the type returned by a function
 	const SymbolType *returns;					//!< The type returned, if a type is a function type
-	SymbolTypeQualifier qualifier;				//!< The qualifier of the type (const, volatile etc)
+	SymbolTypeQualifier qualifier;				//!< The qualifier of the type (const, volatile, pointer etc)
+	int indirectioncount;						//!< The number of indirections (e.g. void ** is 2)
 	SymbolTypeType type;						//!< The type of the type (int, struct, namespace etc)
 	std::list<const SymbolType *> dependents;	//!< The dependent types of the type (namespaces, member functions)
 	std::string name;							//!< The name of the type (union/struct/class/enum/functions)
 	std::list<const SymbolType *> templ_params;	//!< The template parameters of the type
 	std::list<const SymbolType *> func_params;	//!< The parameters of the function type
-	SymbolType() : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), type(SymbolTypeType::Unknown) { }
+	SymbolType() : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), indirectioncount(0), type(SymbolTypeType::Unknown) { }
 	bool operator==(const SymbolType &o) const
 	{
 		return storage==o.storage && returns==o.returns && qualifier==o.qualifier && type==o.type
@@ -618,16 +623,32 @@ namespace NiallsCPP11Utilities {
 //! A dictionary of known symbol types. Used to store types across mangles/demangles.
 typedef std::unordered_map<std::string, const SymbolType> SymbolTypeDict;
 
-/*! \brief A symbol demangler
+/*! \brief An Abstract Syntax Tree generating C++ symbol demangler
+\returns Two vectors of fully parsed and unfully parsed demangled symbols
 
 To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.
 */
-extern NIALLSCPP11UTILITIES_API SymbolType Demangle(SymbolTypeDict &typedict, const std::string &mangled);
-//! \brief Convenience overload which demangles a single mangled symbol. Use the other function if you're demangling more than one symbol.
+extern NIALLSCPP11UTILITIES_API std::pair<std::vector<SymbolType>, std::vector<SymbolType>> Demangle(SymbolTypeDict &typedict, const std::vector<std::string> &mangleds);
+//! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the other function if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled)
 {
 	SymbolTypeDict typedict;
-	return Demangle(typedict, mangled).prettyText();
+	std::vector<std::string> m;
+	m.push_back(mangled);
+	auto ret=Demangle(typedict, m);
+	if(ret.first.empty())
+		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed");
+	return ret.first.front().prettyText();
+}
+//! \brief Convenience overload which demangles a single mangled symbol, returning false if it failed. Use the other function if you're demangling more than one symbol.
+inline std::pair<std::string, bool> Demangle(const std::string &mangled, std::nothrow_t)
+{
+	SymbolTypeDict typedict;
+	std::vector<std::string> m;
+	m.push_back(mangled);
+	auto _ret=Demangle(typedict, m);
+	auto ret=_ret.first.empty() ? std::make_pair(_ret.second.front().prettyText(), false) : std::make_pair(_ret.first.front().prettyText(), true);
+	return ret;
 }
 
 } // namespace

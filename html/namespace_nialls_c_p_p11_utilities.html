@@ -171,12 +171,18 @@ Functions</h2></td></tr>
 ::const_iterator&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9e49d46a2c01335da95e0ad634091728">FromCodePoint</a> (const std::map&lt; size_t, <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html">MappedFileInfo</a> &gt; &amp;list, R(*codepoint)(Pars...))</td></tr>
 <tr class="memdesc:a9e49d46a2c01335da95e0ad634091728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any.  <a href="#a9e49d46a2c01335da95e0ad634091728"></a><br/></td></tr>
 <tr class="separator:a9e49d46a2c01335da95e0ad634091728"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ad829888894f455e81af3d5e0bab3da"><td class="memItemLeft" align="right" valign="top">NIALLSCPP11UTILITIES_API <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9ad829888894f455e81af3d5e0bab3da">Demangle</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;typedict, const std::string &amp;mangled)</td></tr>
-<tr class="memdesc:a9ad829888894f455e81af3d5e0bab3da"><td class="mdescLeft">&#160;</td><td class="mdescRight">A symbol demangler.  <a href="#a9ad829888894f455e81af3d5e0bab3da"></a><br/></td></tr>
-<tr class="separator:a9ad829888894f455e81af3d5e0bab3da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b1aa445c3330b9116bc19d87148d383"><td class="memItemLeft" align="right" valign="top">NIALLSCPP11UTILITIES_API <br class="typebreak"/>
+std::pair&lt; std::vector<br class="typebreak"/>
+&lt; <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> &gt;, std::vector<br class="typebreak"/>
+&lt; <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a7b1aa445c3330b9116bc19d87148d383">Demangle</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;typedict, const std::vector&lt; std::string &gt; &amp;mangleds)</td></tr>
+<tr class="memdesc:a7b1aa445c3330b9116bc19d87148d383"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Abstract Syntax Tree generating C++ symbol demangler.  <a href="#a7b1aa445c3330b9116bc19d87148d383"></a><br/></td></tr>
+<tr class="separator:a7b1aa445c3330b9116bc19d87148d383"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab098ff5e761c2d985be944a37bb70272"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">Demangle</a> (const std::string &amp;mangled)</td></tr>
-<tr class="memdesc:ab098ff5e761c2d985be944a37bb70272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol. Use the other function if you're demangling more than one symbol.  <a href="#ab098ff5e761c2d985be944a37bb70272"></a><br/></td></tr>
+<tr class="memdesc:ab098ff5e761c2d985be944a37bb70272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the other function if you're demangling more than one symbol.  <a href="#ab098ff5e761c2d985be944a37bb70272"></a><br/></td></tr>
 <tr class="separator:ab098ff5e761c2d985be944a37bb70272"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f079911ccb0d706bf520772e8c8614e"><td class="memItemLeft" align="right" valign="top">std::pair&lt; std::string, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8f079911ccb0d706bf520772e8c8614e">Demangle</a> (const std::string &amp;mangled, std::nothrow_t)</td></tr>
+<tr class="memdesc:a8f079911ccb0d706bf520772e8c8614e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, returning false if it failed. Use the other function if you're demangling more than one symbol.  <a href="#a8f079911ccb0d706bf520772e8c8614e"></a><br/></td></tr>
+<tr class="separator:a8f079911ccb0d706bf520772e8c8614e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Where Niall's useful C++ 11 utilities live. </p>
@@ -274,12 +280,12 @@ template&lt;class _typeregistry , class _type &gt; </div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a class="anchor" id="a9ad829888894f455e81af3d5e0bab3da"></a>
+<a class="anchor" id="a7b1aa445c3330b9116bc19d87148d383"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">NIALLSCPP11UTILITIES_API <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a> NiallsCPP11Utilities::Demangle </td>
+          <td class="memname">NIALLSCPP11UTILITIES_API std::pair&lt;std::vector&lt;<a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&gt;, std::vector&lt;<a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>&gt; &gt; NiallsCPP11Utilities::Demangle </td>
           <td>(</td>
           <td class="paramtype">SymbolTypeDict &amp;&#160;</td>
           <td class="paramname"><em>typedict</em>, </td>
@@ -287,8 +293,8 @@ template&lt;class _typeregistry , class _type &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>mangled</em>&#160;</td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>mangleds</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -298,7 +304,8 @@ template&lt;class _typeregistry , class _type &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>A symbol demangler. </p>
+<p>An Abstract Syntax Tree generating C++ symbol demangler. </p>
+<dl class="section return"><dt>Returns</dt><dd>Two vectors of fully parsed and unfully parsed demangled symbols</dd></dl>
 <p>To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit. </p>
 
 </div>
@@ -325,7 +332,43 @@ template&lt;class _typeregistry , class _type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Convenience overload which demangles a single mangled symbol. Use the other function if you're demangling more than one symbol. </p>
+<p>Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the other function if you're demangling more than one symbol. </p>
+
+</div>
+</div>
+<a class="anchor" id="a8f079911ccb0d706bf520772e8c8614e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::pair&lt;std::string, bool&gt; NiallsCPP11Utilities::Demangle </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>mangled</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::nothrow_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convenience overload which demangles a single mangled symbol, returning false if it failed. Use the other function if you're demangling more than one symbol. </p>
 
 </div>
 </div>
