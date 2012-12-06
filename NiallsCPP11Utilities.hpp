@@ -573,6 +573,62 @@ enum class SymbolTypeStorage
 
 	Unknown
 };
+//! C++ operator type
+enum class SymbolTypeOperator
+{
+	None,
+	Constructor,
+	Destructor,
+	Index,
+	Call,
+	Indirect,
+	PreIncrement,
+	PostIncrement,
+	PreDecrement,
+	PostDecrement,
+	New,
+	NewArray,
+	Delete,
+	DeleteArray,
+	Dereference,
+	AddressOf,
+	Positive,
+	Negative,
+	BooleanNot,
+	BitwiseNot,
+	DereferencePointer,
+	Multiply,
+	Divide,
+	Modulus,
+	Add,
+	Subtract,
+	ShiftLeft,
+	ShiftRight,
+	LessThan,
+	GreaterThan,
+	LessThanEqual,
+	GreaterThanEqual,
+	Equal,
+	NotEqual,
+	BitwiseAnd,
+	BitwiseOr,
+	BitwiseXOR,
+	And,
+	Or,
+	Assign,
+	MultiplyAssign,
+	DivideAssign,
+	ModulusAssign,
+	AddAssign,
+	SubtractAssign,
+	ShiftLeftAssign,
+	ShiftRightAssign,
+	BitwiseAndAssign,
+	BitwiseOrAssign,
+	BitwiseXORAssign,
+	Comma,
+	Cast
+};
 /*! \brief A type potentially containing other types
 
 To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.
@@ -597,9 +653,9 @@ struct NIALLSCPP11UTILITIES_API SymbolType
 			&& dependents==o.dependents && name==o.name && templ_params==o.templ_params && func_params==o.func_params;
 	}
 	//! Constructor for a variable
-	SymbolType(SymbolTypeStorage _storage, SymbolTypeType _type, const std::string &_name) : storage(_storage), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), type(_type), name(_name) { }
+	SymbolType(SymbolTypeStorage _storage, SymbolTypeType _type, const std::string &_name) : storage(_storage), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), indirectioncount(qualifier>=SymbolTypeQualifier::Pointer), type(_type), name(_name) { }
 	//! Constructor for a type
-	SymbolType(SymbolTypeQualifier _qualifiers, SymbolTypeType _type, const std::string &_name=std::string()) : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(_qualifiers), type(_type), name(_name) { }
+	SymbolType(SymbolTypeQualifier _qualifiers, SymbolTypeType _type, const std::string &_name=std::string()) : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(_qualifiers), indirectioncount(qualifier>=SymbolTypeQualifier::Pointer), type(_type), name(_name) { }
 	std::string prettyText(bool withTypeType=true) const;
 };
 } // namespace
@@ -623,32 +679,64 @@ namespace NiallsCPP11Utilities {
 //! A dictionary of known symbol types. Used to store types across mangles/demangles.
 typedef std::unordered_map<std::string, const SymbolType> SymbolTypeDict;
 
-/*! \brief An Abstract Syntax Tree generating C++ symbol demangler
-\returns Two vectors of fully parsed and unfully parsed demangled symbols
+namespace Private { struct SymbolDemangle; }
+/*! \brief Holds state for a symbol demangle session
 
 To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit.
 */
-extern NIALLSCPP11UTILITIES_API std::pair<std::vector<SymbolType>, std::vector<SymbolType>> Demangle(SymbolTypeDict &typedict, const std::vector<std::string> &mangleds);
-//! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the other function if you're demangling more than one symbol.
+class NIALLSCPP11UTILITIES_API SymbolDemangle
+{
+	Private::SymbolDemangle *p;
+public:
+	SymbolDemangle(SymbolTypeDict &typedict);
+	~SymbolDemangle();
+
+	//! Returns the type dictionary used by this demangler sessions
+	SymbolTypeDict &typedict() const;
+
+	//! Sets the type dictionary used by this demangler sessions. Implies calling reset().
+	void setTypedict(SymbolTypeDict &typedict);
+
+	//! Resets the lists of demangled symbols
+	void reset();
+
+	//! Returns the raw set of mangled symbols and their demangled ASTs
+	const std::unordered_map<std::string, SymbolType> &parsedSymbols() const;
+
+	//! Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an error message
+	const std::unordered_map<std::string, std::pair<SymbolType, std::string>> &failedParsedSymbols() const;
+
+	//! Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and which failed to parse
+	std::pair<std::vector<std::string>, std::vector<std::string>> demangle(const std::vector<std::string> &mangleds);
+};
+
+//! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled)
 {
 	SymbolTypeDict typedict;
+	SymbolDemangle demangler(typedict);
 	std::vector<std::string> m;
 	m.push_back(mangled);
-	auto ret=Demangle(typedict, m);
+	auto ret=demangler.demangle(m);
 	if(ret.first.empty())
-		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed");
-	return ret.first.front().prettyText();
+		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed. Error was '"+demangler.failedParsedSymbols().at(ret.second.front()).second+"'");
+	return demangler.parsedSymbols().at(ret.first.front()).prettyText();
 }
-//! \brief Convenience overload which demangles a single mangled symbol, returning false if it failed. Use the other function if you're demangling more than one symbol.
-inline std::pair<std::string, bool> Demangle(const std::string &mangled, std::nothrow_t)
+//! \brief Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.
+inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t)
 {
 	SymbolTypeDict typedict;
+	SymbolDemangle demangler(typedict);
 	std::vector<std::string> m;
 	m.push_back(mangled);
-	auto _ret=Demangle(typedict, m);
-	auto ret=_ret.first.empty() ? std::make_pair(_ret.second.front().prettyText(), false) : std::make_pair(_ret.first.front().prettyText(), true);
-	return ret;
+	auto _ret=demangler.demangle(m);
+	if(_ret.first.empty())
+	{
+		const auto &failed=demangler.failedParsedSymbols().at(_ret.second.front());
+		return std::make_pair(failed.first.prettyText(), failed.second);
+	}
+	else
+		return std::make_pair(demangler.parsedSymbols().at(_ret.first.front()).prettyText(), std::string());
 }
 
 } // namespace

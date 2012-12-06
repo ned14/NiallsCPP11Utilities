@@ -27,12 +27,18 @@
     <ClCompile Include="SymbolMangler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SymbolManglerMSVC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorHandling.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NiallsCPP11Utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolMangler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

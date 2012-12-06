@@ -120,6 +120,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">NiallsCPP11Utilities::SymbolType</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A type potentially containing other types.  <a href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html">NiallsCPP11Utilities::SymbolDemangle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Holds state for a symbol demangle session.  <a href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
@@ -161,6 +164,9 @@ Enumerations</h2></td></tr>
 <tr class="memitem:ab69e44affbbb19e5dc37e5f6e71f20d1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">NiallsCPP11Utilities::SymbolTypeStorage</a> </td></tr>
 <tr class="memdesc:ab69e44affbbb19e5dc37e5f6e71f20d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The storage class of a symbol type.  <a href="namespace_nialls_c_p_p11_utilities.html#ab69e44affbbb19e5dc37e5f6e71f20d1">More...</a><br/></td></tr>
 <tr class="separator:ab69e44affbbb19e5dc37e5f6e71f20d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5700ea6f27a750699705a9c2b774262"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#af5700ea6f27a750699705a9c2b774262">NiallsCPP11Utilities::SymbolTypeOperator</a> </td></tr>
+<tr class="memdesc:af5700ea6f27a750699705a9c2b774262"><td class="mdescLeft">&#160;</td><td class="mdescRight">C++ operator type.  <a href="namespace_nialls_c_p_p11_utilities.html#af5700ea6f27a750699705a9c2b774262">More...</a><br/></td></tr>
+<tr class="separator:af5700ea6f27a750699705a9c2b774262"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -206,18 +212,13 @@ MappedFileInfo &gt;<br class="typebreak"/>
 ::const_iterator&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9e49d46a2c01335da95e0ad634091728">NiallsCPP11Utilities::FromCodePoint</a> (const std::map&lt; size_t, MappedFileInfo &gt; &amp;list, R(*codepoint)(Pars...))</td></tr>
 <tr class="memdesc:a9e49d46a2c01335da95e0ad634091728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_mapped_file_info.html" title="Information about mapped files in the process.">MappedFileInfo</a> containing code point , if any.  <a href="#a9e49d46a2c01335da95e0ad634091728"></a><br/></td></tr>
 <tr class="separator:a9e49d46a2c01335da95e0ad634091728"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b1aa445c3330b9116bc19d87148d383"><td class="memItemLeft" align="right" valign="top">NIALLSCPP11UTILITIES_API <br class="typebreak"/>
-std::pair&lt; std::vector<br class="typebreak"/>
-&lt; SymbolType &gt;, std::vector<br class="typebreak"/>
-&lt; SymbolType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a7b1aa445c3330b9116bc19d87148d383">NiallsCPP11Utilities::Demangle</a> (SymbolTypeDict &amp;typedict, const std::vector&lt; std::string &gt; &amp;mangleds)</td></tr>
-<tr class="memdesc:a7b1aa445c3330b9116bc19d87148d383"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Abstract Syntax Tree generating C++ symbol demangler.  <a href="#a7b1aa445c3330b9116bc19d87148d383"></a><br/></td></tr>
-<tr class="separator:a7b1aa445c3330b9116bc19d87148d383"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab098ff5e761c2d985be944a37bb70272"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">NiallsCPP11Utilities::Demangle</a> (const std::string &amp;mangled)</td></tr>
-<tr class="memdesc:ab098ff5e761c2d985be944a37bb70272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the other function if you're demangling more than one symbol.  <a href="#ab098ff5e761c2d985be944a37bb70272"></a><br/></td></tr>
+<tr class="memdesc:ab098ff5e761c2d985be944a37bb70272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.  <a href="#ab098ff5e761c2d985be944a37bb70272"></a><br/></td></tr>
 <tr class="separator:ab098ff5e761c2d985be944a37bb70272"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f079911ccb0d706bf520772e8c8614e"><td class="memItemLeft" align="right" valign="top">std::pair&lt; std::string, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a8f079911ccb0d706bf520772e8c8614e">NiallsCPP11Utilities::Demangle</a> (const std::string &amp;mangled, std::nothrow_t)</td></tr>
-<tr class="memdesc:a8f079911ccb0d706bf520772e8c8614e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, returning false if it failed. Use the other function if you're demangling more than one symbol.  <a href="#a8f079911ccb0d706bf520772e8c8614e"></a><br/></td></tr>
-<tr class="separator:a8f079911ccb0d706bf520772e8c8614e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77ffd382bfc692aebab4dd04ae67879b"><td class="memItemLeft" align="right" valign="top">std::pair&lt; std::string, <br class="typebreak"/>
+std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a77ffd382bfc692aebab4dd04ae67879b">NiallsCPP11Utilities::Demangle</a> (const std::string &amp;mangled, std::nothrow_t)</td></tr>
+<tr class="memdesc:a77ffd382bfc692aebab4dd04ae67879b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.  <a href="#a77ffd382bfc692aebab4dd04ae67879b"></a><br/></td></tr>
+<tr class="separator:a77ffd382bfc692aebab4dd04ae67879b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declares Niall's useful C++ 11 utilities. </p>

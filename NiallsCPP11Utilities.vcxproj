@@ -82,10 +82,12 @@
     <ClCompile Include="MappedFileInfo.cpp" />
     <ClCompile Include="StaticTypeRegistry.cpp" />
     <ClCompile Include="SymbolMangler.cpp" />
+    <ClCompile Include="SymbolManglerMSVC.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorHandling.hpp" />
     <ClInclude Include="NiallsCPP11Utilities.hpp" />
+    <ClInclude Include="SymbolMangler.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
