@@ -688,6 +688,9 @@ class NIALLSCPP11UTILITIES_API SymbolDemangle
 {
 	Private::SymbolDemangle *p;
 public:
+	//! Constructs using an internal typedict
+	SymbolDemangle();
+	//! Constructs using an external typedict. Faster.
 	SymbolDemangle(SymbolTypeDict &typedict);
 	~SymbolDemangle();
 
@@ -706,37 +709,39 @@ public:
 	//! Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an error message
 	const std::unordered_map<std::string, std::pair<SymbolType, std::string>> &failedParsedSymbols() const;
 
-	//! Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and which failed to parse
-	std::pair<std::vector<std::string>, std::vector<std::string>> demangle(const std::vector<std::string> &mangleds);
+	//! Adds a demangle to the internal store, returning true if parsed
+	bool demangle(const std::string &mangled);
 };
 
 //! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.
+inline std::string Demangle(const std::string &mangled, SymbolDemangle &demangler)
+{
+	if(!demangler.demangle(mangled))
+		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed. Error was '"+demangler.failedParsedSymbols().at(mangled).second+"'");
+	return demangler.parsedSymbols().at(mangled).prettyText();
+}
+//! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled)
 {
-	SymbolTypeDict typedict;
-	SymbolDemangle demangler(typedict);
-	std::vector<std::string> m;
-	m.push_back(mangled);
-	auto ret=demangler.demangle(m);
-	if(ret.first.empty())
-		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed. Error was '"+demangler.failedParsedSymbols().at(ret.second.front()).second+"'");
-	return demangler.parsedSymbols().at(ret.first.front()).prettyText();
+	SymbolDemangle demangler;
+	return Demangle(mangled, demangler);
 }
 //! \brief Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.
-inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t)
+inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t, SymbolDemangle &demangler)
 {
-	SymbolTypeDict typedict;
-	SymbolDemangle demangler(typedict);
-	std::vector<std::string> m;
-	m.push_back(mangled);
-	auto _ret=demangler.demangle(m);
-	if(_ret.first.empty())
+	if(!demangler.demangle(mangled))
 	{
-		const auto &failed=demangler.failedParsedSymbols().at(_ret.second.front());
+		const auto &failed=demangler.failedParsedSymbols().at(mangled);
 		return std::make_pair(failed.first.prettyText(), failed.second);
 	}
 	else
-		return std::make_pair(demangler.parsedSymbols().at(_ret.first.front()).prettyText(), std::string());
+		return std::make_pair(demangler.parsedSymbols().at(mangled).prettyText(), std::string());
+}
+//! \brief Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.
+inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t nt)
+{
+	SymbolDemangle demangler;
+	return Demangle(mangled, nt, demangler);
 }
 
 } // namespace

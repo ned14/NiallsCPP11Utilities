@@ -7,6 +7,12 @@ File Created: Nov 2012
 #include "catch.hpp"
 #include "NiallsCPP11Utilities.hpp"
 #include <stdio.h>
+#include <fstream>
+
+extern "C" char* __cdecl __unDName(char* buffer, const char* mangled, int buflen,
+                      void *(*memget)(size_t), void (*memfree)(void *),
+                      unsigned short int flags);
+
 
 using namespace NiallsCPP11Utilities;
 using namespace std;
@@ -126,19 +132,19 @@ TEST_CASE("SymbolType/works", "Tests that SymbolType works")
 
 TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 {
-	struct test_symbol { const char *mangled, *demangled; };
-	static const test_symbol test_symbols[]={
+	struct test_symbol { const char *const mangled, *demangled; };
+	static test_symbol test_symbols[]={
 		{"?alpha@@3HA", "int alpha"},
-		{"?myStaticMember@myclass@@2HA", 	"static int myclass::myStaticMember"},
-		{"?myconstStaticMember@myclass@@2HB", 	"static const int myclass::myconstStaticMember"},
-		{"?myvolatileStaticMember@myclass@@2HC", 	"static volatile int myclass::myvolatileStaticMember"},
+		{"?myStaticMember@myclass@@2HA", 	"public: static int myclass::myStaticMember"},
+		{"?myconstStaticMember@myclass@@2HB", 	"public: static const int myclass::myconstStaticMember"},
+		{"?myvolatileStaticMember@myclass@@2HC", 	"public: static volatile int myclass::myvolatileStaticMember"},
 		{"?myfnptr@@3P6AHH@ZA", 	"int myfnptr(int)"},
 		{"?myglobal@@3HA", 	"int myglobal"},
 		{"?myvolatile@@3HC", 	"volatile int myvolatile"},
-		{"?myarray@@3PAHA", 	"int myarray[10]"}, // Microsoft encodes global array variables as pointers not arrays, so this breaks :(
+		{"?myarray@@3PAHA", 	"int * myarray"},
 		{"?Fv_PPv@@YAPAPAXXZ", 	"void ** Fv_PPv(void)"},
 		{"?Fv_Pv@@YAPAXXZ", 	"void * Fv_Pv(void)"},
-		{"?FA10_i_i@@YAHQAH@Z", 	"int FA10_i_i(int a[10])"},
+		{"?FA10_i_i@@YAHQAH@Z", 	"int FA10_i_i(int * const"},
 		{"?FPi_i@@YAHPAH@Z", 	"int FPi_i(int *)"},
 		{"?Fc_i@@YAHD@Z", 	"int Fc_i(char)"},
 		{"?Ff_i@@YAHM@Z", 	"int Ff_i(float)"},
@@ -147,11 +153,11 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 		{"?Fie_i@@YAHHZZ", 	"int Fie_i(int, ...)"},
 		{"?Fii_i@@YAHHH@Z", 	"int Fii_i(int, int)"},
 		{"?Fiii_i@@YAHHHH@Z", 	"int Fiii_i(int, int, int)"},
-		{"?Fmxmx_v@@YAXVmyclass@@P6AHH@Z01@Z", 	"void Fmxmx_v(myclass, x, myclass, x)"},
-		{"?Fmyclass_v@@YAXVmyclass@@@Z", 	"void Fmyclass_v(myclass)"},
+		{"?Fmxmx_v@@YAXVmyclass@@P6AHH@Z01@Z", 	"void Fmxmx_v(class myclass, int (*)(int), class myclass, int (*)(int))"},
+		{"?Fmyclass_v@@YAXVmyclass@@@Z", 	"void Fmyclass_v(class myclass)"},
 		{"?Fv_Ci@@YA?BHXZ", 	"const int Fv_Ci(void)"},
 		{"?Fv_Lg@@YAOXZ", 	"long double Fv_Lg(void)"},
-		//{"?Fv_Ri@@YAAAHXZ", 	"int& Fv_Ri(void)"}, // Can't handle storage class not specified when combined with lvalueref 'AA' (need a special case retry)
+		{"?Fv_Ri@@YAAAHXZ", 	"int& Fv_Ri(void)"}, // Can't handle storage class not specified when combined with lvalueref 'AA' (need a special case retry)
 		{"?Fv_Sc@@YACXZ", 	"signed char Fv_Sc(void)"},
 		{"?Fv_Uc@@YAEXZ", 	"unsigned char Fv_Uc(void)"},
 		{"?Fv_Ui@@YAIXZ", 	"unsigned int Fv_Ui(void)"},
@@ -168,37 +174,53 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 		//{"?Fv_v_cdecl@@YAXXZ", 	"void __cdecl Fv_v_cdecl(void)"},
 		//{"?Fv_v_fastcall@@YIXXZ", 	"void __fastcall Fv_v_fastcall(void)"},
 		//{"?Fv_v_stdcall@@YGXXZ", 	"void __stdcall Fv_v_stdcall(void)"},
-		{"?Fx_i@@YAHP6AHH@Z@Z", 	"int Fx_i(x)"},
-		{"?Fxix_i@@YAHP6AHH@ZH0@Z", 	"int Fxix_i(x, int, x)"},
-		{"?Fxx_i@@YAHP6AHH@Z0@Z", 	"int Fxx_i(x, x)"},
-		{"?Fxxi_i@@YAHP6AHH@Z00H@Z", 	"int Fxxi_i(x, x, x, int i)"},
-		{"?Fxxx_i@@YAHP6AHH@Z00@Z", 	"int Fxxx_i(x, x, x)"},
-		{"?Fxyxy_i@@YAHP6AHH@ZP6AHF@Z01@Z", 	"int Fxyxy_i(x, y, x, y)"},
-		//{"??3myclass@@SAXPAX@Z", 	"void myclass::operator delete(void *)"},
-		{"?Fi_i@myclass@@QAEHH@Z", 	"int myclass::Fi_i(int)"},
-		{"?Fis_i@myclass@@SAHH@Z", 	"static int myclass::Fis_i(int)"},
+		{"?Fx_i@@YAHP6AHH@Z@Z", 	"int Fx_i(int (*)(int))"},
+		{"?Fxix_i@@YAHP6AHH@ZH0@Z", 	"int Fxix_i(int (*)(int), int, int (*)(int))"},
+		{"?Fxx_i@@YAHP6AHH@Z0@Z", 	"int Fxx_i(int (*)(int), int (*)(int))"},
+		{"?Fxxi_i@@YAHP6AHH@Z00H@Z", 	"int Fxxi_i(int (*)(int), int (*)(int), int (*)(int), int)"},
+		{"?Fxxx_i@@YAHP6AHH@Z00@Z", 	"int Fxxx_i(int (*)(int), int (*)(int), int (*)(int))"},
+		{"?Fxyxy_i@@YAHP6AHH@ZP6AHF@Z01@Z", 	"int Fxyxy_i(int (*)(int), int (*)(short int), int (*)(int), int (*)(short int))"},
+		{"??3myclass@@SAXPAX@Z", 	"public: static void myclass::operator delete(void *)"},
+		{"?Fi_i@myclass@@QAEHH@Z", 	"public: int myclass::Fi_i(int)"},
+		{"?Fis_i@myclass@@SAHH@Z", 	"public: static int myclass::Fis_i(int)"},
 		//{"?Fv_v_cdecl@myclass@@QAAXXZ", 	"void __cdecl myclass::Fv_v_cdecl(void)"},
 		//{"?Fv_v_fastcall@myclass@@QAIXXZ", 	"void __fastcall myclass::Fv_v_fastcall(void)"},
 		//{"?Fv_v_stdcall@myclass@@QAGXXZ", 	"void __stdcall myclass::Fv_v_stdcall(void)"},
-		{"??0myclass@@QAE@H@Z", 	"myclass::myclass(int)"},
-		{"??0myclass@@QAE@XZ", 	"myclass::myclass(void)"},
-		{"?Fi_i@nested@myclass@@QAEHH@Z", 	"int myclass::nested::Fi_i(int)"},
-		{"??0nested@myclass@@QAE@XZ", 	"myclass::nested::nested(void)"},
-		//{"??1nested@myclass@@QAE@XZ", 	"myclass::nested::~nested()"},
-		//{"??Hmyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator+(int x)"},
-		//{"??Emyclass@@QAE?AV0@XZ", 	"myclass myclass::operator++()"},
-		//{"??Emyclass@@QAE?AV0@H@Z", 	"myclass myclass::operator++(int)"},
-		//{"??4myclass@@QAEAAV0@ABV0@@Z", 	"myclass& myclass::operator=(const myclass& from)"},
-		//{"??1myclass@@QAE@XZ", 	"myclass::~myclass()"},
+		{"??0myclass@@QAE@H@Z", 	"public: myclass::myclass(int)"},
+		{"??0myclass@@QAE@XZ", 	"public: myclass::myclass(void)"},
+		{"?Fi_i@nested@myclass@@QAEHH@Z", 	"public: int myclass::nested::Fi_i(int)"},
+		{"??0nested@myclass@@QAE@XZ", 	"public: myclass::nested::nested(void)"},
+		{"??1nested@myclass@@QAE@XZ", 	"public: myclass::nested::~nested(void)"},
+		{"??Hmyclass@@QAE?AV0@H@Z", 	"public: class myclass myclass::operator+(int)"},
+		{"??Emyclass@@QAE?AV0@XZ", 	"public: class myclass myclass::operator++(void)"},
+		{"??Emyclass@@QAE?AV0@H@Z", 	"public: class myclass myclass::operator++(int)"},
+		{"??4myclass@@QAEAAV0@ABV0@@Z", 	"public: class myclass & myclass::operator=(class const myclass &)"},
+		{"??1myclass@@QAE@XZ", 	"public: myclass::~myclass()"},
 		{"?Fi_i@nested@@QAEHH@Z", 	"public: int nested::Fi_i(int)"},
-		//{"??0nested@@QAE@XZ", 	"nested::nested(void)"},
-		//{"??1nested@@QAE@XZ", 	"nested::~nested()"},
-		//{"??2myclass@@SAPAXI@Z", 	"void* myclass::operator new(size_t size)"},
+		{"??0nested@@QAE@XZ", 	"public: nested::nested(void)"},
+		{"??1nested@@QAE@XZ", 	"public: nested::~nested(void)"},
+		{"??2myclass@@SAPAXI@Z", 	"public: static void * myclass::operator new(unsigned int)"},
+
+		{"??4BatteryChargingState@device@bb@@QAEAAV012@ABV012@@Z", "public: class bb::device::BatteryChargingState & bb::device::BatteryChargingState::operator=(class bb::device::BatteryChargingState const &)"},
+		{"?__unique_247@?A0xb1a90387@__component_export__@device@bb@@3QBDB", "char const * const bb::device::__component_export__::A0xb1a90387::__unique_247"},
+		{"?staticMetaObject@BatteryInfo@device@bb@@2UQMetaObject@@B", "public: static struct QMetaObject const bb::device::BatteryInfo::staticMetaObject"},
+		{"??4?$exported_component@VBatteryInfo@device@bb@@$1?__unique_247@?A0xb1a90387@__component_export__@23@3QBDB$0PH@@__component_export_machinery__@@QAEAAU01@ABU01@@Z", "public: struct __component_export_machinery__::exported_component<class bb::device::BatteryInfo,&char const * const bb::device::__component_export__::A0xb1a90387::__unique_247,247> & __component_export_machinery__::exported_component<class bb::device::BatteryInfo,&char const * const bb::device::__component_export__::A0xb1a90387::__unique_247,247>::operator=(struct __component_export_machinery__::exported_component<class bb::device::BatteryInfo,&char const * const bb::device::__component_export__::A0xb1a90387::__unique_247,247> const &)"},
+
 		{ NULL, NULL }
 	};
-	for(const test_symbol *i=test_symbols; i->mangled; i++)
+#if 0
+	auto dump=ofstream("demangled.txt");
+	for(test_symbol *i=test_symbols; i->mangled; i++)
 	{
-		const auto &demangled=Demangle(i->mangled);
-		CHECK(demangled==std::string(i->demangled));
+		//i->demangled=msvc_demangle(NULL, i->mangled, 0);
+		i->demangled=__unDName(NULL, i->mangled, 0, malloc, free, 0);
+		dump << "{\"" << i->mangled << "\", \"" << i->demangled << "\"}," << endl;
 	}
+#else
+	for(test_symbol *i=test_symbols; i->mangled; i++)
+	{
+		const auto &demangled=Demangle(i->mangled, nothrow);
+		CHECK(demangled.first==std::string(i->demangled));
+	}
+#endif
 }

@@ -177,6 +177,7 @@ namespace Private
 {
 	struct SymbolDemangle
 	{
+		unique_ptr<SymbolTypeDict> default_typedict;
 		SymbolTypeDict &typedict;
 		SymbolType temp;
 		stringstream errstream;
@@ -184,18 +185,24 @@ namespace Private
 		std::unordered_map<std::string, SymbolType> parsedSymbols;
 		std::unordered_map<std::string, std::pair<SymbolType, std::string>> failedParsedSymbols;
 
-		SymbolDemangle(SymbolTypeDict &_typedict) : typedict(_typedict)
+		SymbolDemangle(SymbolTypeDict &_typedict) : typedict(_typedict) { init(); }
+		SymbolDemangle() : default_typedict(new SymbolTypeDict), typedict(*default_typedict) { init(); }
+	private:
+		void init()
 		{
 			for(const auto &dm : SymbolDemanglerRegistry())
 				demanglers.push_back(make_pair(dm.first, dm.second(temp, errstream, typedict)));
 		}
-	private:
 #if !defined(_MSC_VER) || _MSC_VER>1700
 		SymbolDemangle &operator=(const SymbolDemangle &) = delete;
 #else
 		SymbolDemangle &operator=(const SymbolDemangle &);
 #endif
 	};
+}
+
+SymbolDemangle::SymbolDemangle() : p(new Private::SymbolDemangle())
+{
 }
 
 SymbolDemangle::SymbolDemangle(SymbolTypeDict &typedict) : p(new Private::SymbolDemangle(typedict))
@@ -235,44 +242,34 @@ const std::unordered_map<std::string, std::pair<SymbolType, std::string>> &Symbo
 	return p->failedParsedSymbols;
 }
 
-std::pair<std::vector<std::string>, std::vector<std::string>> SymbolDemangle::demangle(const std::vector<std::string> &mangleds)
+bool SymbolDemangle::demangle(const std::string &mangled)
 {
-	vector<string> parsed, failed;
-	parsed.reserve(mangleds.size());
-	failed.reserve(mangleds.size());
-	for(const auto &mangled : mangleds)
-	{
-		bool found=false;
-		for(const auto &demangler : p->demanglers)
-			if(demangler.first==mangled[0])
-			{
-				found=true;
-				p->temp=SymbolType();
-				auto clearerror=Undoer([this](){p->errstream.str(string()); p->errstream.clear();});
-				auto first=mangled.begin(), last=mangled.end();
-				if(demangler.second->parse(first, last, p->errstream))
-				{
-					p->parsedSymbols[mangled]=move(p->temp);
-					parsed.push_back(mangled);
-					clearerror.dismiss();
-				}
-				else
-				{
-					p->failedParsedSymbols[mangled]=make_pair(move(p->temp), p->errstream.str());
-					failed.push_back(mangled);
-				}
-				break;
-			}
-		if(!found)
+	bool success=true, found=false;
+	for(const auto &demangler : p->demanglers)
+		if(demangler.first==mangled[0])
 		{
-			// Probably a C symbol, so assume it's a function (we can't tell if it's a variable)
-			p->parsedSymbols[mangled]=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Function, mangled);
-			parsed.push_back(mangled);
+			found=true;
+			p->temp=SymbolType();
+			auto clearerror=Undoer([this](){p->errstream.str(string()); p->errstream.clear();});
+			auto first=mangled.begin(), last=mangled.end();
+			if(demangler.second->parse(first, last, p->errstream))
+			{
+				p->parsedSymbols[mangled]=move(p->temp);
+				clearerror.dismiss();
+			}
+			else
+			{
+				p->failedParsedSymbols[mangled]=make_pair(move(p->temp), p->errstream.str());
+				success=false;
+			}
+			break;
 		}
+	if(!found)
+	{
+		// Probably a C symbol, so assume it's a function (we can't tell if it's a variable)
+		p->parsedSymbols[mangled]=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Function, mangled);
 	}
-	parsed.reserve(parsed.size());
-	failed.reserve(failed.size());
-	return make_pair(move(parsed), move(failed));
+	return success;
 }
 
 
