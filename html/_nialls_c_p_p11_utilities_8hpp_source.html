@@ -633,57 +633,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;{</div>
 <div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    Private::SymbolDemangle *p;</div>
 <div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a>(SymbolTypeDict &amp;typedict);</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    ~<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a>();</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    SymbolTypeDict &amp;typedict() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a>();</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a>(SymbolTypeDict &amp;typedict);</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;    ~<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a>();</div>
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <span class="keywordtype">void</span> setTypedict(SymbolTypeDict &amp;typedict);</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    SymbolTypeDict &amp;typedict() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordtype">void</span> reset();</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <span class="keywordtype">void</span> setTypedict(SymbolTypeDict &amp;typedict);</div>
 <div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <span class="keyword">const</span> std::unordered_map&lt;std::string, SymbolType&gt; &amp;parsedSymbols() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <span class="keywordtype">void</span> reset();</div>
 <div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    <span class="keyword">const</span> std::unordered_map&lt;std::string, std::pair&lt;SymbolType, std::string&gt;&gt; &amp;failedParsedSymbols() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    <span class="keyword">const</span> std::unordered_map&lt;std::string, SymbolType&gt; &amp;parsedSymbols() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    std::pair&lt;std::vector&lt;std::string&gt;, std::vector&lt;std::string&gt;&gt; demangle(<span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;mangleds);</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;};</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;</div>
-<div class="line"><a name="l00714"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">  714</a></span>&#160;<span class="keyword">inline</span> std::string <a class="code" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled)</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;{</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;    SymbolTypeDict typedict;</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> demangler(typedict);</div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;    std::vector&lt;std::string&gt; m;</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    m.push_back(mangled);</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <span class="keyword">auto</span> ret=demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a3ab9a7b041c607442d13a4ca049fbce8" title="Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and wh...">demangle</a>(m);</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keywordflow">if</span>(ret.first.empty())</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Mangled symbol &#39;&quot;</span>+mangled+<span class="stringliteral">&quot;&#39; is malformed. Error was &#39;&quot;</span>+demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a14d1ca50fa6c17d50a85f93bf72100b7" title="Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an erro...">failedParsedSymbols</a>().at(ret.second.front()).second+<span class="stringliteral">&quot;&#39;&quot;</span>);</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;    <span class="keywordflow">return</span> demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#af9b08204bd8737323fb94ec6b7958c5d" title="Returns the raw set of mangled symbols and their demangled ASTs.">parsedSymbols</a>().at(ret.first.front()).prettyText();</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;}</div>
-<div class="line"><a name="l00726"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#a77ffd382bfc692aebab4dd04ae67879b">  726</a></span>&#160;<span class="keyword">inline</span> std::pair&lt;std::string, std::string&gt; <a class="code" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled, std::nothrow_t)</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;{</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    SymbolTypeDict typedict;</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> demangler(typedict);</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    std::vector&lt;std::string&gt; m;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    m.push_back(mangled);</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    <span class="keyword">auto</span> _ret=demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a3ab9a7b041c607442d13a4ca049fbce8" title="Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and wh...">demangle</a>(m);</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    <span class="keywordflow">if</span>(_ret.first.empty())</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    {</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;failed=demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a14d1ca50fa6c17d50a85f93bf72100b7" title="Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an erro...">failedParsedSymbols</a>().at(_ret.second.front());</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        <span class="keywordflow">return</span> std::make_pair(failed.first.prettyText(), failed.second);</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    }</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        <span class="keywordflow">return</span> std::make_pair(demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#af9b08204bd8737323fb94ec6b7958c5d" title="Returns the raw set of mangled symbols and their demangled ASTs.">parsedSymbols</a>().at(_ret.first.front()).prettyText(), std::string());</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;}</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;</div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;} <span class="comment">// namespace</span></div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(pop)</span></div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    <span class="keyword">const</span> std::unordered_map&lt;std::string, std::pair&lt;SymbolType, std::string&gt;&gt; &amp;failedParsedSymbols() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="keywordtype">bool</span> demangle(<span class="keyword">const</span> std::string &amp;mangled);</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;};</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;</div>
+<div class="line"><a name="l00717"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d">  717</a></span>&#160;<span class="keyword">inline</span> std::string <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled, <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> &amp;demangler)</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;{</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    <span class="keywordflow">if</span>(!demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a9234e30944c51b5d63f40e71d6a4c4e2" title="Adds a demangle to the internal store, returning true if parsed.">demangle</a>(mangled))</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Mangled symbol &#39;&quot;</span>+mangled+<span class="stringliteral">&quot;&#39; is malformed. Error was &#39;&quot;</span>+demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a14d1ca50fa6c17d50a85f93bf72100b7" title="Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an erro...">failedParsedSymbols</a>().at(mangled).second+<span class="stringliteral">&quot;&#39;&quot;</span>);</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;    <span class="keywordflow">return</span> demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#af9b08204bd8737323fb94ec6b7958c5d" title="Returns the raw set of mangled symbols and their demangled ASTs.">parsedSymbols</a>().at(mangled).prettyText();</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;}</div>
+<div class="line"><a name="l00724"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272">  724</a></span>&#160;<span class="keyword">inline</span> std::string <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled)</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;{</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> demangler;</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(mangled, demangler);</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;}</div>
+<div class="line"><a name="l00730"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#a41b17bda0d6e63318f8bbae62dde58cc">  730</a></span>&#160;<span class="keyword">inline</span> std::pair&lt;std::string, std::string&gt; <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled, std::nothrow_t, <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> &amp;demangler)</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;{</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;    <span class="keywordflow">if</span>(!demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a9234e30944c51b5d63f40e71d6a4c4e2" title="Adds a demangle to the internal store, returning true if parsed.">demangle</a>(mangled))</div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    {</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <span class="keyword">const</span> <span class="keyword">auto</span> &amp;failed=demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a14d1ca50fa6c17d50a85f93bf72100b7" title="Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an erro...">failedParsedSymbols</a>().at(mangled);</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;        <span class="keywordflow">return</span> std::make_pair(failed.first.prettyText(), failed.second);</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    }</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        <span class="keywordflow">return</span> std::make_pair(demangler.<a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#af9b08204bd8737323fb94ec6b7958c5d" title="Returns the raw set of mangled symbols and their demangled ASTs.">parsedSymbols</a>().at(mangled).prettyText(), std::string());</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;}</div>
+<div class="line"><a name="l00741"></a><span class="lineno"><a class="code" href="namespace_nialls_c_p_p11_utilities.html#acbdf8c0613ff1367c1ce3019eb85c9de">  741</a></span>&#160;<span class="keyword">inline</span> std::pair&lt;std::string, std::string&gt; <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(<span class="keyword">const</span> std::string &amp;mangled, std::nothrow_t nt)</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;{</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <a class="code" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html" title="Holds state for a symbol demangle session.">SymbolDemangle</a> demangler;</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d" title="Convenience overload which demangles a single mangled symbol, throwing an exception if it failed...">Demangle</a>(mangled, nt, demangler);</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;}</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;} <span class="comment">// namespace</span></div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#pragma warning(pop)</span></div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <hr class="footer"/><address class="footer">(C) 2012 <a href="http://www.nedprod.com/">Niall Douglas</a></address>
 </body>

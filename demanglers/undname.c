@@ -19,17 +19,40 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#include "config.h"
-#include "wine/port.h"
+#define _CRT_SECURE_NO_WARNINGS
+
+//#include "config.h"
+//#include "wine/port.h"
+#include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+
+typedef void *(*malloc_func_t)(size_t);
+typedef void (*free_func_t)(void *);
+typedef int BOOL;
+typedef char CHAR;
+#define FALSE 0
+#define TRUE 1
+#define TRACE(...)
+#define WARN(...)
+#define ERR(...)
+#define CDECL __cdecl
+#define lstrcpynA strncpy
+
+#ifdef _MSC_VER
+#pragma warning(disable:4018)
+#pragma warning(disable:4100)
+#pragma warning(disable:4706)
+#endif
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "msvcrt.h"
+//#include "msvcrt.h"
 
-#include "wine/debug.h"
+//#include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(msvcrt);
+//WINE_DEFAULT_DEBUG_CHANNEL(msvcrt);
 
 /* TODO:
  * - document a bit (grammar + functions)
@@ -1489,4 +1512,9 @@ char* CDECL __unDName(char* buffer, const char* mangled, int buflen,
                       unsigned short int flags)
 {
     return __unDNameEx(buffer, mangled, buflen, memget, memfree, NULL, flags);
+}
+
+char *msvc_demangle(char *buffer, const char *mangled, int buflen)
+{
+	return __unDName(buffer, mangled, buflen, malloc, free, 0);
 }

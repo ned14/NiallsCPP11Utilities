@@ -99,6 +99,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ae946e4703671e8673033a1be9b72acd8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#ae946e4703671e8673033a1be9b72acd8">SymbolDemangle</a> ()</td></tr>
+<tr class="memdesc:ae946e4703671e8673033a1be9b72acd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs using an internal typedict.  <a href="#ae946e4703671e8673033a1be9b72acd8"></a><br/></td></tr>
+<tr class="separator:ae946e4703671e8673033a1be9b72acd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80c06da18056676adea43752d328d02a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a80c06da18056676adea43752d328d02a">SymbolDemangle</a> (<a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;<a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#aa360e55b4f25bf1919effc2f15fd02b9">typedict</a>)</td></tr>
+<tr class="memdesc:a80c06da18056676adea43752d328d02a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs using an external typedict. Faster.  <a href="#a80c06da18056676adea43752d328d02a"></a><br/></td></tr>
+<tr class="separator:a80c06da18056676adea43752d328d02a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa360e55b4f25bf1919effc2f15fd02b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#aa360e55b4f25bf1919effc2f15fd02b9">typedict</a> () const </td></tr>
 <tr class="memdesc:aa360e55b4f25bf1919effc2f15fd02b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type dictionary used by this demangler sessions.  <a href="#aa360e55b4f25bf1919effc2f15fd02b9"></a><br/></td></tr>
 <tr class="separator:aa360e55b4f25bf1919effc2f15fd02b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,31 +123,65 @@ Public Member Functions</h2></td></tr>
 &lt; <a class="el" href="struct_nialls_c_p_p11_utilities_1_1_symbol_type.html">SymbolType</a>, std::string &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a14d1ca50fa6c17d50a85f93bf72100b7">failedParsedSymbols</a> () const </td></tr>
 <tr class="memdesc:a14d1ca50fa6c17d50a85f93bf72100b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an error message.  <a href="#a14d1ca50fa6c17d50a85f93bf72100b7"></a><br/></td></tr>
 <tr class="separator:a14d1ca50fa6c17d50a85f93bf72100b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ab9a7b041c607442d13a4ca049fbce8"><td class="memItemLeft" align="right" valign="top">std::pair&lt; std::vector<br class="typebreak"/>
-&lt; std::string &gt;, std::vector<br class="typebreak"/>
-&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a3ab9a7b041c607442d13a4ca049fbce8">demangle</a> (const std::vector&lt; std::string &gt; &amp;mangleds)</td></tr>
-<tr class="memdesc:a3ab9a7b041c607442d13a4ca049fbce8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and which failed to parse.  <a href="#a3ab9a7b041c607442d13a4ca049fbce8"></a><br/></td></tr>
-<tr class="separator:a3ab9a7b041c607442d13a4ca049fbce8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9234e30944c51b5d63f40e71d6a4c4e2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a9234e30944c51b5d63f40e71d6a4c4e2">demangle</a> (const std::string &amp;mangled)</td></tr>
+<tr class="memdesc:a9234e30944c51b5d63f40e71d6a4c4e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a demangle to the internal store, returning true if parsed.  <a href="#a9234e30944c51b5d63f40e71d6a4c4e2"></a><br/></td></tr>
+<tr class="separator:a9234e30944c51b5d63f40e71d6a4c4e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Holds state for a symbol demangle session. </p>
 <p>To use this you must compile SymbolMangler.cpp which depends on Boost.MPL and Boost.Spirit. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a3ab9a7b041c607442d13a4ca049fbce8"></a>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ae946e4703671e8673033a1be9b72acd8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt;std::vector&lt;std::string&gt;, std::vector&lt;std::string&gt; &gt; NiallsCPP11Utilities::SymbolDemangle::demangle </td>
+          <td class="memname">NiallsCPP11Utilities::SymbolDemangle::SymbolDemangle </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>mangleds</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Adds demangles of a list of mangled symbols to the internal store, returning which were parsed and which failed to parse. </p>
+<p>Constructs using an internal typedict. </p>
+
+</div>
+</div>
+<a class="anchor" id="a80c06da18056676adea43752d328d02a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">NiallsCPP11Utilities::SymbolDemangle::SymbolDemangle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#af9b33658f9f7a0da430ebfef439ab298">SymbolTypeDict</a> &amp;&#160;</td>
+          <td class="paramname"><em>typedict</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructs using an external typedict. Faster. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a9234e30944c51b5d63f40e71d6a4c4e2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool NiallsCPP11Utilities::SymbolDemangle::demangle </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>mangled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a demangle to the internal store, returning true if parsed. </p>
 
 </div>
 </div>
