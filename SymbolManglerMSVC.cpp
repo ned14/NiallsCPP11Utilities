@@ -37,10 +37,10 @@ mpl::pair<SymbolTypeType_<SymbolTypeType::Vect256d>,			mpl::pair<mpl::string<'T_
 mpl::pair<SymbolTypeType_<SymbolTypeType::Vect256i>,			mpl::pair<mpl::string<'T__m', '256i', '@@'>::type,			mpl::string<>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::Varargs>,				mpl::pair<mpl::string<'Z'>::type,							mpl::string<>::type>::type>::type,
 
-mpl::pair<SymbolTypeType_<SymbolTypeType::Namespace>,			mpl::pair<mpl::string<'V'>::type,							mpl::string<'@@'>::type>::type>::type,
+mpl::pair<SymbolTypeType_<SymbolTypeType::Class>,				mpl::pair<mpl::string<'V'>::type,							mpl::string<'@@'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::Union>,				mpl::pair<mpl::string<'T'>::type,							mpl::string<'@@'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::Struct>,				mpl::pair<mpl::string<'U'>::type,							mpl::string<'@@'>::type>::type>::type,
-mpl::pair<SymbolTypeType_<SymbolTypeType::Class>,				mpl::pair<mpl::string<'V'>::type,							mpl::string<'@@'>::type>::type>::type,
+mpl::pair<SymbolTypeType_<SymbolTypeType::Namespace>,			mpl::pair<mpl::string<'V'>::type,							mpl::string<'@@'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::Enum>,				mpl::pair<mpl::string<'W4'>::type,							mpl::string<'@@'>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::EnumMember>,			mpl::pair<mpl::string<'W4'>::type,							mpl::string<>::type>::type>::type,
 
@@ -107,6 +107,8 @@ namespace qi {
 	using namespace boost::spirit::qi;
 	using std::string;
 
+	static rule<string::const_iterator, string()> msvc_identifier=+(~char_("@?")) | ("?A0" > +char_("x0-9a-f"));
+
 	struct msvc_simpletype : symbols<char, SymbolTypeType>
 	{
 		msvc_simpletype()
@@ -153,20 +155,65 @@ namespace qi {
 				;
 		}
 	};
-#if 0
 	struct msvc_operator : symbols<char, string>
 	{
 		msvc_operator()
 		{
 			name("msvc_operator");
-			add ("A", SymbolTypeStorage::None)("?A", SymbolTypeStorage::None)
-				("B", SymbolTypeStorage::Const)("?B", SymbolTypeStorage::Const)
-				("C", SymbolTypeStorage::Volatile)("?C", SymbolTypeStorage::Volatile)
-				("D", SymbolTypeStorage::ConstVolatile)("?D", SymbolTypeStorage::ConstVolatile)
+			add
+				("?0", "%1")
+				("?1", "~%1")
+				("?A", "operator[]")
+				("?R", "operator()")
+				("?C", "operator->")
+				("?E", "operator++")
+				("?F", "operator--")
+				("?2", "operator new")
+				("?_U", "operator new[]")
+				("?3", "operator delete")
+				("?_V", "operator delete[]")
+				("?D", "operator*")
+				("?I", "operator&")
+				("?H", "operator+")
+				("?G", "operator-")
+				("?7", "operator!")
+				("?S", "operator~")
+				("?J", "operator->*")
+				("?D", "operator*")
+				("?K", "operator/")
+				("?L", "operator%")
+				("?H", "operator+")
+				("?G", "operator-")
+				("?6", "operator<<")
+				("?5", "operator>>")
+				("?M", "operator<")
+				("?O", "operator>")
+				("?N", "operator<=")
+				("?P", "operator>=")
+				("?8", "operator==")
+				("?9", "operator!=")
+				("?I", "operator&")
+				("?U", "operator|")
+				("?T", "operator^")
+				("?V", "operator&&")
+				("?W", "operator||")
+				("?4", "operator=")
+				("?X", "operator*=")
+				("?_0", "operator/=")
+				("?_1", "operator%=")
+				("?Y", "operator+=")
+				("?Z", "operator-=")
+				("?_3", "operator<<=")
+				("?_2", "operator>>=")
+				("?_4", "operator&=")
+				("?_5", "operator|=")
+				("?_6", "operator^=")
+				("?Q", "operator,")
+				("?B", "operator")
+				("?_7", "__vtable")
 				;
 		}
 	};
-#endif
 	// FIXME: This parser can't cope with unsigned long long constants. We need to be more intelligent here.
 	template<typename iterator> struct msvc_constant : grammar<iterator, long long()>
 	{
@@ -196,7 +243,7 @@ namespace qi {
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_constant");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in constant: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
@@ -210,53 +257,65 @@ namespace qi {
 	will lose the intermediate bits
 	FIXME: Currently makes no attempt at templated types
 	*/
-	template<typename iterator> struct msvc_type : grammar<iterator, const SymbolType *()>
+	template<typename iterator> struct msvc_type : grammar<iterator, const SymbolType *(), locals<SymbolType>>
 	{
 		SymbolTypeDict &typedict;
 		ostream &err;
-		// This is a nasty FIXME, but need to work around const volatile void ***** or worse
-		mutable SymbolTypeQualifier qualifier_;
-		mutable int qualifier_count;
-		void reset() const
+		void reset(SymbolType &a) const
 		{
-			qualifier_=SymbolTypeQualifier::None;
+			a.storage=SymbolTypeStorage::None;
+			a.qualifier=SymbolTypeQualifier::None;
 		}
-		void qualifier_writer(const SymbolType *&, SymbolTypeQualifier qualifier) const
+		void qualifier_writer(SymbolType &a, SymbolTypeQualifier qualifier) const
 		{
-			if(qualifier_==SymbolTypeQualifier::None)
+			if(a.qualifier==SymbolTypeQualifier::None)
 			{
-				qualifier_=qualifier;
-				qualifier_count=0;
+				a.qualifier=qualifier;
+				a.indirectioncount=0;
 			}
-			qualifier_count+=(qualifier>=SymbolTypeQualifier::Pointer);
+			a.indirectioncount+=(qualifier>=SymbolTypeQualifier::Pointer);
 		}
-		void simpletype_writer(const SymbolType *&val, SymbolTypeType type) const
+		void simpletype_writer(SymbolType &a, SymbolTypeType type) const
 		{
-			string i("_t"+to_string(static_cast<int>(type))+"_"+to_string(static_cast<int>(qualifier_))+"_"+to_string(qualifier_count));
+			a.type=type;
+		}
+		void identifier_writer(SymbolType &a, const string &i) const
+		{
+			a.name=i;
+		}
+		void finish(const SymbolType *&val, SymbolType &a) const
+		{
+			string i(a.prettyText());
 			SymbolTypeDict::const_iterator dt=typedict.find(i);
 			if(dt==typedict.end())
 			{
-				SymbolType v(qualifier_, type);
-				v.indirectioncount=qualifier_count;
-				auto _dt=typedict.emplace(make_pair(i, v));
+				auto _dt=typedict.emplace(make_pair(i, a));
 				dt=_dt.first;
 			}
 			val=&dt->second;
 		}
+		bool hasIdentifier(SymbolType &a) const
+		{
+			return a.type>=SymbolTypeType::Namespace && a.type<=SymbolTypeType::Enum;
+		}
 		msvc_type(ostream &_err, SymbolTypeDict &_typedict) : msvc_type::base_type(start), err(_err), typedict(_typedict)
 		{
-			start = eps [ boost::phoenix::bind(&msvc_type::reset, this)]
-				>> *qualifier [ boost::phoenix::bind(&msvc_type::qualifier_writer, this, _val, _1)]
-				>> simpletype [ boost::phoenix::bind(&msvc_type::simpletype_writer, this, _val, _1)];
+			start = eps [ boost::phoenix::bind(&msvc_type::reset, this, _a)]
+				>> *qualifier [ boost::phoenix::bind(&msvc_type::qualifier_writer, this, _a, _1)]
+				>> *("?" > storage)
+				>> simpletype [ boost::phoenix::bind(&msvc_type::simpletype_writer, this, _a, _1)]
+				>> (eps(boost::phoenix::bind(&msvc_type::hasIdentifier, this, _a) == false) | msvc_identifier [ boost::phoenix::bind(&msvc_type::identifier_writer, this, _a, _1)])
+				>> eps [ boost::phoenix::bind(&msvc_type::finish, this, _val, _a) ];
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_type");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in type: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
-		rule<iterator, const SymbolType *()> start;
+		rule<iterator, const SymbolType *(), locals<SymbolType>> start;
 		msvc_qualifier qualifier;
+		msvc_storage storage;
 		msvc_simpletype simpletype;
 	};
 	// This grammar is for a MSVC mangled global variable or static member variable
@@ -284,7 +343,7 @@ namespace qi {
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_variable");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in variable: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
@@ -312,14 +371,14 @@ namespace qi {
 			delimiter=lit("@") - "@@";
 			start = (lit('Y')/*near*/ | lit('Z')/*far*/) [ boost::phoenix::bind(&msvc_function::reset, this) ]
 			> char_ /* calling convention */
-			> -storageclass [ boost::phoenix::bind(&msvc_function::storage_writer, this, _1) ] /* optional storage class */
+			> -("?" > storageclass [ boost::phoenix::bind(&msvc_function::storage_writer, this, _1) ]) /* optional storage class */
 			> type [ boost::phoenix::bind(&msvc_function::return_type_writer, this, _1) ]
 			> +type [ boost::phoenix::bind(&msvc_function::parameter_type_writer, this, _1) ]
 			> ("@Z" | eps [ boost::phoenix::bind(&msvc_function::pop_last_parameter, this) ]);
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_function");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in function: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
@@ -340,6 +399,7 @@ namespace qi {
 		void type_writer(SymbolTypeType i) const { ret.qualifier=SymbolTypeQualifier::None; ret.storage=SymbolTypeStorage::None; ret.type=i; }
 		void storage_writer(SymbolTypeStorage i) const { ret.storage=i; }
 		void return_type_writer(const SymbolType *i) const { ret.returns=i; }
+		void return_self_type_writer() const { ret.returns=ret.dependents.back(); }
 		void parameter_type_writer(const SymbolType *i) const { ret.func_params.push_back(i); }
 		void pop_last_parameter() const { ret.func_params.pop_back(); }
 		msvc_memberfunction(SymbolType &_ret, ostream &_err, SymbolTypeDict &_typedict) : msvc_memberfunction::base_type(start), ret(_ret), err(_err), typedict(_typedict), type(_err, _typedict)
@@ -348,13 +408,14 @@ namespace qi {
 			start = memberfunctiontype [ boost::phoenix::bind(&msvc_memberfunction::type_writer, this, _1) ]
 			> storageclass [ boost::phoenix::bind(&msvc_memberfunction::storage_writer, this, _1) ]
 			> char_ // calling convention
-			> type [ boost::phoenix::bind(&msvc_memberfunction::return_type_writer, this, _1) ]
+			> (delimiter [ boost::phoenix::bind(&msvc_memberfunction::return_self_type_writer, this) ] // '@' = return type of self
+				| type [ boost::phoenix::bind(&msvc_memberfunction::return_type_writer, this, _1) ])
 			> +type [ boost::phoenix::bind(&msvc_memberfunction::parameter_type_writer, this, _1) ]
 			> ("@Z" | eps [ boost::phoenix::bind(&msvc_memberfunction::pop_last_parameter, this) ]);
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_memberfunction");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in memberfunction: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
@@ -365,32 +426,51 @@ namespace qi {
 		msvc_storage storageclass;
 	};
 	// This grammar is for a MSVC mangled identifier
-	template<typename iterator> struct msvc_name : grammar<iterator, locals<SymbolType, string>>
+	template<typename iterator> struct msvc_name : grammar<iterator>
 	{
 		SymbolType &ret;
 		ostream &err;
 		SymbolTypeDict &typedict;
 		void name_writer(const string &i) const { ret.name=i; }
-		void dependent_writer(const string &i) const
+		void replace_operator_name(const string &i) const
 		{
+			// For constructor and destructors, we need to patch in the right name during dependents
+			auto idx=ret.name.find("%1");
+			if(idx!=(size_t)-1)
+				ret.name.replace(ret.name.begin()+idx, ret.name.begin()+idx+2, i);
+		}
+		void dependent_writer(const string &_i) const
+		{
+			string i("class "+_i);
 			SymbolTypeDict::const_iterator dt=typedict.find(i);
 			if(dt==typedict.end())
 			{
-				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Namespace, i)));
+				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Class, _i)));
 				dt=_dt.first;
 			}
-			ret.dependents.push_back(&dt->second);
+			if(ret.dependents.empty()) replace_operator_name(_i);
+			ret.dependents.push_front(&dt->second);
 		}
 		// These work by spreading the building of a templated type over multiple calls using local variables _a and _b
 		// We accumulate template parameters into _a and accumulate mangled symbolness into _b
-		void begin_template_dependent_writer(SymbolType &a, string &b, const string &i) const
+		void begin_template_dependent_writer(SymbolType &a, const string &_i) const
 		{
-			a=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Class, i);
-			b=i;
+			a=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Class, _i);
 		}
-		void add_template_constant_dependent_writer(SymbolType &a, string &b, long long constant) const
+		void add_template_dependent_dependent_writer(SymbolType &a, const string &_i) const
 		{
-			string i("_c"+to_string(constant));
+			string i("class "+_i);
+			SymbolTypeDict::const_iterator dt=typedict.find(i);
+			if(dt==typedict.end())
+			{
+				auto _dt=typedict.emplace(make_pair(i, SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Class, _i)));
+				dt=_dt.first;
+			}
+			a.dependents.push_front(&dt->second);
+		}
+		void add_template_constant_dependent_writer(SymbolType &a, long long constant) const
+		{
+			string i("__c"+to_string(constant));
 			SymbolTypeDict::const_iterator dt=typedict.find(i);
 			if(dt==typedict.end())
 			{
@@ -398,50 +478,55 @@ namespace qi {
 				dt=_dt.first;
 			}
 			a.templ_params.push_back(&dt->second);
-			b.append(i);
 		}
-		void add_template_type_dependent_writer(SymbolType &a, string &b, const SymbolType *type) const
+		void add_template_type_dependent_writer(SymbolType &a, const SymbolType *type) const
 		{
-			string i("_t"+to_string(static_cast<int>(type->type)));
 			a.templ_params.push_back(type);
-			b.append(i);
 		}
-		void finish_template_dependent_writer(SymbolType &a, string &b) const
+		void finish_template_dependent_writer(SymbolType &a) const
 		{
+			string b=a.prettyText();
 			SymbolTypeDict::const_iterator dt=typedict.find(b);
 			if(dt==typedict.end())
 			{
 				auto _dt=typedict.emplace(make_pair(b, a));
 				dt=_dt.first;
 			}
-			ret.dependents.push_back(&dt->second);
+			if(ret.dependents.empty()) replace_operator_name(dt->second.name);
+			ret.dependents.push_front(&dt->second);
 		}
 		msvc_name(SymbolType &_ret, ostream &_err, SymbolTypeDict &_typedict) : msvc_name::base_type(start), ret(_ret), err(_err), typedict(_typedict), type(_err, _typedict), constant(_err)
 		{
 			delimiter=lit("@") - "@@";
-			identifier=+(char_ - '@');
-			identifier.name("identifier");
-			template_dependent_identifier=+(char_ - '@');
+			template_dependent_identifier=msvc_identifier;
 			template_dependent_identifier.name("template_dependent_identifier");
-			dependent_identifier=+(char_ - '@');
+			dependent_identifier=msvc_identifier;
 			dependent_identifier.name("dependent_identifier");
-			start = identifier [ boost::phoenix::bind(&msvc_name::name_writer, this, _1) ] >> *(
-				(("@?$" > template_dependent_identifier [ boost::phoenix::bind(&msvc_name::begin_template_dependent_writer, this, _a, _b, _1) ])
-					> delimiter > +(( "$0" > constant [ boost::phoenix::bind(&msvc_name::add_template_constant_dependent_writer, this, _a, _b, _1) ])
-						| type [ boost::phoenix::bind(&msvc_name::add_template_type_dependent_writer, this, _a, _b, _1) ])
-					>> eps [ boost::phoenix::bind(&msvc_name::finish_template_dependent_writer, this, _a, _b) ])
-				| (delimiter > dependent_identifier [ boost::phoenix::bind(&msvc_name::dependent_writer, this, _1) ]))
-				;
+			template_dependent_sequence=("?$" > template_dependent_identifier [ boost::phoenix::bind(&msvc_name::begin_template_dependent_writer, this, _a, _1) ])
+					>> *(delimiter > (/* FIXME: missing template recurse here */
+						dependent_identifier [ boost::phoenix::bind(&msvc_name::add_template_dependent_dependent_writer, this, _a, _1) ]))
+				>> "@@" >>
+					+(( "$" > char_("0-9") > constant [ boost::phoenix::bind(&msvc_name::add_template_constant_dependent_writer, this, _a, _1) ])
+						| type [ boost::phoenix::bind(&msvc_name::add_template_type_dependent_writer, this, _a, _1) ])
+					>> eps [ boost::phoenix::bind(&msvc_name::finish_template_dependent_writer, this, _a) ];
+			dependent_sequence=dependent_identifier [ boost::phoenix::bind(&msvc_name::dependent_writer, this, _1) ];
+
+			start = ((operator_ [ boost::phoenix::bind(&msvc_name::name_writer, this, _1) ] > (template_dependent_sequence | dependent_sequence))
+					| msvc_identifier [ boost::phoenix::bind(&msvc_name::name_writer, this, _1) ])
+				>> *(delimiter > (template_dependent_sequence | dependent_sequence));
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			start.name("msvc_name");
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in name: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 
-		rule<iterator, locals<SymbolType, string>> start;
+		rule<iterator> start;
 		rule<iterator> delimiter;
-		rule<iterator, string()> identifier, template_dependent_identifier, dependent_identifier;
+		rule<iterator, string()> template_dependent_identifier, dependent_identifier;
+		rule<iterator, locals<SymbolType>> template_dependent_sequence;
+		rule<iterator> dependent_sequence;
+		msvc_operator operator_;
 		msvc_type<iterator> type;
 		msvc_constant<iterator> constant;
 	};
@@ -450,6 +535,7 @@ namespace qi {
 		SymbolType &ret;
 		ostream &err;
 		SymbolTypeDict &typedict;
+		void vtable_storage_writer(SymbolTypeStorage i) const { ret.qualifier=SymbolTypeQualifier::None; ret.type=SymbolTypeType::VTable; ret.storage=i; }
 		/* The key to Microsoft symbol mangles is the operator '@@' which consists of a preamble
 		and a postamble. Immediately following the '@@' operator is:
 		Variable:
@@ -465,10 +551,11 @@ namespace qi {
 		*/
 		msvc_symbol(SymbolType &_ret, ostream &_err, SymbolTypeDict &_typedict) : msvc_symbol::base_type(start), ret(_ret), err(_err), typedict(_typedict), name(ret, _err, _typedict), variable(ret, _err, _typedict), function(ret, _err, _typedict), memberfunction(ret, _err, _typedict)
 		{
-			start="?" >> name >> "@@" >> (variable | function | memberfunction);
+			vtable="6" > storageclass [ boost::phoenix::bind(&msvc_symbol::vtable_storage_writer, this, _1) ];
+			start="?" >> name >> "@@" >> (variable | function | memberfunction | vtable);
 			BOOST_SPIRIT_DEBUG_NODE(start);
 			on_error<boost::spirit::qi::fail, iterator>(start,
-				err << boost::phoenix::val("Parsing error: Expected ") << _4 << boost::phoenix::val(" here: \"")
+				err << boost::phoenix::val("Parsing error in symbol: Expected ") << _4 << boost::phoenix::val(" here: \"")
 					<< boost::phoenix::construct<string>(_3, _2) << boost::phoenix::val("\""));
 		}
 		virtual bool parse(std::string::const_iterator &first, std::string::const_iterator &last, std::ostream &errout)
@@ -481,6 +568,8 @@ namespace qi {
 		msvc_variable<iterator> variable;
 		msvc_function<iterator> function;
 		msvc_memberfunction<iterator> memberfunction;
+		rule<iterator> vtable;
+		msvc_storage storageclass;
 	};
 } // namespace
 

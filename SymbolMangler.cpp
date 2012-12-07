@@ -57,6 +57,8 @@ mpl::pair<SymbolTypeType_<SymbolTypeType::VirtualMemberFunction>,			mpl::pair<mp
 mpl::pair<SymbolTypeType_<SymbolTypeType::VirtualMemberFunctionProtected>,	mpl::pair<mpl::string<'prot', 'ecte', 'd: v', 'irtu', 'al'>::type,	mpl::string<>::type>::type>::type,
 mpl::pair<SymbolTypeType_<SymbolTypeType::VirtualMemberFunctionPrivate>,	mpl::pair<mpl::string<'priv', 'ate:', ' vir', 'tual'>::type,			mpl::string<>::type>::type>::type,
 
+mpl::pair<SymbolTypeType_<SymbolTypeType::VTable>,							mpl::pair<mpl::string<'vtab', 'le'>::type,			mpl::string<>::type>::type>::type,
+
 mpl::pair<SymbolTypeType_<SymbolTypeType::Unknown>,							mpl::pair<mpl::string<'unkn', 'own'>::type,							mpl::string<>::type>::type>::type
 >::type SymbolTypeTypeStringMap;
 
@@ -116,8 +118,11 @@ std::string SymbolType::prettyText(bool withTypeType) const
 			ret.append(p->prettyText());
 		}
 	};
-	if(!sts.first.empty()) ret.append(sts.first).append(" ");
-	if(isFunction)
+	if(!isFunction)
+	{
+		if(!sts.first.empty()) ret.append(sts.first).append(" ");
+	}
+	else
 	{
 		if(!stt.first.empty()) ret.append(stt.first).append(" ");
 		if(returns)
@@ -143,8 +148,8 @@ std::string SymbolType::prettyText(bool withTypeType) const
 		for(const auto &d : dependents)
 			ret.append(std::move(d->prettyText(false))).append("::");
 	}
-	if(SymbolTypeType::StaticMemberFunction<=type && SymbolTypeType::MemberFunctionPrivate>=type)
-		ret.append("*");
+	//if(SymbolTypeType::StaticMemberFunction<=type && SymbolTypeType::MemberFunctionPrivate>=type)
+	//	ret.append("*");
 	ret.append(name);
 	if(!templ_params.empty())
 	{
@@ -168,6 +173,7 @@ std::string SymbolType::prettyText(bool withTypeType) const
 			PrintParams(func_params);
 			ret.append(")");
 		}
+		if(!sts.first.empty()) ret.append(" ").append(sts.first);
 	}
 	if(ret.back()==' ') ret.resize(ret.size()-1);
 	return ret;
@@ -184,6 +190,7 @@ namespace Private
 		vector<std::pair<char, std::unique_ptr<SymbolDemangler>>> demanglers;
 		std::unordered_map<std::string, SymbolType> parsedSymbols;
 		std::unordered_map<std::string, std::pair<SymbolType, std::string>> failedParsedSymbols;
+		std::unordered_multimap<std::string, std::string> namespaces;
 
 		SymbolDemangle(SymbolTypeDict &_typedict) : typedict(_typedict) { init(); }
 		SymbolDemangle() : default_typedict(new SymbolTypeDict), typedict(*default_typedict) { init(); }
@@ -242,8 +249,14 @@ const std::unordered_map<std::string, std::pair<SymbolType, std::string>> &Symbo
 	return p->failedParsedSymbols;
 }
 
-bool SymbolDemangle::demangle(const std::string &mangled)
+const std::unordered_multimap<std::string, std::string> &SymbolDemangle::namespaces() const
 {
+	return p->namespaces;
+}
+
+std::pair<const SymbolType *, bool>  SymbolDemangle::demangle(const std::string &mangled)
+{
+	const SymbolType *ret=nullptr;
 	bool success=true, found=false;
 	for(const auto &demangler : p->demanglers)
 		if(demangler.first==mangled[0])
@@ -254,14 +267,24 @@ bool SymbolDemangle::demangle(const std::string &mangled)
 			auto first=mangled.begin(), last=mangled.end();
 			if(demangler.second->parse(first, last, p->errstream))
 			{
-				p->parsedSymbols[mangled]=move(p->temp);
+				auto it=p->parsedSymbols.emplace(make_pair(mangled, p->temp));
+				ret=&(it.first)->second;
 				clearerror.dismiss();
 			}
 			else
 			{
-				p->failedParsedSymbols[mangled]=make_pair(move(p->temp), p->errstream.str());
+				auto it=p->failedParsedSymbols.emplace(make_pair(mangled, make_pair(p->temp, p->errstream.str())));
+				ret=&(it.first)->second.first;
 				success=false;
 			}
+			string namespace_;
+			if(!p->temp.dependents.empty())
+			{
+				for(const auto &dependent : p->temp.dependents)
+					namespace_.append(dependent->name).append("::");
+				namespace_.resize(namespace_.size()-2);
+			}
+			p->namespaces.emplace(make_pair(namespace_, mangled));
 			break;
 		}
 	if(!found)
@@ -269,7 +292,7 @@ bool SymbolDemangle::demangle(const std::string &mangled)
 		// Probably a C symbol, so assume it's a function (we can't tell if it's a variable)
 		p->parsedSymbols[mangled]=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Function, mangled);
 	}
-	return success;
+	return make_pair(ret, success);
 }
 
 

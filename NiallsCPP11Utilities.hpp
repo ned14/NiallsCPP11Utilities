@@ -532,6 +532,7 @@ enum class SymbolTypeType
 	VirtualMemberFunctionProtected,
 	VirtualMemberFunctionPrivate,
 
+	VTable,
 	Unknown
 };
 //! The qualifiers of a symbol type
@@ -649,7 +650,7 @@ struct NIALLSCPP11UTILITIES_API SymbolType
 	SymbolType() : storage(SymbolTypeStorage::Unknown), returns(nullptr), qualifier(SymbolTypeQualifier::Unknown), indirectioncount(0), type(SymbolTypeType::Unknown) { }
 	bool operator==(const SymbolType &o) const
 	{
-		return storage==o.storage && returns==o.returns && qualifier==o.qualifier && type==o.type
+		return storage==o.storage && returns==o.returns && qualifier==o.qualifier && indirectioncount==o.indirectioncount && type==o.type
 			&& dependents==o.dependents && name==o.name && templ_params==o.templ_params && func_params==o.func_params;
 	}
 	//! Constructor for a variable
@@ -709,16 +710,20 @@ public:
 	//! Returns the raw set of mangled symbols we failed to parse, their partially demangled ASTs and an error message
 	const std::unordered_map<std::string, std::pair<SymbolType, std::string>> &failedParsedSymbols() const;
 
-	//! Adds a demangle to the internal store, returning true if parsed
-	bool demangle(const std::string &mangled);
+	//! Adds a demangle to the internal store, returning the item and true if successfully parsed
+	std::pair<const SymbolType *, bool> demangle(const std::string &mangled);
+
+	//! Returns a namespace/class/struct to mangled symbol map
+	const std::unordered_multimap<std::string, std::string> &namespaces() const;
 };
 
 //! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled, SymbolDemangle &demangler)
 {
-	if(!demangler.demangle(mangled))
+	auto ret=demangler.demangle(mangled);
+	if(!ret.second)
 		throw std::runtime_error("Mangled symbol '"+mangled+"' is malformed. Error was '"+demangler.failedParsedSymbols().at(mangled).second+"'");
-	return demangler.parsedSymbols().at(mangled).prettyText();
+	return ret.first->prettyText();
 }
 //! \brief Convenience overload which demangles a single mangled symbol, throwing an exception if it failed. Use the class if you're demangling more than one symbol.
 inline std::string Demangle(const std::string &mangled)
@@ -729,13 +734,14 @@ inline std::string Demangle(const std::string &mangled)
 //! \brief Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.
 inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t, SymbolDemangle &demangler)
 {
-	if(!demangler.demangle(mangled))
+	auto ret=demangler.demangle(mangled);
+	if(!ret.second)
 	{
 		const auto &failed=demangler.failedParsedSymbols().at(mangled);
 		return std::make_pair(failed.first.prettyText(), failed.second);
 	}
 	else
-		return std::make_pair(demangler.parsedSymbols().at(mangled).prettyText(), std::string());
+		return std::make_pair(ret.first->prettyText(), std::string());
 }
 //! \brief Convenience overload which demangles a single mangled symbol, returning any error message if it failed. Use the class if you're demangling more than one symbol.
 inline std::pair<std::string, std::string> Demangle(const std::string &mangled, std::nothrow_t nt)
