@@ -265,7 +265,11 @@ std::pair<const SymbolType *, bool>  SymbolDemangle::demangle(const std::string 
 			p->temp=SymbolType();
 			auto clearerror=Undoer([this](){p->errstream.str(string()); p->errstream.clear();});
 			auto first=mangled.begin(), last=mangled.end();
-			if(demangler.second->parse(first, last, p->errstream))
+			bool success=demangler.second->parse(first, last, p->errstream);
+			// FIXME: MSVC parser occasionally returns spurious void parameters
+			if(!p->temp.func_params.empty() && p->temp.func_params.back()->type==SymbolTypeType::Void && p->temp.func_params.back()->indirectioncount==0)
+				p->temp.func_params.pop_back();
+			if(success)
 			{
 				auto it=p->parsedSymbols.emplace(make_pair(mangled, p->temp));
 				ret=&(it.first)->second;
