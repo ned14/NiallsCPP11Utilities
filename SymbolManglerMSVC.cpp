@@ -228,7 +228,7 @@ namespace qi {
 		{	// Hexadecimal, but encoded A-P instead of 0-F
 			string v(i);
 			for(auto &c : v)
-				c=(c-'A'+'0');
+				c=(c>='K') ? (c-'K'+'a') : (c-'A'+'0');
 			val=stoll(v, 0, 16);
 			if(neg) val=-val;
 		}
