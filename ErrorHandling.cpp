@@ -3,6 +3,8 @@
 File Created: Nov 2012
 */
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "ErrorHandling.hpp"
 #include <locale>
 #include <codecvt>
@@ -57,3 +59,35 @@ void int_throwWinError(const char *file, const char *function, int lineno, unsig
 } // namespace
 
 #endif
+
+namespace NiallsCPP11Utilities {
+
+using namespace std;
+
+void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::string *filename)
+{
+	/*if(EINTR==code && QThread::current()->isBeingCancelled())
+	{	*//* Some POSIX implementation have badly written pthread support which unpredictably returns
+		an interrupted system call error rather than actually cancelling the thread. */
+		/*fxmessage("WARNING: Your pthread implementation caused an interrupted system call error rather than properly cancelling a thread. You should report this to your libc maintainer!\n");
+		QThread::current()->checkForTerminate();
+	}*/
+	string errstr(strerror(code));
+	errstr.append(" ("+to_string(code)+") in '"+string(file)+"':"+string(function)+":"+to_string(lineno));
+	if(ENOENT==code || ENOTDIR==code)
+	{
+		errstr="File '"+*filename+"' not found [Host OS Error: "+errstr+"]";
+		throw ios_base::failure(errstr);
+	}
+	else if(EACCES==code)
+	{
+		errstr="Access to '"+*filename+"' denied [Host OS Error: "+errstr+"]";
+		throw ios_base::failure(errstr);
+	}
+	else
+	{
+		throw ios_base::failure(errstr);
+	}
+}
+
+} // namespace
