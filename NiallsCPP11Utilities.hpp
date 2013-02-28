@@ -90,6 +90,18 @@ Tested on the following compilers:
 #endif
 #endif
 
+//! \define TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
+#ifndef TYPEALIGNMENT
+#ifdef _MSC_VER
+#define TYPEALIGNMENT(bytes) __declspec(align(bytes))
+#elif defined(__GNUC__)
+#define TYPEALIGNMENT(bytes) __attribute__((alignment(bytes)))
+#else
+#define TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
+#endif
+#endif
+
+
 #ifdef NIALLSCPP11UTILITIES_DLL_EXPORTS
 #define NIALLSCPP11UTILITIES_API DLLEXPORTMARKUP
 #else
