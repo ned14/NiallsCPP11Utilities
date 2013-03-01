@@ -22,6 +22,7 @@ env['SHCCCOM'] =  env['SHCCCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['CXXCOM']  =   env['CXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 env['SHCXXCOM']= env['SHCXXCOM'].replace('$CHANGED_SOURCES','$SOURCES.abspath')
 architecture="generic"
+env['CPPPATH']=[]
 env['CPPDEFINES']=[]
 env['CCFLAGS']=[]
 env['CXXFLAGS']=[]
@@ -82,7 +83,16 @@ else:
         cc.env['CPPFLAGS']=temp
         cc.Result(result)
         return result
-    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveCPP11Features" : CheckHaveCPP11Features } )
+    def CheckHaveBoost(cc):
+        cc.Message("Checking for Boost C++ libraries ...")
+        try:
+            temp=cc.env['CPPFLAGS']
+        except:
+            temp=[]
+        result=cc.TryCompile('#include "boost/mpl/vector.hpp"\n', '.cpp')
+        cc.Result(result)
+        return result
+    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
     if env.GetOption('useclang') and conf.CheckHaveClang():
         env['CC']="clang"
         env['CXX']="clang++"
@@ -102,6 +112,18 @@ else:
     #    env['CXXFLAGS']+=["-std=c++11"]
     #else:
     #    print "Disabling C++11 support"
+	
+    if not conf.CheckHaveBoost():
+    	old=env['CPPPATH']
+    	boostpath=os.path.abspath(os.path.join(os.getcwd(), "../boost"))
+    	while not os.path.exists(boostpath) and len(boostpath):
+    		boostpath=os.path.dirname(boostpath)
+    	if len(boostpath):
+        	env['CPPPATH']+=[boostpath]
+    	#env['LIB']+=['../boost/stage/lib/']
+    	if not conf.CheckHaveBoost():
+    		print("ERROR: I need the Boost libraries, either in the system or in a boost directory just above mine")
+    		sys.exit(1)
 
     env=conf.Finish()
 
@@ -151,7 +173,7 @@ mylibrary=mylibrary['mylib'][0]
 
 # Set up the MSVC project files
 if 'win32'==sys.platform:
-    includes = [ "NiallsCPP11Utilities.hpp", "StaticTypeRegistry.cpp" ]
+    includes = [ "NiallsCPP11Utilities.hpp" ]
     variants = []
     projs = {}
     for buildvariant, output in buildvariants.items():

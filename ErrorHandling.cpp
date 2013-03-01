@@ -7,7 +7,7 @@ File Created: Nov 2012
 
 #include "ErrorHandling.hpp"
 #include <locale>
-#include <codecvt>
+#include <cstring>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN 1

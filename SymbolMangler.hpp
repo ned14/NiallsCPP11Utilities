@@ -9,6 +9,7 @@ File Created: Nov 2012
 //#define BOOST_SPIRIT_DEBUG
 
 #include "NiallsCPP11Utilities.hpp"
+#include <utility>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/list.hpp>
@@ -68,7 +69,8 @@ template<class maptype> struct FillMap
 	FillMap(maptype &_map) : map(&_map) { }
 	template<typename T> void operator()(T) const
 	{
-		(*map)[T::first::value]=make_pair<std::string, std::string>(mpl::c_str<typename T::second::first>::value, mpl::c_str<typename T::second::second>::value);
+		using namespace boost;
+		(*map)[T::first::value]=std::make_pair<std::string, std::string>(mpl::c_str<typename T::second::first>::value, mpl::c_str<typename T::second::second>::value);
 	}
 };
 template<class maptype> struct FillMapR
@@ -78,11 +80,13 @@ template<class maptype> struct FillMapR
 	FillMapR(maptype &_map) : map(&_map) { }
 	template<typename T> void operator()(T) const
 	{
+		using namespace boost;
 		(*map)[mpl::c_str<typename T::second::first>::value]=T::first::value;
 	}
 };
-template<class fillmaptype, class sourcemaptype, typename T=fillmaptype::type> T MakeStringMap()
+template<class fillmaptype, class sourcemaptype, typename T=typename fillmaptype::type> T MakeStringMap()
 {
+	using namespace boost;
 	T ret;
 	mpl::for_each<sourcemaptype>(fillmaptype(ret));
 	return ret;

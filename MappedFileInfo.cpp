@@ -6,7 +6,6 @@ File Created: Nov 2012
 #include "NiallsCPP11Utilities.hpp"
 #include "ErrorHandling.hpp"
 #include <locale>
-#include <codecvt>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN 1

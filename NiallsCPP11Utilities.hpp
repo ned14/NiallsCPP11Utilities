@@ -48,6 +48,21 @@ Tested on the following compilers:
 #include <string>
 #include <type_traits>
 #include <list>
+#include <streambuf>
+#include <ios>
+#include <iostream>
+#include <cstddef>
+#include <stdexcept>
+
+// This avoids including <codecvt> which libstdc++ doesn't provide and therefore breaks GCC and clang
+namespace std {
+	template <class Elem, unsigned long Maxcode = 0x10ffff>
+	class codecvt_utf8_utf16
+		: public codecvt<Elem, char, mbstate_t>
+	{
+		// unspecified
+	};
+}
 
 #if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(noexcept)
 #define noexcept throw()

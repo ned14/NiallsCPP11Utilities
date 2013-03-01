@@ -55,7 +55,7 @@ if env['CC']=='cl':
     if not debugbuild:
         env['LINKFLAGS']+=["/OPT:ICF"]  # Eliminate redundants
 else:
-    env['CPPDEFINES']+=[]
+    env['CPPDEFINES']+=["DISABLE_SYMBOLMANGLER"] # libstdc++ doesn't have emplace()
     env['CCFLAGS']+=["-fstrict-aliasing", "-fargument-noalias", "-Wstrict-aliasing"]
     env['CCFLAGS']+=["-Wall", "-Wno-unused"]
     if debugbuild:
@@ -69,7 +69,8 @@ else:
 outputs={}
 
 # Build the NiallsCPP11Utilities DLL
-sources = ["StaticTypeRegistry.cpp"]
+sources = ["ErrorHandling.cpp", "MappedFileInfo.cpp", "StaticTypeRegistry.cpp"]
+if "DISABLE_SYMBOLMANGLER" not in env['CPPDEFINES']: sources.append("SymbolMangler.cpp")
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["NIALLSCPP11UTILITIES_DLL_EXPORTS"])
 if env.GetOption("static"):
     mylib = env.StaticLibrary("NiallsCPP11Utilities", source = libobjects)

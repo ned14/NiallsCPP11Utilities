@@ -98,6 +98,7 @@ TEST_CASE("MappedFileInfo/works", "Tests that MappedFileInfo works")
 	cout << TextDump(FromCodePoint(mfs, main)->second);
 }
 
+#ifndef DISABLE_SYMBOLMANGLER
 TEST_CASE("SymbolType/works", "Tests that SymbolType works")
 {
 	auto test1=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Int);
@@ -226,3 +227,5 @@ TEST_CASE("Demangle/msvc", "Tests that the MSVC C++ symbol demangler works")
 	}
 #endif
 }
+#endif
+
