@@ -46,6 +46,8 @@ Tested on the following compilers:
 #include <unordered_map>
 #include <typeinfo>
 #include <string>
+#include <type_traits>
+#include <list>
 
 #if defined(_MSC_VER) && _MSC_VER<=1700 && !defined(noexcept)
 #define noexcept throw()
@@ -92,12 +94,16 @@ Tested on the following compilers:
 
 //! \define TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
 #ifndef TYPEALIGNMENT
+#if __cplusplus>=201103L
+#define TYPEALIGNMENT(bytes) alignas(bytes)
+#else
 #ifdef _MSC_VER
 #define TYPEALIGNMENT(bytes) __declspec(align(bytes))
 #elif defined(__GNUC__)
 #define TYPEALIGNMENT(bytes) __attribute__((alignment(bytes)))
 #else
 #define TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
+#endif
 #endif
 #endif
 
@@ -240,6 +246,205 @@ template<typename callable> inline UndoerImpl<callable> Undoer(callable c)
 	auto foo=UndoerImpl<callable>(std::move(c));
 	return foo;
 }
+
+
+/*! \enum allocator_alignment
+\brief Some preset alignment values for convenience
+*/
+enum class allocator_alignment : size_t
+{
+    Default = sizeof(void*), //!< The default alignment on this machine.
+    SSE    = 16,			//!< The alignment for SSE. Better to use M128 for NEON et al support.
+	M128   = 16,			//!< The alignment for a 128 bit vector.
+    AVX    = 32,			//!< The alignment for AVX. Better to use M256 for NEON et al support.
+	M256   = 32				//!< The alignment for a 256 bit vector.
+};
+
+
+namespace detail {
+    inline void* allocate_aligned_memory(size_t align, size_t size)
+	{
+#ifdef _MSC_VER
+		return _aligned_malloc(size, align);
+#else
+		extern int posix_memalign(void **memptr, size_t alignment, size_t size);
+		void *ret=nullptr;
+		if(posix_memalign(&ret, align, size)) return nullptr;
+		return ret;
+#endif
+	}
+    inline void deallocate_aligned_memory(void* ptr) noexcept
+	{
+		free(ptr);
+	}
+}
+
+/*! \class aligned_allocator
+\brief An STL allocator which allocates aligned memory
+
+Stolen from http://stackoverflow.com/questions/12942548/making-stdvector-allocate-aligned-memory
+*/
+template <typename T, size_t Align=std::alignment_of<T>::value>
+class aligned_allocator
+{
+public:
+    typedef T         value_type;
+    typedef T*        pointer;
+    typedef const T*  const_pointer;
+    typedef T& reference;
+    typedef const T&  const_reference;
+    typedef size_t    size_type;
+    typedef ptrdiff_t difference_type;
+    static constexpr size_t alignment=Align;
+
+    typedef std::true_type propagate_on_container_move_assignment;
+
+    template <class U>
+    struct rebind { typedef aligned_allocator<U, Align> other; };
+
+public:
+    aligned_allocator() noexcept
+    {}
+
+    template <class U>
+    aligned_allocator(const aligned_allocator<U, Align>&) noexcept
+    {}
+
+    size_type
+    max_size() const noexcept
+    { return (size_type(~0) - size_type(Align)) / sizeof(T); }
+
+    pointer
+    address(reference x) const noexcept
+    { return std::addressof(x); }
+
+    const_pointer
+    address(const_reference x) const noexcept
+    { return std::addressof(x); }
+
+    pointer
+    allocate(size_type n, typename aligned_allocator<void, Align>::const_pointer = 0)
+    {
+        const size_type alignment = static_cast<size_type>( Align );
+        void* ptr = detail::allocate_aligned_memory(alignment , n * sizeof(T));
+        if (ptr == nullptr) {
+            throw std::bad_alloc();
+        }
+
+        return reinterpret_cast<pointer>(ptr);
+    }
+
+    void
+    deallocate(pointer p, size_type) noexcept
+    { return detail::deallocate_aligned_memory(p); }
+
+    template <class U, class ...Args>
+    void
+    construct(U* p, Args&&... args)
+    { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+
+    void
+    destroy(pointer p)
+    { p->~T(); }
+};
+
+template <size_t Align> class aligned_allocator<void, Align>
+{
+public:
+    typedef void         value_type;
+    typedef void *  pointer;
+    typedef const void *  const_pointer;
+    typedef void reference;
+    typedef const void  const_reference;
+    typedef size_t    size_type;
+    typedef ptrdiff_t difference_type;
+    static constexpr size_t alignment=Align;
+};
+template <size_t Align> class aligned_allocator<const void, Align>
+{
+public:
+    typedef const void         value_type;
+    typedef const void*  pointer;
+    typedef const void*  const_pointer;
+    typedef void reference;
+    typedef const void  const_reference;
+    typedef size_t    size_type;
+    typedef ptrdiff_t difference_type;
+    static constexpr size_t alignment=Align;
+};
+
+template <typename T, size_t Align>
+class aligned_allocator<const T, Align>
+{
+public:
+    typedef T         value_type;
+    typedef const T*  pointer;
+    typedef const T*  const_pointer;
+    typedef T& reference;
+    typedef const T&  const_reference;
+    typedef size_t    size_type;
+    typedef ptrdiff_t difference_type;
+    static constexpr size_t alignment=Align;
+
+    typedef std::true_type propagate_on_container_move_assignment;
+
+    template <class U>
+    struct rebind { typedef aligned_allocator<U, Align> other; };
+
+public:
+    aligned_allocator() noexcept
+    {}
+
+    template <class U>
+    aligned_allocator(const aligned_allocator<U, Align>&) noexcept
+    {}
+
+    size_type
+    max_size() const noexcept
+    { return (size_type(~0) - size_type(Align)) / sizeof(T); }
+
+    const_pointer
+    address(const_reference x) const noexcept
+    { return std::addressof(x); }
+
+    pointer
+    allocate(size_type n, typename aligned_allocator<void, Align>::const_pointer = 0)
+    {
+        const size_type alignment = static_cast<size_type>( Align );
+        void* ptr = detail::allocate_aligned_memory(alignment , n * sizeof(T));
+        if (ptr == nullptr) {
+            throw std::bad_alloc();
+        }
+
+        return reinterpret_cast<pointer>(ptr);
+    }
+
+    void
+    deallocate(pointer p, size_type) noexcept
+    { return detail::deallocate_aligned_memory(p); }
+
+    template <class U, class ...Args>
+    void
+    construct(U* p, Args&&... args)
+    { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+
+    void
+    destroy(pointer p)
+    { p->~T(); }
+};
+
+template <typename T, size_t TAlign, typename U, size_t UAlign>
+inline
+bool
+operator== (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) noexcept
+{ return TAlign == UAlign; }
+
+template <typename T, size_t TAlign, typename U, size_t UAlign>
+inline
+bool
+operator!= (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlign>&) noexcept
+{ return TAlign != UAlign; }
+
 
 template<class T> struct TextDumpImpl
 {
@@ -460,7 +665,7 @@ struct NIALLSCPP11UTILITIES_API MappedFileInfo
 {
 	std::string path;				//!< Full path to the binary.
 	size_t startaddr, endaddr;		//!< Start and end addresses of where it's mapped to
-	off_t offset;					//!< From which offset in the file
+	size_t offset;					//!< From which offset in the file
 	size_t length;					//!< Length of mapped section (basically \c endaddr-startaddr)
 	bool read, write, execute, copyonwrite;	//!< Reflecting if the section is readable, writeable, executable and/or copy-on-write
 

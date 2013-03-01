@@ -103,6 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;unordered_map&gt;</code><br/>
 <code>#include &lt;typeinfo&gt;</code><br/>
 <code>#include &lt;string&gt;</code><br/>
+<code>#include &lt;list&gt;</code><br/>
 </div>
 <p><a href="_nialls_c_p_p11_utilities_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -110,6 +111,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1membuf.html">NiallsCPP11Utilities::membuf</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a byte buffer processing std::streambuf.  <a href="struct_nialls_c_p_p11_utilities_1_1membuf.html#details">More...</a><br/></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_nialls_c_p_p11_utilities_1_1aligned__allocator.html">NiallsCPP11Utilities::aligned_allocator&lt; T, Align &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An STL allocator which allocates aligned memory.  <a href="class_nialls_c_p_p11_utilities_1_1aligned__allocator.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html">NiallsCPP11Utilities::StaticTypeRegistry&lt; _registry, _type, _containertype &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An iterable, statically stored registry of items associated with a type.  <a href="struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html#details">More...</a><br/></td></tr>
@@ -141,6 +145,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a4e58b66a458170222acc53c4b4b84714"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a4e58b66a458170222acc53c4b4b84714">DLLWEAKMARKUP</a>(type, name)</td></tr>
 <tr class="memdesc:a4e58b66a458170222acc53c4b4b84714"><td class="mdescLeft">&#160;</td><td class="mdescRight">DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak  <a href="#a4e58b66a458170222acc53c4b4b84714"></a><br/></td></tr>
 <tr class="separator:a4e58b66a458170222acc53c4b4b84714"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79d4cea409fd4bd321c59f1978e18f7c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a79d4cea409fd4bd321c59f1978e18f7c">TYPEALIGNMENT</a>(bytes)&#160;&#160;&#160;unknown_type_alignment_markup_for_this_compiler</td></tr>
+<tr class="memdesc:a79d4cea409fd4bd321c59f1978e18f7c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a79d4cea409fd4bd321c59f1978e18f7c" title="TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment...">TYPEALIGNMENT(bytes)</a> The markup this compiler uses to mark a type as having some given alignment  <a href="#a79d4cea409fd4bd321c59f1978e18f7c"></a><br/></td></tr>
+<tr class="separator:a79d4cea409fd4bd321c59f1978e18f7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7eed15c4920ee413e81d42711b765166"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a7eed15c4920ee413e81d42711b765166">RETURNS</a>(...)&#160;&#160;&#160;-&gt; decltype(__VA_ARGS__) { return (__VA_ARGS__); }</td></tr>
 <tr class="memdesc:a7eed15c4920ee413e81d42711b765166"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEFINES Defines RETURNS to automatically figure out your return type  <a href="#a7eed15c4920ee413e81d42711b765166"></a><br/></td></tr>
 <tr class="separator:a7eed15c4920ee413e81d42711b765166"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,6 +162,9 @@ SymbolType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:abf91c96cb75fa0fcf7f38ab03382d145"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#abf91c96cb75fa0fcf7f38ab03382d145">NiallsCPP11Utilities::allocator_alignment</a> : size_t </td></tr>
+<tr class="memdesc:abf91c96cb75fa0fcf7f38ab03382d145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Some preset alignment values for convenience.  <a href="namespace_nialls_c_p_p11_utilities.html#abf91c96cb75fa0fcf7f38ab03382d145">More...</a><br/></td></tr>
+<tr class="separator:abf91c96cb75fa0fcf7f38ab03382d145"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc9e34ac457a82a88ad4bc675a1de73a"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">NiallsCPP11Utilities::SymbolTypeType</a> </td></tr>
 <tr class="memdesc:acc9e34ac457a82a88ad4bc675a1de73a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of a symbol type.  <a href="namespace_nialls_c_p_p11_utilities.html#acc9e34ac457a82a88ad4bc675a1de73a">More...</a><br/></td></tr>
 <tr class="separator:acc9e34ac457a82a88ad4bc675a1de73a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,6 +311,24 @@ std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </div><div class="memdoc">
 
 <p>DEFINES Defines RETURNS to automatically figure out your return type </p>
+
+</div>
+</div>
+<a class="anchor" id="a79d4cea409fd4bd321c59f1978e18f7c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TYPEALIGNMENT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">bytes</td><td>)</td>
+          <td>&#160;&#160;&#160;unknown_type_alignment_markup_for_this_compiler</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="_nialls_c_p_p11_utilities_8hpp.html#a79d4cea409fd4bd321c59f1978e18f7c" title="TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment...">TYPEALIGNMENT(bytes)</a> The markup this compiler uses to mark a type as having some given alignment </p>
 
 </div>
 </div>
