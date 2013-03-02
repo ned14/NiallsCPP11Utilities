@@ -30,6 +30,9 @@
     <ClCompile Include="SymbolManglerMSVC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hashes\niallsnasty256hash\niallsnasty256hash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorHandling.hpp">

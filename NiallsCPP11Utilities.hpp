@@ -277,12 +277,16 @@ enum class allocator_alignment : size_t
 
 
 namespace detail {
+#ifdef WIN32
+	extern "C" void *_aligned_malloc(size_t size, size_t alignment);
+#else
+	extern "C" int posix_memalign(void **memptr, size_t alignment, size_t size);
+#endif
     inline void* allocate_aligned_memory(size_t align, size_t size)
 	{
-#ifdef _MSC_VER
+#ifdef WIN32
 		return _aligned_malloc(size, align);
 #else
-		extern int posix_memalign(void **memptr, size_t alignment, size_t size);
 		void *ret=nullptr;
 		if(posix_memalign(&ret, align, size)) return nullptr;
 		return ret;
@@ -310,7 +314,7 @@ public:
     typedef const T&  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-    static constexpr size_t alignment=Align;
+	enum { alignment=Align };
 
     typedef std::true_type propagate_on_container_move_assignment;
 
@@ -353,10 +357,17 @@ public:
     deallocate(pointer p, size_type) noexcept
     { return detail::deallocate_aligned_memory(p); }
 
+#if defined(_MSC_VER) && _MSC_VER>1700
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
     { ::new(reinterpret_cast<void*>(p)) U(std::forward<Args>(args)...); }
+#else
+	void construct( pointer p, const_reference val )
+	{
+		::new(reinterpret_cast<void*>(p)) T(val);
+	}
+#endif
 
     void
     destroy(pointer p)
@@ -373,7 +384,7 @@ public:
     typedef const void  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-    static constexpr size_t alignment=Align;
+	enum { alignment=Align };
 };
 template <size_t Align> class aligned_allocator<const void, Align>
 {
@@ -385,7 +396,7 @@ public:
     typedef const void  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-    static constexpr size_t alignment=Align;
+	enum { alignment=Align };
 };
 
 template <typename T, size_t Align>
@@ -399,7 +410,7 @@ public:
     typedef const T&  const_reference;
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
-    static constexpr size_t alignment=Align;
+	enum { alignment=Align };
 
     typedef std::true_type propagate_on_container_move_assignment;
 
