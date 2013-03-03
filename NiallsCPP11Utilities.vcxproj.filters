@@ -30,7 +30,7 @@
     <ClCompile Include="SymbolManglerMSVC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hashes\niallsnasty256hash\niallsnasty256hash.cpp">
+    <ClCompile Include="Int128_256.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

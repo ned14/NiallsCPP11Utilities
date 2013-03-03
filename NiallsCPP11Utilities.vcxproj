@@ -55,6 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;NIALLSCPP11UTILITIES_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\boost</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,7 +82,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ErrorHandling.cpp" />
-    <ClCompile Include="hashes\niallsnasty256hash\niallsnasty256hash.cpp" />
+    <ClCompile Include="Int128_256.cpp" />
     <ClCompile Include="MappedFileInfo.cpp" />
     <ClCompile Include="StaticTypeRegistry.cpp" />
     <ClCompile Include="SymbolMangler.cpp" />

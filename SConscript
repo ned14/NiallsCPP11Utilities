@@ -69,7 +69,7 @@ else:
 outputs={}
 
 # Build the NiallsCPP11Utilities DLL
-sources = ["ErrorHandling.cpp", "MappedFileInfo.cpp", "StaticTypeRegistry.cpp", "hashes/niallsnasty256hash/niallsnasty256hash.cpp"]
+sources = ["ErrorHandling.cpp", "MappedFileInfo.cpp", "StaticTypeRegistry.cpp", "Int128_256.cpp"]
 if "DISABLE_SYMBOLMANGLER" not in env['CPPDEFINES']: sources.append("SymbolMangler.cpp")
 libobjects = env.SharedObject(sources, CPPDEFINES=env['CPPDEFINES']+["NIALLSCPP11UTILITIES_DLL_EXPORTS"])
 if env.GetOption("static"):
