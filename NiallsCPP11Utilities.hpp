@@ -76,7 +76,7 @@ namespace std {
 				   + __GNUC_PATCHLEVEL__)
 #endif
 
-//! \define DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL
+//! \def DLLEXPORTMARKUP The markup this compiler uses to export a symbol from a DLL
 #ifndef DLLEXPORTMARKUP
 #ifdef WIN32
 #define DLLEXPORTMARKUP __declspec(dllexport)
@@ -87,7 +87,7 @@ namespace std {
 #endif
 #endif
 
-//! \define DLLIMPORTMARKUP The markup this compiler uses to import a symbol from a DLL
+//! \def DLLIMPORTMARKUP The markup this compiler uses to import a symbol from a DLL
 #ifndef DLLIMPORTMARKUP
 #ifdef WIN32
 #define DLLIMPORTMARKUP __declspec(dllimport)
@@ -96,7 +96,7 @@ namespace std {
 #endif
 #endif
 
-//! \define DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak
+//! \def DLLSELECTANYMARKUP The markup this compiler uses to mark a symbol as being weak
 #ifndef DLLWEAKMARKUP
 #ifdef WIN32
 #define DLLWEAKMARKUP(type, name) extern __declspec(selectany) type name; extern __declspec(selectany) type name##_weak=NULL; __pragma(comment(linker, "/alternatename:_" #name "=_" #name "_weak"))
@@ -107,7 +107,7 @@ namespace std {
 #endif
 #endif
 
-//! \define TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
+//! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
 #ifndef TYPEALIGNMENT
 #if __cplusplus>=201103L
 #define TYPEALIGNMENT(bytes) alignas(bytes)
@@ -129,7 +129,7 @@ namespace std {
 #define NIALLSCPP11UTILITIES_API DLLIMPORTMARKUP
 #endif
 
-//! \define DEFINES Defines RETURNS to automatically figure out your return type
+//! \def DEFINES Defines RETURNS to automatically figure out your return type
 #ifndef RETURNS
 #define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
 #endif
@@ -294,7 +294,11 @@ namespace detail {
 	}
     inline void deallocate_aligned_memory(void* ptr) noexcept
 	{
+#ifdef WIN32
+		_aligned_free(ptr);
+#else
 		free(ptr);
+#endif
 	}
 }
 
@@ -715,7 +719,7 @@ inline std::ostream &operator<<(std::ostream &s, const TextDumpImpl<std::map<siz
 		s << "   " << TextDump(i.second);
 	return s;
 }
-//! \brief Finds the MappedFileInfo containing code point \codepoint, if any
+//! \brief Finds the MappedFileInfo containing code point \em codepoint, if any
 template<class R, class... Pars> inline std::map<size_t, MappedFileInfo>::const_iterator FromCodePoint(const std::map<size_t, MappedFileInfo> &list, R(*codepoint)(Pars...))
 {
 	size_t addr=(size_t)(void *)codepoint;

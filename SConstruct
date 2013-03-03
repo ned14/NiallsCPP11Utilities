@@ -3,10 +3,10 @@ import os, sys, platform, subprocess
 architectures = ["generic", "x86", "x64", "ARMv7"]
 
 env = Environment()
-#print env['TOOLS']
+print env['TOOLS']
 if sys.platform=="win32" and 'INCLUDE' not in os.environ:
     env = Environment(tools=['mingw', 'msvs'])
-#print env['TOOLS']
+print env['TOOLS']
 AddOption('--postfix', dest='postfix', nargs=1, default='_test', help='appends a string to the DLL name')
 AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debug build')
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')

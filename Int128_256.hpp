@@ -255,9 +255,11 @@ public:
 };
 
 /*! \class Hash128
-\brief Provides a 128 bit hash
+\brief Provides a 128 bit hash, namely SpookyHash.
 
 To use this you must compile Int128_256.cpp.
+
+Performance on 32 bit is approx. 32% of memcpy(). Performance on 64 bit is approx. 139% of memcpy().
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
@@ -267,9 +269,11 @@ public:
 };
 
 /*! \class Hash256
-\brief Provides a 256 bit hash
+\brief Provides a 256 bit hash. Uses two threads if given >=1024 bytes and OpenMP support.
 
 To use this you must compile Int128_256.cpp.
+
+Performance on 32 bit is approx. 13% of memcpy(). Performance on 64 bit is approx. 104% of memcpy().
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {
@@ -298,25 +302,12 @@ namespace std
 			return v.asSize_t();
 		}
 	};
-	//! Stop the default std::vector<> doing unaligned storage
-	template<> class vector<NiallsCPP11Utilities::Int256, allocator<NiallsCPP11Utilities::Int256>> : public vector<NiallsCPP11Utilities::Int256, NiallsCPP11Utilities::aligned_allocator<NiallsCPP11Utilities::Int256>>
-	{
-		typedef vector<NiallsCPP11Utilities::Int256, NiallsCPP11Utilities::aligned_allocator<NiallsCPP11Utilities::Int256>> Base;
-	public:
-		explicit vector (const allocator_type& alloc = allocator_type()) : Base(alloc) { }
-		explicit vector (size_type n) : Base(n) { }
-		vector (size_type n, const value_type& val,
-			const allocator_type& alloc = allocator_type()) : Base(n, val, alloc) { }
-		template <class InputIterator> vector (InputIterator first, InputIterator last,
-			const allocator_type& alloc = allocator_type()) : Base(first, last, alloc) { }
-		vector (const vector& x) : Base(x) { }
-		//vector (const vector& x, const allocator_type& alloc) : Base(x, alloc) { }
-		vector (vector&& x) : Base(std::move(x)) { }
-		//vector (vector&& x, const allocator_type& alloc) : Base(std::move(x), alloc) { }
-#if defined(_MSC_VER) && _MSC_VER>1700
-		vector (initializer_list<value_type> il, const allocator_type& alloc = allocator_type()) : Base(il, alloc) { }
-#endif
-	};
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int128
+#include "incl_stl_allocator_override.hpp"
+#undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int256
+#include "incl_stl_allocator_override.hpp"
+#undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
 }
 
 #endif

@@ -1,6 +1,7 @@
 var searchData=
 [
   ['settypedict',['setTypedict',['../class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a6f88d442dde0af6b5248d3ecfece24f2',1,'NiallsCPP11Utilities::SymbolDemangle']]],
+  ['sse',['SSE',['../namespace_nialls_c_p_p11_utilities.html#a78f1e6f126ba868dfd6095e2e6b975c7addd78bd451e3b8ef11296eda02beb232',1,'NiallsCPP11Utilities']]],
   ['statictyperegistry',['StaticTypeRegistry',['../struct_nialls_c_p_p11_utilities_1_1_static_type_registry.html',1,'NiallsCPP11Utilities']]],
   ['storage',['storage',['../struct_nialls_c_p_p11_utilities_1_1_symbol_type.html#a93a3a09dca6b7a6587dab411f8670adc',1,'NiallsCPP11Utilities::SymbolType']]],
   ['symboldemangle',['SymbolDemangle',['../class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html',1,'NiallsCPP11Utilities']]],

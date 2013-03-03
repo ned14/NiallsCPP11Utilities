@@ -44,5 +44,8 @@
     <ClInclude Include="SymbolMangler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Int128_256.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

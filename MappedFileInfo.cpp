@@ -85,7 +85,7 @@ std::map<size_t, MappedFileInfo> MappedFileInfo::mappedFiles()
 	do
 	{
 		drives.resize(GetLogicalDriveStrings(0, NULL)+1);
-	} while(!GetLogicalDriveStrings(drives.size(), drives.data()));
+	} while(!GetLogicalDriveStrings((DWORD) drives.size(), drives.data()));
 	unordered_map<string, string> deviceToDrive;
 	for(TCHAR *d=drives.data(), *e=_tcschr(d, 0); *d!=0; d=e+1, e=_tcschr(d, 0))
 	{
