@@ -55,7 +55,7 @@ if env['CC']=='cl':
     if not debugbuild:
         env['LINKFLAGS']+=["/OPT:ICF"]  # Eliminate redundants
 else:
-    env['CPPDEFINES']+=["DISABLE_SYMBOLMANGLER"] # libstdc++ doesn't have emplace()
+    env['CPPDEFINES']+=[("DISABLE_SYMBOLMANGLER", 1)] # libstdc++ doesn't have emplace()
     env['CCFLAGS']+=["-fstrict-aliasing", "-fargument-noalias", "-Wstrict-aliasing"]
     env['CCFLAGS']+=["-Wall", "-Wno-unused"]
     if debugbuild:

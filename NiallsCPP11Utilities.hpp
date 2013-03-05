@@ -15,6 +15,9 @@ File Created: Nov 2012
 #pragma warning(disable: 4251) // needs to have dll-interface to be used by clients of
 #endif
 
+#ifndef DISABLE_SYMBOLMANGLER
+#define DISABLE_SYMBOLMANGLER 1 // SymbolMangler needs a ground-up reimplementation. Its current implementation isn't reliable.
+#endif
 
 /*! \mainpage
 
@@ -132,6 +135,12 @@ namespace std {
 //! \def DEFINES Defines RETURNS to automatically figure out your return type
 #ifndef RETURNS
 #define RETURNS(...) -> decltype(__VA_ARGS__) { return (__VA_ARGS__); }
+#endif
+
+#ifndef __LP64__
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IA64))
+#define __LP64__ 1
+#endif
 #endif
 
 //! \namespace NiallsCPP11Utilities Where Niall's useful C++ 11 utilities live
@@ -375,7 +384,7 @@ public:
 
     void
     destroy(pointer p)
-    { p->~T(); }
+    { (void) p; p->~T(); }
 };
 
 template <size_t Align> class aligned_allocator<void, Align>
@@ -730,6 +739,7 @@ template<class R, class... Pars> inline std::map<size_t, MappedFileInfo>::const_
 	return list.cend();
 }
 
+#if !DISABLE_SYMBOLMANGLER
 //! The type of a symbol type
 enum class SymbolTypeType
 {
@@ -996,6 +1006,8 @@ inline std::pair<std::string, std::string> Demangle(const std::string &mangled, 
 	SymbolDemangle demangler;
 	return Demangle(mangled, nt, demangler);
 }
+
+#endif // DISABLE_SYMBOLMANGLER
 
 } // namespace
 

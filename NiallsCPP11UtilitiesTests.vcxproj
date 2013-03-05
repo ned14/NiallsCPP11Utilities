@@ -139,12 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="unittests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="NiallsCPP11Utilities.vcxproj">
       <Project>{cf7497ef-702b-4237-bb7c-ad72c297b88e}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="unittests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

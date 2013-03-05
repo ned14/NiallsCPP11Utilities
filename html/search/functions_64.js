@@ -1,4 +1,0 @@
-var searchData=
-[
-  ['demangle',['demangle',['../class_nialls_c_p_p11_utilities_1_1_symbol_demangle.html#a12a49a75f53ea4a87da3cf54b16ce660',1,'NiallsCPP11Utilities::SymbolDemangle::demangle()'],['../namespace_nialls_c_p_p11_utilities.html#a21dcaefb5e899dc8c3acb28344c8991d',1,'NiallsCPP11Utilities::Demangle(const std::string &amp;mangled, SymbolDemangle &amp;demangler)'],['../namespace_nialls_c_p_p11_utilities.html#ab098ff5e761c2d985be944a37bb70272',1,'NiallsCPP11Utilities::Demangle(const std::string &amp;mangled)'],['../namespace_nialls_c_p_p11_utilities.html#a41b17bda0d6e63318f8bbae62dde58cc',1,'NiallsCPP11Utilities::Demangle(const std::string &amp;mangled, std::nothrow_t, SymbolDemangle &amp;demangler)'],['../namespace_nialls_c_p_p11_utilities.html#acbdf8c0613ff1367c1ce3019eb85c9de',1,'NiallsCPP11Utilities::Demangle(const std::string &amp;mangled, std::nothrow_t nt)']]]
-];

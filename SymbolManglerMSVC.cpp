@@ -5,6 +5,8 @@ File Created: Nov 2012
 
 #include "SymbolMangler.hpp"
 
+#if !DISABLE_SYMBOLMANGLER
+
 namespace NiallsCPP11Utilities {
 
 using namespace std;
@@ -577,3 +579,4 @@ static auto reg=NiallsCPP11Utilities::AutoDataRegistration<SymbolDemanglerRegist
 
 } // namespace
 
+#endif

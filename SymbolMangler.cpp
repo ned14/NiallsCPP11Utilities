@@ -5,6 +5,8 @@ File Created: Nov 2012
 
 #include "SymbolMangler.hpp"
 
+#if !DISABLE_SYMBOLMANGLER
+
 namespace NiallsCPP11Utilities {
 
 using namespace std;
@@ -302,3 +304,5 @@ std::pair<const SymbolType *, bool>  SymbolDemangle::demangle(const std::string 
 
 
 } // namespace
+
+#endif

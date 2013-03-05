@@ -68,6 +68,7 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 	union
 	{
 		char asBytes[16];
+		unsigned int asInts[4];
 		unsigned long long asLongLongs[2];
 		size_t asSize_t;
 #if HAVE_M128
@@ -85,7 +86,7 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 		return (char)((x>9) ? 'a'+x-10 : '0'+x);
 	}
 public:
-	//! Constructs an empty hash
+	//! Constructs an empty int
 	Int128() { int_testAlignment(); memset(this, 0, sizeof(*this)); }
 #if HAVE_M128
 	Int128(const Int128 &o) { int_testAlignment(); mydata.asM128=_mm_load_si128(&o.mydata.asM128); }
@@ -98,39 +99,31 @@ public:
 		unsigned r=_mm_movemask_epi8(result);
 		return r==0xffff;
 	}
-	bool operator>(const Int128 &o) const
-	{
-		__m128i result[2];
-		result[0]=_mm_cmpgt_epi32(mydata.asM128, o.mydata.asM128);
-		result[1]=_mm_cmpgt_epi32(o.mydata.asM128, mydata.asM128);
-		unsigned r[2];
-		r[0]=_mm_movemask_epi8(result[0]);
-		r[1]=_mm_movemask_epi8(result[1]);
-		return r[0]>r[1];
-	}
 #else
-	//! Copies another hash
+	//! Copies another int
 	Int128(const Int128 &o) { int_testAlignment(); memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-	//! Copies another hash
+	//! Copies another int
 	Int128 &operator=(const Int128 &o) { memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); return *this; }
-	//! Constructs a hash from unaligned data
+	//! Constructs a int from unaligned data
 	explicit Int128(const char *bytes) { int_testAlignment(); memcpy(mydata.asBytes, bytes, sizeof(mydata.asBytes)); }
 	bool operator==(const Int128 &o) const { return !memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-	bool operator>(const Int128 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
 #endif
 	Int128(Int128 &&o) { *this=o; }
 	Int128 &operator=(Int128 &&o) { *this=o; return *this; }
 	bool operator!=(const Int128 &o) const { return !(*this==o); }
+	bool operator>(const Int128 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
 	bool operator<(const Int128 &o) const { return o>*this; }
 	bool operator>=(const Int128 &o) const { return !(o>*this); }
 	bool operator<=(const Int128 &o) const { return !(*this>o); }
-	//! Returns the hash as bytes
+	//! Returns the int as bytes
 	const char *asBytes() const { return mydata.asBytes; }
-	//! Returns the hash as long longs
+	//! Returns the int as ints
+	const unsigned int *asInts() const { return mydata.asInts; }
+	//! Returns the int as long longs
 	const unsigned long long *asLongLongs() const { return mydata.asLongLongs; }
-	//! Returns the front of the hash as a size_t
+	//! Returns the front of the int as a size_t
 	size_t asSize_t() const { return mydata.asSize_t; }
-	//! Returns the hash as a 64 character hexadecimal string
+	//! Returns the int as a 64 character hexadecimal string
 	std::string asHexString() const
 	{
 		std::string ret(32, '0');
@@ -142,6 +135,14 @@ public:
 		}
 		return ret;
 	}
+	//! Fast gets \em no random Int128s.
+	static void FillFastRandom(Int128 *ints, size_t no);
+	//! Fast fills a vector with random Int128s
+	static inline void FillFastRandom(std::vector<Int128> &ints);
+	//! Quality gets \em no random Int128s.
+	static void FillQualityRandom(Int128 *ints, size_t no);
+	//! Quality fills a vector with random Int128s
+	static inline void FillQualityRandom(std::vector<Int128> &ints);
 };
 
 /*! \class Int256
@@ -152,6 +153,7 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 	union
 	{
 		char asBytes[32];
+		unsigned int asInts[8];
 		unsigned long long asLongLongs[4];
 		size_t asSize_t;
 #if HAVE_M128
@@ -172,7 +174,7 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 		return (char)((x>9) ? 'a'+x-10 : '0'+x);
 	}
 public:
-	//! Constructs an empty hash
+	//! Constructs an empty int
 	Int256() { int_testAlignment(); memset(this, 0, sizeof(*this)); }
 #if HAVE_M256
 	Int256(const Int256 &o) { int_testAlignment(); mydata.asM256=_mm256_load_si256(&o.mydata.asM256); }
@@ -182,16 +184,6 @@ public:
 	{
 		__m256i result=_mm256_cmpeq_epi64(mydata.asM256, o.mydata.asM256);
 		return !(~_mm256_movemask_epi8(result));
-	}
-	bool operator>(const Int256 &o) const
-	{
-		__m256i result[2];
-		result[0]=_mm256_cmpgt_epi64(mydata.asM256, o.mydata.asM256);
-		result[1]=_mm256_cmpgt_epi64(o.mydata.asM256, mydata.asM256);
-		unsigned r[2];
-		r[0]=_mm256_movemask_epi8(result[0]);
-		r[1]=_mm256_movemask_epi8(result[1]);
-		return r[0]>r[1];
 	}
 #elif HAVE_M128
 	Int256(const Int256 &o) { int_testAlignment(); mydata.asM128s[0]=_mm_load_si128(&o.mydata.asM128s[0]); mydata.asM128s[1]=_mm_load_si128(&o.mydata.asM128s[1]); }
@@ -206,41 +198,31 @@ public:
 		r|=_mm_movemask_epi8(result[1])<<16;
 		return !(~r);
 	}
-	bool operator>(const Int256 &o) const
-	{
-		__m128i result[4];
-		result[0]=_mm_cmpgt_epi32(mydata.asM128s[0], o.mydata.asM128s[0]);
-		result[1]=_mm_cmpgt_epi32(mydata.asM128s[1], o.mydata.asM128s[1]);
-		result[2]=_mm_cmpgt_epi32(o.mydata.asM128s[0], mydata.asM128s[0]);
-		result[3]=_mm_cmpgt_epi32(o.mydata.asM128s[1], mydata.asM128s[1]);
-		unsigned r[2];
-		r[0]=_mm_movemask_epi8(result[0])|(_mm_movemask_epi8(result[1])<<16);
-		r[1]=_mm_movemask_epi8(result[2])|(_mm_movemask_epi8(result[3])<<16);
-		return r[0]>r[1];
-	}
 #else
-	//! Copies another hash
+	//! Copies another int
 	Int256(const Int256 &o) { int_testAlignment(); memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-	//! Copies another hash
+	//! Copies another int
 	Int256 &operator=(const Int256 &o) { memcpy(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); return *this; }
-	//! Constructs a hash from unaligned data
+	//! Constructs a int from unaligned data
 	explicit Int256(const char *bytes) { int_testAlignment(); memcpy(mydata.asBytes, bytes, sizeof(mydata.asBytes)); }
 	bool operator==(const Int256 &o) const { return !memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes)); }
-	bool operator>(const Int256 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
 #endif
 	Int256(Int256 &&o) { *this=o; }
 	Int256 &operator=(Int256 &&o) { *this=o; return *this; }
 	bool operator!=(const Int256 &o) const { return !(*this==o); }
+	bool operator>(const Int256 &o) const { return memcmp(mydata.asBytes, o.mydata.asBytes, sizeof(mydata.asBytes))>0; }
 	bool operator<(const Int256 &o) const { return o>*this; }
 	bool operator>=(const Int256 &o) const { return !(o>*this); }
 	bool operator<=(const Int256 &o) const { return !(*this>o); }
-	//! Returns the hash as bytes
+	//! Returns the int as bytes
 	const char *asBytes() const { return mydata.asBytes; }
-	//! Returns the hash as long longs
+	//! Returns the int as ints
+	const unsigned int *asInts() const { return mydata.asInts; }
+	//! Returns the int as long longs
 	const unsigned long long *asLongLongs() const { return mydata.asLongLongs; }
-	//! Returns the front of the hash as a size_t
+	//! Returns the front of the int as a size_t
 	size_t asSize_t() const { return mydata.asSize_t; }
-	//! Returns the hash as a 64 character hexadecimal string
+	//! Returns the int as a 64 character hexadecimal string
 	std::string asHexString() const
 	{
 		std::string ret(64, '0');
@@ -252,34 +234,46 @@ public:
 		}
 		return ret;
 	}
+	//! Fast gets \em no random Int256s.
+	static void FillFastRandom(Int256 *ints, size_t no);
+	//! Fast fills a vector with random Int256s.
+	static inline void FillFastRandom(std::vector<Int256> &ints);
+	//! Quality gets \em no random Int256s.
+	static void FillQualityRandom(Int256 *ints, size_t no);
+	//! Quality fills a vector with random Int256s.
+	static inline void FillQualityRandom(std::vector<Int256> &ints);
 };
 
 /*! \class Hash128
-\brief Provides a 128 bit hash, namely SpookyHash.
+\brief Provides a 128 bit hash.
 
 To use this you must compile Int128_256.cpp.
 
-Performance on 32 bit is approx. 32% of memcpy(). Performance on 64 bit is approx. 139% of memcpy().
+Fasthash (SpookyHash) performance on 32 bit is approx. 1.27 cycles/byte. Performance on 64 bit is approx. 0.29 cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
 public:
-	//! Adds data to this hash.
-	void AddTo(const char *data, size_t length);
+	//! Adds fash hashed data to this hash.
+	void AddFastHashTo(const char *data, size_t length);
 };
 
 /*! \class Hash256
-\brief Provides a 256 bit hash. Uses two threads if given >=1024 bytes and OpenMP support.
+\brief Provides a 256 bit hash.
 
 To use this you must compile Int128_256.cpp.
 
-Performance on 32 bit is approx. 13% of memcpy(). Performance on 64 bit is approx. 104% of memcpy().
+Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 3.13 cycles/byte. Performance on 64 bit is approx. 0.39 cycles/byte.
+
+SHA-256 performance on 32 bit is approx. X cycles/byte. Performance on 64 bit is approx. X cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {
 public:
-	//! Adds data to this hash.
-	void AddTo(const char *data, size_t length);
+	//! Adds fast hashed data to this hash. Uses two threads if given >=1024 bytes and OpenMP support.
+	void AddFastHashTo(const char *data, size_t length);
+	//! Adds SHA-256 data to this hash.
+	void AddSHA256To(const char *data, size_t length);
 };
 
 } //namespace
@@ -294,7 +288,7 @@ namespace std
 			return v.asSize_t();
 		}
 	};
-	//! Defines a hash for a Hash256 (simply truncates)
+	//! Defines a hash for a Int256 (simply truncates)
 	template<> struct hash<NiallsCPP11Utilities::Int256>
 	{
 		size_t operator()(const NiallsCPP11Utilities::Int256 &v) const
@@ -308,6 +302,13 @@ namespace std
 #define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int256
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
+}
+
+namespace NiallsCPP11Utilities {
+	inline void Int128::FillFastRandom(std::vector<Int128> &ints) { FillFastRandom(ints.data(), ints.size()); }
+	inline void Int128::FillQualityRandom(std::vector<Int128> &ints) { FillQualityRandom(ints.data(), ints.size()); }
+	inline void Int256::FillFastRandom(std::vector<Int256> &ints) { FillFastRandom(ints.data(), ints.size()); }
+	inline void Int256::FillQualityRandom(std::vector<Int256> &ints) { FillQualityRandom(ints.data(), ints.size()); }
 }
 
 #endif

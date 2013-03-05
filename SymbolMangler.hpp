@@ -9,6 +9,7 @@ File Created: Nov 2012
 //#define BOOST_SPIRIT_DEBUG
 
 #include "NiallsCPP11Utilities.hpp"
+#if !DISABLE_SYMBOLMANGLER
 #include <utility>
 #include <boost/mpl/vector.hpp>
 #include <boost/mpl/map.hpp>
@@ -93,3 +94,5 @@ template<class fillmaptype, class sourcemaptype, typename T=typename fillmaptype
 }
 
 } // namespace
+
+#endif

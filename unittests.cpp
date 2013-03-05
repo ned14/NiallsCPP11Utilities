@@ -3,9 +3,11 @@
 File Created: Nov 2012
 */
 
+#define CPU_CYCLES_PER_SEC (2400000000)
+
 #define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
 #include "NiallsCPP11Utilities.hpp"
+#include "catch.hpp"
 #include "Int128_256.hpp"
 #include <stdio.h>
 #include <fstream>
@@ -109,7 +111,7 @@ TEST_CASE("MappedFileInfo/works", "Tests that MappedFileInfo works")
 	cout << TextDump(FromCodePoint(mfs, main)->second);
 }
 
-#ifndef DISABLE_SYMBOLMANGLER
+#if! DISABLE_SYMBOLMANGLER
 TEST_CASE("SymbolType/works", "Tests that SymbolType works")
 {
 	auto test1=SymbolType(SymbolTypeQualifier::None, SymbolTypeType::Int);
@@ -271,8 +273,40 @@ TEST_CASE("Int128/works", "Tests that Int128 works")
 	CHECK_FALSE(hash2>hash2);
 
 	CHECK(alignment_of<Int128>::value==16);
-	vector<Int128> hashes(4);
+	vector<Int128> hashes(4096);
 	CHECK(vector<Int128>::allocator_type::alignment==16);
+
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		Int128::FillFastRandom(hashes);
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "FillFastRandom 128-bit does " << ((hashes.size()*sizeof(Int128))/diff.count())/1024/1024 << "Mb/sec" << endl;
+	}
+	vector<char> comparisons1(hashes.size());
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<1000; m++)
+			for(size_t n=0; n<hashes.size()-1; n++)
+				comparisons1[n]=hashes[n]>hashes[n+1];
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "Comparisons 128-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << "cycles/op" << endl;
+	}
+	vector<char> comparisons2(hashes.size());
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<1000; m++)
+			for(size_t n=0; n<hashes.size()-1; n++)
+				comparisons2[n]=memcmp(&hashes[n], &hashes[n+1], sizeof(hashes[n]))>0;
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "Comparisons memcmp does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << "cycles/op" << endl;
+	}
+	CHECK((comparisons1==comparisons2));
 }
 
 TEST_CASE("Int256/works", "Tests that Int256 works")
@@ -335,7 +369,7 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 		auto begin=chrono::high_resolution_clock::now();
 		for(int n=0; n<1000; n++)
 		{
-			hash.AddTo(random, sizeof(random));
+			hash.AddFastHashTo(random, sizeof(random));
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
@@ -371,7 +405,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		auto begin=chrono::high_resolution_clock::now();
 		for(int n=0; n<1000; n++)
 		{
-			hash.AddTo(random, sizeof(random));
+			hash.AddFastHashTo(random, sizeof(random));
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
