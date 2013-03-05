@@ -260,17 +260,17 @@ TEST_CASE("Int128/works", "Tests that Int128 works")
 	CHECK(hash2!=null);
 	CHECK(hash1!=hash2);
 
-	CHECK(hash1<hash2);
-	CHECK_FALSE(hash1>hash2);
-	CHECK(hash2>hash1);
-	CHECK_FALSE(hash2<hash1);
+	CHECK(hash1>hash2);
+	CHECK_FALSE(hash1<hash2);
+	CHECK(hash2<hash1);
+	CHECK_FALSE(hash2>hash1);
 
-	CHECK(hash1<=hash2);
-	CHECK_FALSE(hash1>=hash2);
-	CHECK(hash1>=hash1);
-	CHECK_FALSE(hash1>hash1);
-	CHECK(hash2>=hash2);
-	CHECK_FALSE(hash2>hash2);
+	CHECK(hash1>=hash2);
+	CHECK_FALSE(hash1<=hash2);
+	CHECK(hash1<=hash1);
+	CHECK_FALSE(hash1<hash1);
+	CHECK(hash2<=hash2);
+	CHECK_FALSE(hash2<hash2);
 
 	CHECK(alignment_of<Int128>::value==16);
 	vector<Int128> hashes(4096);
@@ -279,10 +279,20 @@ TEST_CASE("Int128/works", "Tests that Int128 works")
 	{
 		typedef std::chrono::duration<double, ratio<1>> secs_type;
 		auto begin=chrono::high_resolution_clock::now();
-		Int128::FillFastRandom(hashes);
+		for(int m=0; m<10000; m++)
+			Int128::FillFastRandom(hashes);
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "FillFastRandom 128-bit does " << ((hashes.size()*sizeof(Int128))/diff.count())/1024/1024 << "Mb/sec" << endl;
+		cout << "FillFastRandom 128-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(10000*hashes.size()*sizeof(Int128)) << " cycles/byte" << endl;
+	}
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<10000; m++)
+			Int128::FillQualityRandom(hashes);
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "FillQualityRandom 128-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(10000*hashes.size()*sizeof(Int128)) << " cycles/byte" << endl;
 	}
 	vector<char> comparisons1(hashes.size());
 	{
@@ -293,7 +303,7 @@ TEST_CASE("Int128/works", "Tests that Int128 works")
 				comparisons1[n]=hashes[n]>hashes[n+1];
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Comparisons 128-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << "cycles/op" << endl;
+		cout << "Comparisons 128-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << " cycles/op" << endl;
 	}
 	vector<char> comparisons2(hashes.size());
 	{
@@ -304,7 +314,7 @@ TEST_CASE("Int128/works", "Tests that Int128 works")
 				comparisons2[n]=memcmp(&hashes[n], &hashes[n+1], sizeof(hashes[n]))>0;
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Comparisons memcmp does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << "cycles/op" << endl;
+		cout << "Comparisons memcmp does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << " cycles/op" << endl;
 	}
 	CHECK((comparisons1==comparisons2));
 }
@@ -326,21 +336,63 @@ TEST_CASE("Int256/works", "Tests that Int256 works")
 	CHECK(hash2!=null);
 	CHECK(hash1!=hash2);
 
-	CHECK(hash1<hash2);
-	CHECK_FALSE(hash1>hash2);
-	CHECK(hash2>hash1);
-	CHECK_FALSE(hash2<hash1);
+	CHECK(hash1>hash2);
+	CHECK_FALSE(hash1<hash2);
+	CHECK(hash2<hash1);
+	CHECK_FALSE(hash2>hash1);
 
-	CHECK(hash1<=hash2);
-	CHECK_FALSE(hash1>=hash2);
-	CHECK(hash1>=hash1);
-	CHECK_FALSE(hash1>hash1);
-	CHECK(hash2>=hash2);
-	CHECK_FALSE(hash2>hash2);
+	CHECK(hash1>=hash2);
+	CHECK_FALSE(hash1<=hash2);
+	CHECK(hash1<=hash1);
+	CHECK_FALSE(hash1<hash1);
+	CHECK(hash2<=hash2);
+	CHECK_FALSE(hash2<hash2);
 
 	CHECK(alignment_of<Int256>::value==32);
-	vector<Int256> hashes(4);
+	vector<Int256> hashes(4096);
 	CHECK(vector<Int256>::allocator_type::alignment==32);
+
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<10000; m++)
+			Int256::FillFastRandom(hashes);
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "FillFastRandom 256-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(10000*hashes.size()*sizeof(Int256)) << " cycles/byte" << endl;
+	}
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<10000; m++)
+			Int256::FillQualityRandom(hashes);
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "FillQualityRandom 256-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(10000*hashes.size()*sizeof(Int256)) << " cycles/byte" << endl;
+	}
+	vector<char> comparisons1(hashes.size());
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<1000; m++)
+			for(size_t n=0; n<hashes.size()-1; n++)
+				comparisons1[n]=hashes[n]>hashes[n+1];
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "Comparisons 256-bit does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << " cycles/op" << endl;
+	}
+	vector<char> comparisons2(hashes.size());
+	{
+		typedef std::chrono::duration<double, ratio<1>> secs_type;
+		auto begin=chrono::high_resolution_clock::now();
+		for(int m=0; m<1000; m++)
+			for(size_t n=0; n<hashes.size()-1; n++)
+				comparisons2[n]=memcmp(&hashes[n], &hashes[n+1], sizeof(hashes[n]))>0;
+		auto end=chrono::high_resolution_clock::now();
+		auto diff=chrono::duration_cast<secs_type>(end-begin);
+		cout << "Comparisons memcmp does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000*(hashes.size()-1)) << " cycles/op" << endl;
+	}
+	CHECK((comparisons1==comparisons2));
 }
 
 TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
@@ -362,7 +414,7 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "memcpy does " << ((1000ULL*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
 	Hash128 hash;
 	{
@@ -373,7 +425,7 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Niall's nasty 128 bit hash does " << ((1000ULL*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+		cout << "Niall's nasty 128 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
 	cout << "Hash is " << hash.asHexString() << endl;
 	CHECK(shouldbe==hash.asHexString());
@@ -382,7 +434,6 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 {
 	using namespace std;
-	const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2853582ffda4bfdf34b82e8d2bc28a1f6");
 	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
@@ -398,19 +449,38 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "memcpy does " << ((1000ULL*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
-	Hash256 hash;
 	{
-		auto begin=chrono::high_resolution_clock::now();
-		for(int n=0; n<1000; n++)
+		const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2853582ffda4bfdf34b82e8d2bc28a1f6");
+		Hash256 hash;
 		{
-			hash.AddFastHashTo(random, sizeof(random));
+			auto begin=chrono::high_resolution_clock::now();
+			for(int n=0; n<1000; n++)
+			{
+				hash.AddFastHashTo(random, sizeof(random));
+			}
+			auto end=chrono::high_resolution_clock::now();
+			auto diff=chrono::duration_cast<secs_type>(end-begin);
+			cout << "Niall's nasty 256 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 		}
-		auto end=chrono::high_resolution_clock::now();
-		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Niall's nasty 256 bit hash does " << ((1000ULL*sizeof(random))/diff.count())/1024/1024 << "Mb/sec" << endl;
+		cout << "Hash is " << hash.asHexString() << endl;
+		CHECK(shouldbe==hash.asHexString());
 	}
-	cout << "Hash is " << hash.asHexString() << endl;
-	CHECK(shouldbe==hash.asHexString());
+	{
+		const string shouldbe("8d4552fb934bc3752602f36535e1aa118ef8a582b1e793b7caf1bbd87f94d7b2");
+		Hash256 hash;
+		{
+			auto begin=chrono::high_resolution_clock::now();
+			for(int n=0; n<100; n++)
+			{
+				hash.AddSHA256To(random, sizeof(random));
+			}
+			auto end=chrono::high_resolution_clock::now();
+			auto diff=chrono::duration_cast<secs_type>(end-begin);
+			cout << "Reference SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100*sizeof(random)) << " cycles/byte" << endl;
+		}
+		cout << "Hash is " << hash.asHexString() << endl;
+		CHECK(shouldbe==hash.asHexString());
+	}
 }

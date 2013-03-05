@@ -135,11 +135,17 @@ public:
 		}
 		return ret;
 	}
-	//! Fast gets \em no random Int128s.
+	/*! \brief Fast gets \em no random Int128s.
+
+	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	*/
 	static void FillFastRandom(Int128 *ints, size_t no);
 	//! Fast fills a vector with random Int128s
 	static inline void FillFastRandom(std::vector<Int128> &ints);
-	//! Quality gets \em no random Int128s.
+	/*! \brief Quality gets \em no random Int128s.
+
+	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	*/
 	static void FillQualityRandom(Int128 *ints, size_t no);
 	//! Quality fills a vector with random Int128s
 	static inline void FillQualityRandom(std::vector<Int128> &ints);
@@ -234,11 +240,17 @@ public:
 		}
 		return ret;
 	}
-	//! Fast gets \em no random Int256s.
+	/*! \brief Fast gets \em no random Int256s.
+
+	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	*/
 	static void FillFastRandom(Int256 *ints, size_t no);
 	//! Fast fills a vector with random Int256s.
 	static inline void FillFastRandom(std::vector<Int256> &ints);
-	//! Quality gets \em no random Int256s.
+	/*! \brief Quality gets \em no random Int256s.
+
+	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	*/
 	static void FillQualityRandom(Int256 *ints, size_t no);
 	//! Quality fills a vector with random Int256s.
 	static inline void FillQualityRandom(std::vector<Int256> &ints);
@@ -249,7 +261,7 @@ public:
 
 To use this you must compile Int128_256.cpp.
 
-Fasthash (SpookyHash) performance on 32 bit is approx. 1.27 cycles/byte. Performance on 64 bit is approx. 0.29 cycles/byte.
+Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Performance on 64 bit is approx. 0.31 cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
@@ -263,9 +275,9 @@ public:
 
 To use this you must compile Int128_256.cpp.
 
-Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 3.13 cycles/byte. Performance on 64 bit is approx. 0.39 cycles/byte.
+Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
 
-SHA-256 performance on 32 bit is approx. X cycles/byte. Performance on 64 bit is approx. X cycles/byte.
+SHA-256 performance on 32 bit is approx. 17.91 cycles/byte. Performance on 64 bit is approx. 15.66 cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {

@@ -31,24 +31,23 @@ namespace NiallsCPP11Utilities {
 
 template<class generator_type> void FillRandom(char *buffer, size_t length)
 {
-	random_device rd;
-	generator_type rand_gen(rd());
-
-#pragma omp parallel if(length>=1024)
+	// No speed benefit so disabled
+//#pragma omp parallel if(0 && length>=1024) num_threads((int)(length/256))
 	{
-#ifdef _OPENMP
-		static const int partitions=omp_get_num_threads();
-		static const int thispartition=omp_get_thread_num();
+#if 0 //def _OPENMP
+		const int partitions=omp_get_num_threads();
+		const int thispartition=omp_get_thread_num();
 #else
-		static const int partitions=1;
-		static const int thispartition=0;
+		const int partitions=1;
+		const int thispartition=0;
 #endif
-		static const size_t thislength=(length/partitions)&~(sizeof(generator_type::result_type)-1);
-		static const size_t thisno=thislength/sizeof(generator_type::result_type);
-		generator_type gen(rand_gen);
+		const size_t thislength=(length/partitions)&~(sizeof(generator_type::result_type)-1);
+		const size_t thisno=thislength/sizeof(generator_type::result_type);
+		random_device rd;
+		generator_type gen(rd());
 		generator_type::result_type *tofill=(generator_type::result_type *) buffer;
-		gen.discard(thislength*thispartition);
-		tofill+=thisno*thispartition;
+		if(thispartition)
+			tofill+=thisno*thispartition;
 		for(size_t n=0; n<thisno; n++)
 			*tofill++=gen();
 		if(thispartition==partitions-1)
@@ -63,6 +62,9 @@ template<class generator_type> void FillRandom(char *buffer, size_t length)
 
 void Int128::FillFastRandom(Int128 *ints, size_t no)
 {
+	// For integers, Mersenne is faster
+	FillQualityRandom(ints, no);
+	return;
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
 #ifdef __LP64__
@@ -87,6 +89,9 @@ void Int128::FillQualityRandom(Int128 *ints, size_t no)
 
 void Int256::FillFastRandom(Int256 *ints, size_t no)
 {
+	// For integers, Mersenne is faster
+	FillQualityRandom(ints, no);
+	return;
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
 #ifdef __LP64__
