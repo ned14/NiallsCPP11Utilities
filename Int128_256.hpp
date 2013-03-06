@@ -265,9 +265,21 @@ Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Perform
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
+	static Int128 int_init()
+	{
+		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
+		static const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+		return Int128((const char *) int_iv);
+	}
 public:
-	//! Adds fash hashed data to this hash.
+	//! Constructs an instance
+	Hash128() : Int128(int_init()) { }
+	explicit Hash128(const char *bytes) : Int128(bytes) { }
+	//! Adds fast hashed data to this hash.
 	void AddFastHashTo(const char *data, size_t length);
+	//! Batch adds fast hashed data to hashes.
+	static void BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, size_t *length);
 };
 
 /*! \class Hash256
@@ -281,11 +293,25 @@ SHA-256 performance on 32 bit is approx. 17.91 cycles/byte. Performance on 64 bi
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {
+	static Int256 int_init()
+	{
+		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
+		static const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+		return Int256((const char *) int_iv);
+	}
 public:
+	//! Constructs an instance
+	Hash256() : Int256(int_init()) { }
+	explicit Hash256(const char *bytes) : Int256(bytes) { }
 	//! Adds fast hashed data to this hash. Uses two threads if given >=1024 bytes and OpenMP support.
 	void AddFastHashTo(const char *data, size_t length);
+	//! Batch adds fast hashed data to hashes.
+	static void BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length);
 	//! Adds SHA-256 data to this hash.
 	void AddSHA256To(const char *data, size_t length);
+	//! Batch adds SHA-256 data to hashes.
+	static void BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length);
 };
 
 } //namespace

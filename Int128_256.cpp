@@ -15,6 +15,7 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #include "hashes/cityhash/src/city.cc"
 #include "hashes/spookyhash/SpookyV2.cpp"
 #include "hashes/sha256/sha256-ref.c"
+#include "hashes/sha256/sha256-sse.c"
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -120,6 +121,15 @@ void Hash128::AddFastHashTo(const char *data, size_t length)
 	SpookyHash::Hash128(data, length, spookyhash, spookyhash+1);
 }
 
+void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, size_t *length)
+{
+	// TODO: Implement a SIMD version of SpookyHash, and parallelise that too :)
+#pragma omp parallel for
+	for(size_t n=0; n<no; n++)
+		hashs[n].AddFastHashTo(data[n], length[n]);
+}
+
+
 void Hash256::AddFastHashTo(const char *data, size_t length)
 {
 	uint64 *spookyhash=const_cast<unsigned long long *>(asLongLongs());
@@ -133,6 +143,13 @@ void Hash256::AddFastHashTo(const char *data, size_t length)
 			cityhash=CityHash128WithSeed(data, length, cityhash);
 	}
 	*(uint128 *)(asLongLongs()+2)=cityhash;
+}
+
+void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
+{
+#pragma omp parallel for
+	for(size_t n=0; n<no; n++)
+		hashs[n].AddFastHashTo(data[n], length[n]);
 }
 
 void Hash256::AddSHA256To(const char *data, size_t length)
@@ -150,5 +167,63 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 		__sha256_osol(temp, const_cast<unsigned int *>(asInts())); 
 	}
 }
+
+void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
+{
+	const __sha256_block_t *blks[4]={0};
+	size_t lengths[4]={0};
+	unsigned *out[4]={0};
+	vector<tuple<Hash256 *, const char *, size_t>> tobefinished; // The hash and amount (less than one block) remaining. These need processing separately.
+	tobefinished.reserve(no);
+	bool done=false;
+	while(!done)
+	{
+		// Fill SHA streams with work
+		for(size_t n=0; n<4; n++)
+		{
+			if(!blks[n] && no)
+			{
+				blks[n]=(const __sha256_block_t *) *data++;
+				out[n]=const_cast<unsigned int *>((*hashs++).asInts());
+				lengths[n]=*length++;
+				if(--no==(size_t)-1)
+				{
+					done=true;
+					break;
+				}
+			}
+			// Retire if length is too small
+			if(blks[n] && lengths[n]<sizeof(__sha256_block_t))
+			{
+				if(lengths[n])
+					tobefinished.push_back(make_tuple((Hash256 *) out[n], blks[n], lengths[n]));
+				blks[n]=0;
+				continue;
+			}
+		}
+		if(done) break;
+#ifndef NDEBUG
+		for(size_t n=0; n<4; n++)
+		{
+			assert(blks[n]);
+			assert(lengths[n]>=sizeof(__sha256_block_t));
+		}
+#endif
+		__sha256_int(blks, out); 
+		for(size_t n=0; n<4; n++)
+		{
+			blks[n]++;
+			lengths[n]-=sizeof(__sha256_block_t));
+		}
+	}
+	for(const auto &i : tobefinished)
+	{
+		__sha256_block_t temp;
+		memset(temp, 0, sizeof(temp));
+		memcpy(temp, get<1>(i), get<2>(i));
+		__sha256_osol(temp, const_cast<unsigned int *>(get<0>(i)->asInts())); 
+	}
+}
+
 
 } // namespace
