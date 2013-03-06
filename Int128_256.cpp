@@ -183,6 +183,7 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 
 void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
+#if HAVE_M128
 	const __sha256_block_t *blks[4]={0};
 	size_t lengths[4]={0};
 	__sha256_hash_t *out[4]={0};
@@ -236,6 +237,11 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 		memcpy(temp, get<1>(i), get<2>(i));
 		__sha256_osol(temp, const_cast<unsigned int *>(get<0>(i)->asInts())); 
 	}
+#else
+#pragma omp parallel for
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
+		hashs[n].AddSHA256To(data[n], length[n]);
+#endif
 }
 
 
