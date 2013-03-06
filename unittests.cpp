@@ -3,7 +3,7 @@
 File Created: Nov 2012
 */
 
-#define CPU_CYCLES_PER_SEC (2400000000)
+#define CPU_CYCLES_PER_SEC (2400000000U)
 
 #define CATCH_CONFIG_RUNNER
 #include "NiallsCPP11Utilities.hpp"
@@ -482,5 +482,21 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		}
 		cout << "Hash is " << hash.asHexString() << endl;
 		CHECK(shouldbe==hash.asHexString());
+	}
+}
+
+TEST_CASE("SHA256/works", "Tests that this SHA-256 works as per reference")
+{
+	// These are taken from the FIPS test for SHA-256. If this works, it's probably standards compliant.
+	const char *tests[][2]={
+		{"", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+		{"The quick brown fox jumps over the lazy dog",  "d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592"},
+		{"The quick brown fox jumps over the lazy dog.", "ef537f25c895bfa782526529a9b63d97aa631564d5d789c2b765448c8635fb6c"}
+	};
+	for(size_t n=0; n<sizeof(tests)/sizeof(tests[0]); n++)
+	{
+		Hash256 hash;
+		hash.AddSHA256To(tests[n][0], strlen(tests[n][0]));
+		CHECK(hash.asHexString()==tests[n][1]);
 	}
 }

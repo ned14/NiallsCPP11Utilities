@@ -15,7 +15,9 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #include "hashes/cityhash/src/city.cc"
 #include "hashes/spookyhash/SpookyV2.cpp"
 #include "hashes/sha256/sha256-ref.c"
+#if HAVE_M128
 #include "hashes/sha256/sha256-sse.c"
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -42,18 +44,18 @@ template<class generator_type> void FillRandom(char *buffer, size_t length)
 		const int partitions=1;
 		const int thispartition=0;
 #endif
-		const size_t thislength=(length/partitions)&~(sizeof(generator_type::result_type)-1);
-		const size_t thisno=thislength/sizeof(generator_type::result_type);
+		const size_t thislength=(length/partitions)&~(sizeof(typename generator_type::result_type)-1);
+		const size_t thisno=thislength/sizeof(typename generator_type::result_type);
 		random_device rd;
 		generator_type gen(rd());
-		generator_type::result_type *tofill=(generator_type::result_type *) buffer;
+		typename generator_type::result_type *tofill=(typename generator_type::result_type *) buffer;
 		if(thispartition)
 			tofill+=thisno*thispartition;
 		for(size_t n=0; n<thisno; n++)
 			*tofill++=gen();
 		if(thispartition==partitions-1)
 		{
-			for(size_t remaining=length-(thislength*partitions); remaining>0; remaining-=sizeof(generator_type::result_type))
+			for(size_t remaining=length-(thislength*partitions); remaining>0; remaining-=sizeof(typename generator_type::result_type))
 			{
 				*tofill++=gen();
 			}
@@ -125,7 +127,7 @@ void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, s
 {
 	// TODO: Implement a SIMD version of SpookyHash, and parallelise that too :)
 #pragma omp parallel for
-	for(size_t n=0; n<no; n++)
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddFastHashTo(data[n], length[n]);
 }
 
@@ -148,7 +150,7 @@ void Hash256::AddFastHashTo(const char *data, size_t length)
 void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
 #pragma omp parallel for
-	for(size_t n=0; n<no; n++)
+	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddFastHashTo(data[n], length[n]);
 }
 
@@ -159,20 +161,31 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 	size_t remaining=length-(no*sizeof(__sha256_block_t));
 	for(size_t n=0; n<no; n++)
 		__sha256_osol(*blks++, const_cast<unsigned int *>(asInts())); 
-	if(remaining)
+	__sha256_block_t temp;
+	memset(temp, 0, sizeof(temp));
+	memcpy(temp, blks, remaining);
+	// Pad to 56 bytes
+	if(remaining<56)
+		temp[remaining]=0x80;
+	else
 	{
-		__sha256_block_t temp;
+		temp[remaining]=0x80;
+		// Insufficient space for termination, so another round
+		__sha256_osol(temp, const_cast<unsigned int *>(asInts()));
 		memset(temp, 0, sizeof(temp));
-		memcpy(temp, blks, remaining);
-		__sha256_osol(temp, const_cast<unsigned int *>(asInts())); 
 	}
+	*(uint64_t *)(temp+56)=bswap_64(8*length);
+	__sha256_osol(temp, const_cast<unsigned int *>(asInts())); 
+	// Finally, as we're little endian flip back the words
+	for(int n=0; n<8; n++)
+		const_cast<unsigned int *>(asInts())[n]=LOAD_BIG_32(asInts()+n);
 }
 
 void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
 	const __sha256_block_t *blks[4]={0};
 	size_t lengths[4]={0};
-	unsigned *out[4]={0};
+	__sha256_hash_t *out[4]={0};
 	vector<tuple<Hash256 *, const char *, size_t>> tobefinished; // The hash and amount (less than one block) remaining. These need processing separately.
 	tobefinished.reserve(no);
 	bool done=false;
@@ -184,7 +197,7 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 			if(!blks[n] && no)
 			{
 				blks[n]=(const __sha256_block_t *) *data++;
-				out[n]=const_cast<unsigned int *>((*hashs++).asInts());
+				out[n]=(__sha256_hash_t *)(*hashs++).asInts();
 				lengths[n]=*length++;
 				if(--no==(size_t)-1)
 				{
@@ -196,7 +209,7 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 			if(blks[n] && lengths[n]<sizeof(__sha256_block_t))
 			{
 				if(lengths[n])
-					tobefinished.push_back(make_tuple((Hash256 *) out[n], blks[n], lengths[n]));
+					tobefinished.push_back(make_tuple((Hash256 *) out[n], (const char *) blks[n], lengths[n]));
 				blks[n]=0;
 				continue;
 			}
@@ -213,7 +226,7 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 		for(size_t n=0; n<4; n++)
 		{
 			blks[n]++;
-			lengths[n]-=sizeof(__sha256_block_t));
+			lengths[n]-=sizeof(__sha256_block_t);
 		}
 	}
 	for(const auto &i : tobefinished)

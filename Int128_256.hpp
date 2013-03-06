@@ -268,9 +268,9 @@ class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 	static Int128 int_init()
 	{
 		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
-		static const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+		static TYPEALIGNMENT(16) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
-		return Int128((const char *) int_iv);
+		return *((Int128 *) int_iv);
 	}
 public:
 	//! Constructs an instance
@@ -296,9 +296,9 @@ class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 	static Int256 int_init()
 	{
 		// First 32 bits of the fractional parts of the square roots of the first 8 primes 2..19
-		static const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+		static TYPEALIGNMENT(32) const unsigned int_iv[]={0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
 			0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
-		return Int256((const char *) int_iv);
+		return *((Int256 *) int_iv);
 	}
 public:
 	//! Constructs an instance

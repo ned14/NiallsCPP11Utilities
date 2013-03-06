@@ -4,7 +4,7 @@
 
 #include "sha256.h"
 
-#include <xmmintrin.h>
+#include <emmintrin.h>
 #include <stdint.h>
 
 static const uint32_t sha256_consts[] = {
@@ -28,15 +28,15 @@ static const uint32_t sha256_consts[] = {
 
 
 static inline __m128i Ch(__m128i b, __m128i c, __m128i d) {
-    return (b & c) ^ (~b & d);
+    return _mm_xor_si128(_mm_and_si128(b, c), _mm_andnot_si128(b, d));
 }
 
 static inline __m128i Maj(__m128i b, __m128i c, __m128i d) {
-    return (b & c) ^ (b & d) ^ (c & d);
+    return _mm_xor_si128(_mm_xor_si128(_mm_and_si128(b, c), _mm_and_si128(b, d)), _mm_and_si128(c, d));
 }
 
 static inline __m128i ROTR(__m128i x, int n) {
-    return _mm_srli_epi32(x, n) | _mm_slli_epi32(x, 32 - n);
+    return _mm_or_si128(_mm_srli_epi32(x, n), _mm_slli_epi32(x, 32 - n));
 }
 
 static inline __m128i SHR(__m128i x, int n) {
@@ -44,10 +44,10 @@ static inline __m128i SHR(__m128i x, int n) {
 }
 
 /* SHA256 Functions */
-#define	BIGSIGMA0_256(x)	(ROTR((x), 2) ^ ROTR((x), 13) ^ ROTR((x), 22))
-#define	BIGSIGMA1_256(x)	(ROTR((x), 6) ^ ROTR((x), 11) ^ ROTR((x), 25))
-#define	SIGMA0_256(x)		(ROTR((x), 7) ^ ROTR((x), 18) ^ SHR((x), 3))
-#define	SIGMA1_256(x)		(ROTR((x), 17) ^ ROTR((x), 19) ^ SHR((x), 10))
+#define	BIGSIGMA0_256(x)	(_mm_xor_si128(_mm_xor_si128(ROTR((x), 2), ROTR((x), 13)), ROTR((x), 22)))
+#define	BIGSIGMA1_256(x)	(_mm_xor_si128(_mm_xor_si128(ROTR((x), 6), ROTR((x), 11)), ROTR((x), 25)))
+#define	SIGMA0_256(x)		(_mm_xor_si128(_mm_xor_si128(ROTR((x), 7), ROTR((x), 18)), SHR((x), 3)))
+#define	SIGMA1_256(x)		(_mm_xor_si128(_mm_xor_si128(ROTR((x), 17), ROTR((x), 19)), SHR((x), 10)))
 
 static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3) {
 	return _mm_set_epi32(x0, x1, x2, x3);
@@ -60,7 +60,7 @@ static inline uint32_t store32(__m128i x) {
 }
 
 static inline void store_epi32(__m128i x, uint32_t *x0, uint32_t *x1, uint32_t *x2, uint32_t *x3) {
-    union { uint32_t ret[4]; __m128i x; } box = { .x = x };
+    union { uint32_t ret[4]; __m128i x; } box; box.x=x;
     *x0 = box.ret[3]; *x1 = box.ret[2]; *x2 = box.ret[1]; *x3 = box.ret[0];
 }
 
@@ -79,7 +79,11 @@ static inline __m128i SHA256_CONST(int i) {
     h = _mm_add_epi32(T1, T2);
 
 static inline uint32_t SWAP32(const void *addr) {
-    return htonl(*((uint32_t *)(addr)));
+#ifdef _MSC_VER
+	return _byteswap_ulong(*((uint32_t *)(addr)));
+#else
+    return __builtin_bswap32(*((uint32_t *)(addr)));
+#endif
 }
 
 static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
@@ -87,7 +91,7 @@ static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
 }
 
 static inline void dumpreg(__m128i x, char *msg) {
-    union { uint32_t ret[4]; __m128i x; } box = { .x = x };
+    union { uint32_t ret[4]; __m128i x; } box; box.x = x;
     printf("%s %08x %08x %08x %08x\n", msg, box.ret[0], box.ret[1], box.ret[2], box.ret[3]);
 }
 

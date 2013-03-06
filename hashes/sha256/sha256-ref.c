@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-#define	SHA256_CONST(x)		(SHA256_CONST_ ## x)
+#define	SHA256_CONST_(x)		(SHA256_CONST_ ## x)
 
 /* constants, as provided in FIPS 180-2 */
 
@@ -84,26 +84,26 @@
 #define	SHA256_CONST_63		0xc67178f2U
 
 /* Ch and Maj are the basic SHA2 functions. */
-#define	Ch(b, c, d)	(((b) & (c)) ^ ((~b) & (d)))
-#define	Maj(b, c, d)	(((b) & (c)) ^ ((b) & (d)) ^ ((c) & (d)))
+#define	Ch_(b, c, d)	(((b) & (c)) ^ ((~b) & (d)))
+#define	Maj_(b, c, d)	(((b) & (c)) ^ ((b) & (d)) ^ ((c) & (d)))
 
 /* Rotates x right n bits. */
-#define	ROTR(x, n)	\
+#define	ROTR_(x, n)	\
 (((x) >> (n)) | ((x) << ((sizeof (x) * 8)-(n))))
 
 /* Shift x right n bits */
-#define	SHR(x, n)	((x) >> (n))
+#define	SHR_(x, n)	((x) >> (n))
 
 /* SHA256 Functions */
-#define	BIGSIGMA0_256(x)	(ROTR((x), 2) ^ ROTR((x), 13) ^ ROTR((x), 22))
-#define	BIGSIGMA1_256(x)	(ROTR((x), 6) ^ ROTR((x), 11) ^ ROTR((x), 25))
-#define	SIGMA0_256(x)		(ROTR((x), 7) ^ ROTR((x), 18) ^ SHR((x), 3))
-#define	SIGMA1_256(x)		(ROTR((x), 17) ^ ROTR((x), 19) ^ SHR((x), 10))
+#define	BIGSIGMA0_256_(x)	(ROTR_((x), 2) ^ ROTR_((x), 13) ^ ROTR_((x), 22))
+#define	BIGSIGMA1_256_(x)	(ROTR_((x), 6) ^ ROTR_((x), 11) ^ ROTR_((x), 25))
+#define	SIGMA0_256_(x)		(ROTR_((x), 7) ^ ROTR_((x), 18) ^ SHR_((x), 3))
+#define	SIGMA1_256_(x)		(ROTR_((x), 17) ^ ROTR_((x), 19) ^ SHR_((x), 10))
 
-#define	SHA256ROUND(a, b, c, d, e, f, g, h, i, w)			\
-T1 = h + BIGSIGMA1_256(e) + Ch(e, f, g) + SHA256_CONST(i) + w;	\
+#define	SHA256ROUND_(a, b, c, d, e, f, g, h, i, w)			\
+T1 = h + BIGSIGMA1_256_(e) + Ch_(e, f, g) + SHA256_CONST_(i) + w;	\
 d += T1;							\
-T2 = BIGSIGMA0_256(a) + Maj(a, b, c);				\
+T2 = BIGSIGMA0_256_(a) + Maj_(a, b, c);				\
 h = T1 + T2
 
 
@@ -119,6 +119,25 @@ h = T1 + T2
 #if	defined(_BIG_ENDIAN)
 #define	LOAD_BIG_32(addr)	(*(uint32_t *)(addr))
 #define	LOAD_BIG_64(addr)	(*(uint64_t *)(addr))
+
+#elif defined(_MSC_VER)
+
+#include <stdlib.h>
+#define	LOAD_BIG_32(addr) _byteswap_ulong(*((uint32_t *)(addr)))
+#define	LOAD_BIG_64(addr) _byteswap_uint64(*((uint64_t *)(addr)))
+
+#elif defined(__APPLE__)
+
+// Mac OS X / Darwin features
+#include <libkern/OSByteOrder.h>
+#define	LOAD_BIG_32(addr) OSSwapInt32(*((uint32_t *)(addr)))
+#define	LOAD_BIG_64(addr) OSSwapInt64(*((uint64_t *)(addr)))
+
+#elif defined(__GNUC__)
+
+//#include <byteswap.h>
+#define	LOAD_BIG_32(addr) __builtin_bswap32(*((uint32_t *)(addr)))
+#define	LOAD_BIG_64(addr) __builtin_bswap64(*((uint64_t *)(addr)))
 
 #elif	defined(HAVE_HTONL)
 #define	LOAD_BIG_32(addr) htonl(*((uint32_t *)(addr)))
@@ -187,153 +206,153 @@ __sha256_osol(const __sha256_block_t blk, __sha256_hash_t ctx)
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w0 =  LOAD_BIG_32(blk + 4 * 0);
     dumpstate();
-	SHA256ROUND(a, b, c, d, e, f, g, h, 0, w0);
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 0, w0);
     dumpstate();
 
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w1 =  LOAD_BIG_32(blk + 4 * 1);
-	SHA256ROUND(h, a, b, c, d, e, f, g, 1, w1);
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 1, w1);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w2 =  LOAD_BIG_32(blk + 4 * 2);
-	SHA256ROUND(g, h, a, b, c, d, e, f, 2, w2);
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 2, w2);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w3 =  LOAD_BIG_32(blk + 4 * 3);
-	SHA256ROUND(f, g, h, a, b, c, d, e, 3, w3);
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 3, w3);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w4 =  LOAD_BIG_32(blk + 4 * 4);
-	SHA256ROUND(e, f, g, h, a, b, c, d, 4, w4);
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 4, w4);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w5 =  LOAD_BIG_32(blk + 4 * 5);
-	SHA256ROUND(d, e, f, g, h, a, b, c, 5, w5);
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 5, w5);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w6 =  LOAD_BIG_32(blk + 4 * 6);
-	SHA256ROUND(c, d, e, f, g, h, a, b, 6, w6);
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 6, w6);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w7 =  LOAD_BIG_32(blk + 4 * 7);
-	SHA256ROUND(b, c, d, e, f, g, h, a, 7, w7);
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 7, w7);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w8 =  LOAD_BIG_32(blk + 4 * 8);
-	SHA256ROUND(a, b, c, d, e, f, g, h, 8, w8);
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 8, w8);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w9 =  LOAD_BIG_32(blk + 4 * 9);
-	SHA256ROUND(h, a, b, c, d, e, f, g, 9, w9);
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 9, w9);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w10 =  LOAD_BIG_32(blk + 4 * 10);
-	SHA256ROUND(g, h, a, b, c, d, e, f, 10, w10);
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 10, w10);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w11 =  LOAD_BIG_32(blk + 4 * 11);
-	SHA256ROUND(f, g, h, a, b, c, d, e, 11, w11);
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 11, w11);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w12 =  LOAD_BIG_32(blk + 4 * 12);
-	SHA256ROUND(e, f, g, h, a, b, c, d, 12, w12);
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 12, w12);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w13 =  LOAD_BIG_32(blk + 4 * 13);
-	SHA256ROUND(d, e, f, g, h, a, b, c, 13, w13);
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 13, w13);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w14 =  LOAD_BIG_32(blk + 4 * 14);
-	SHA256ROUND(c, d, e, f, g, h, a, b, 14, w14);
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 14, w14);
 	/* LINTED E_BAD_PTR_CAST_ALIGN */
 	w15 =  LOAD_BIG_32(blk + 4 * 15);
-	SHA256ROUND(b, c, d, e, f, g, h, a, 15, w15);
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 15, w15);
     
-	w0 = SIGMA1_256(w14) + w9 + SIGMA0_256(w1) + w0;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 16, w0);
-	w1 = SIGMA1_256(w15) + w10 + SIGMA0_256(w2) + w1;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 17, w1);
-	w2 = SIGMA1_256(w0) + w11 + SIGMA0_256(w3) + w2;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 18, w2);
-	w3 = SIGMA1_256(w1) + w12 + SIGMA0_256(w4) + w3;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 19, w3);
-	w4 = SIGMA1_256(w2) + w13 + SIGMA0_256(w5) + w4;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 20, w4);
-	w5 = SIGMA1_256(w3) + w14 + SIGMA0_256(w6) + w5;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 21, w5);
-	w6 = SIGMA1_256(w4) + w15 + SIGMA0_256(w7) + w6;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 22, w6);
-	w7 = SIGMA1_256(w5) + w0 + SIGMA0_256(w8) + w7;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 23, w7);
-	w8 = SIGMA1_256(w6) + w1 + SIGMA0_256(w9) + w8;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 24, w8);
-	w9 = SIGMA1_256(w7) + w2 + SIGMA0_256(w10) + w9;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 25, w9);
-	w10 = SIGMA1_256(w8) + w3 + SIGMA0_256(w11) + w10;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 26, w10);
-	w11 = SIGMA1_256(w9) + w4 + SIGMA0_256(w12) + w11;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 27, w11);
-	w12 = SIGMA1_256(w10) + w5 + SIGMA0_256(w13) + w12;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 28, w12);
-	w13 = SIGMA1_256(w11) + w6 + SIGMA0_256(w14) + w13;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 29, w13);
-	w14 = SIGMA1_256(w12) + w7 + SIGMA0_256(w15) + w14;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 30, w14);
-	w15 = SIGMA1_256(w13) + w8 + SIGMA0_256(w0) + w15;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 31, w15);
+	w0 = SIGMA1_256_(w14) + w9 + SIGMA0_256_(w1) + w0;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 16, w0);
+	w1 = SIGMA1_256_(w15) + w10 + SIGMA0_256_(w2) + w1;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 17, w1);
+	w2 = SIGMA1_256_(w0) + w11 + SIGMA0_256_(w3) + w2;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 18, w2);
+	w3 = SIGMA1_256_(w1) + w12 + SIGMA0_256_(w4) + w3;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 19, w3);
+	w4 = SIGMA1_256_(w2) + w13 + SIGMA0_256_(w5) + w4;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 20, w4);
+	w5 = SIGMA1_256_(w3) + w14 + SIGMA0_256_(w6) + w5;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 21, w5);
+	w6 = SIGMA1_256_(w4) + w15 + SIGMA0_256_(w7) + w6;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 22, w6);
+	w7 = SIGMA1_256_(w5) + w0 + SIGMA0_256_(w8) + w7;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 23, w7);
+	w8 = SIGMA1_256_(w6) + w1 + SIGMA0_256_(w9) + w8;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 24, w8);
+	w9 = SIGMA1_256_(w7) + w2 + SIGMA0_256_(w10) + w9;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 25, w9);
+	w10 = SIGMA1_256_(w8) + w3 + SIGMA0_256_(w11) + w10;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 26, w10);
+	w11 = SIGMA1_256_(w9) + w4 + SIGMA0_256_(w12) + w11;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 27, w11);
+	w12 = SIGMA1_256_(w10) + w5 + SIGMA0_256_(w13) + w12;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 28, w12);
+	w13 = SIGMA1_256_(w11) + w6 + SIGMA0_256_(w14) + w13;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 29, w13);
+	w14 = SIGMA1_256_(w12) + w7 + SIGMA0_256_(w15) + w14;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 30, w14);
+	w15 = SIGMA1_256_(w13) + w8 + SIGMA0_256_(w0) + w15;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 31, w15);
     
-	w0 = SIGMA1_256(w14) + w9 + SIGMA0_256(w1) + w0;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 32, w0);
-	w1 = SIGMA1_256(w15) + w10 + SIGMA0_256(w2) + w1;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 33, w1);
-	w2 = SIGMA1_256(w0) + w11 + SIGMA0_256(w3) + w2;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 34, w2);
-	w3 = SIGMA1_256(w1) + w12 + SIGMA0_256(w4) + w3;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 35, w3);
-	w4 = SIGMA1_256(w2) + w13 + SIGMA0_256(w5) + w4;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 36, w4);
-	w5 = SIGMA1_256(w3) + w14 + SIGMA0_256(w6) + w5;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 37, w5);
-	w6 = SIGMA1_256(w4) + w15 + SIGMA0_256(w7) + w6;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 38, w6);
-	w7 = SIGMA1_256(w5) + w0 + SIGMA0_256(w8) + w7;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 39, w7);
-	w8 = SIGMA1_256(w6) + w1 + SIGMA0_256(w9) + w8;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 40, w8);
-	w9 = SIGMA1_256(w7) + w2 + SIGMA0_256(w10) + w9;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 41, w9);
-	w10 = SIGMA1_256(w8) + w3 + SIGMA0_256(w11) + w10;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 42, w10);
-	w11 = SIGMA1_256(w9) + w4 + SIGMA0_256(w12) + w11;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 43, w11);
-	w12 = SIGMA1_256(w10) + w5 + SIGMA0_256(w13) + w12;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 44, w12);
-	w13 = SIGMA1_256(w11) + w6 + SIGMA0_256(w14) + w13;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 45, w13);
-	w14 = SIGMA1_256(w12) + w7 + SIGMA0_256(w15) + w14;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 46, w14);
-	w15 = SIGMA1_256(w13) + w8 + SIGMA0_256(w0) + w15;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 47, w15);
+	w0 = SIGMA1_256_(w14) + w9 + SIGMA0_256_(w1) + w0;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 32, w0);
+	w1 = SIGMA1_256_(w15) + w10 + SIGMA0_256_(w2) + w1;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 33, w1);
+	w2 = SIGMA1_256_(w0) + w11 + SIGMA0_256_(w3) + w2;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 34, w2);
+	w3 = SIGMA1_256_(w1) + w12 + SIGMA0_256_(w4) + w3;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 35, w3);
+	w4 = SIGMA1_256_(w2) + w13 + SIGMA0_256_(w5) + w4;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 36, w4);
+	w5 = SIGMA1_256_(w3) + w14 + SIGMA0_256_(w6) + w5;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 37, w5);
+	w6 = SIGMA1_256_(w4) + w15 + SIGMA0_256_(w7) + w6;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 38, w6);
+	w7 = SIGMA1_256_(w5) + w0 + SIGMA0_256_(w8) + w7;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 39, w7);
+	w8 = SIGMA1_256_(w6) + w1 + SIGMA0_256_(w9) + w8;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 40, w8);
+	w9 = SIGMA1_256_(w7) + w2 + SIGMA0_256_(w10) + w9;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 41, w9);
+	w10 = SIGMA1_256_(w8) + w3 + SIGMA0_256_(w11) + w10;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 42, w10);
+	w11 = SIGMA1_256_(w9) + w4 + SIGMA0_256_(w12) + w11;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 43, w11);
+	w12 = SIGMA1_256_(w10) + w5 + SIGMA0_256_(w13) + w12;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 44, w12);
+	w13 = SIGMA1_256_(w11) + w6 + SIGMA0_256_(w14) + w13;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 45, w13);
+	w14 = SIGMA1_256_(w12) + w7 + SIGMA0_256_(w15) + w14;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 46, w14);
+	w15 = SIGMA1_256_(w13) + w8 + SIGMA0_256_(w0) + w15;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 47, w15);
     
-	w0 = SIGMA1_256(w14) + w9 + SIGMA0_256(w1) + w0;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 48, w0);
-	w1 = SIGMA1_256(w15) + w10 + SIGMA0_256(w2) + w1;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 49, w1);
-	w2 = SIGMA1_256(w0) + w11 + SIGMA0_256(w3) + w2;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 50, w2);
-	w3 = SIGMA1_256(w1) + w12 + SIGMA0_256(w4) + w3;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 51, w3);
-	w4 = SIGMA1_256(w2) + w13 + SIGMA0_256(w5) + w4;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 52, w4);
-	w5 = SIGMA1_256(w3) + w14 + SIGMA0_256(w6) + w5;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 53, w5);
-	w6 = SIGMA1_256(w4) + w15 + SIGMA0_256(w7) + w6;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 54, w6);
-	w7 = SIGMA1_256(w5) + w0 + SIGMA0_256(w8) + w7;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 55, w7);
-	w8 = SIGMA1_256(w6) + w1 + SIGMA0_256(w9) + w8;
-	SHA256ROUND(a, b, c, d, e, f, g, h, 56, w8);
-	w9 = SIGMA1_256(w7) + w2 + SIGMA0_256(w10) + w9;
-	SHA256ROUND(h, a, b, c, d, e, f, g, 57, w9);
-	w10 = SIGMA1_256(w8) + w3 + SIGMA0_256(w11) + w10;
-	SHA256ROUND(g, h, a, b, c, d, e, f, 58, w10);
-	w11 = SIGMA1_256(w9) + w4 + SIGMA0_256(w12) + w11;
-	SHA256ROUND(f, g, h, a, b, c, d, e, 59, w11);
-	w12 = SIGMA1_256(w10) + w5 + SIGMA0_256(w13) + w12;
-	SHA256ROUND(e, f, g, h, a, b, c, d, 60, w12);
-	w13 = SIGMA1_256(w11) + w6 + SIGMA0_256(w14) + w13;
-	SHA256ROUND(d, e, f, g, h, a, b, c, 61, w13);
-	w14 = SIGMA1_256(w12) + w7 + SIGMA0_256(w15) + w14;
-	SHA256ROUND(c, d, e, f, g, h, a, b, 62, w14);
-	w15 = SIGMA1_256(w13) + w8 + SIGMA0_256(w0) + w15;
-	SHA256ROUND(b, c, d, e, f, g, h, a, 63, w15);
+	w0 = SIGMA1_256_(w14) + w9 + SIGMA0_256_(w1) + w0;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 48, w0);
+	w1 = SIGMA1_256_(w15) + w10 + SIGMA0_256_(w2) + w1;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 49, w1);
+	w2 = SIGMA1_256_(w0) + w11 + SIGMA0_256_(w3) + w2;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 50, w2);
+	w3 = SIGMA1_256_(w1) + w12 + SIGMA0_256_(w4) + w3;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 51, w3);
+	w4 = SIGMA1_256_(w2) + w13 + SIGMA0_256_(w5) + w4;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 52, w4);
+	w5 = SIGMA1_256_(w3) + w14 + SIGMA0_256_(w6) + w5;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 53, w5);
+	w6 = SIGMA1_256_(w4) + w15 + SIGMA0_256_(w7) + w6;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 54, w6);
+	w7 = SIGMA1_256_(w5) + w0 + SIGMA0_256_(w8) + w7;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 55, w7);
+	w8 = SIGMA1_256_(w6) + w1 + SIGMA0_256_(w9) + w8;
+	SHA256ROUND_(a, b, c, d, e, f, g, h, 56, w8);
+	w9 = SIGMA1_256_(w7) + w2 + SIGMA0_256_(w10) + w9;
+	SHA256ROUND_(h, a, b, c, d, e, f, g, 57, w9);
+	w10 = SIGMA1_256_(w8) + w3 + SIGMA0_256_(w11) + w10;
+	SHA256ROUND_(g, h, a, b, c, d, e, f, 58, w10);
+	w11 = SIGMA1_256_(w9) + w4 + SIGMA0_256_(w12) + w11;
+	SHA256ROUND_(f, g, h, a, b, c, d, e, 59, w11);
+	w12 = SIGMA1_256_(w10) + w5 + SIGMA0_256_(w13) + w12;
+	SHA256ROUND_(e, f, g, h, a, b, c, d, 60, w12);
+	w13 = SIGMA1_256_(w11) + w6 + SIGMA0_256_(w14) + w13;
+	SHA256ROUND_(d, e, f, g, h, a, b, c, 61, w13);
+	w14 = SIGMA1_256_(w12) + w7 + SIGMA0_256_(w15) + w14;
+	SHA256ROUND_(c, d, e, f, g, h, a, b, 62, w14);
+	w15 = SIGMA1_256_(w13) + w8 + SIGMA0_256_(w0) + w15;
+	SHA256ROUND_(b, c, d, e, f, g, h, a, 63, w15);
     
     //printf("%s last d: %08x\n", __func__, d);
     

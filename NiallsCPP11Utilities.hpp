@@ -288,6 +288,7 @@ enum class allocator_alignment : size_t
 namespace detail {
 #ifdef WIN32
 	extern "C" void *_aligned_malloc(size_t size, size_t alignment);
+	extern "C" void _aligned_free(void *blk);
 #else
 	extern "C" int posix_memalign(void **memptr, size_t alignment, size_t size);
 #endif
@@ -370,7 +371,7 @@ public:
     deallocate(pointer p, size_type) noexcept
     { return detail::deallocate_aligned_memory(p); }
 
-#if defined(_MSC_VER) && _MSC_VER>1700
+#if !defined(_MSC_VER) || _MSC_VER>1700
     template <class U, class ...Args>
     void
     construct(U* p, Args&&... args)
