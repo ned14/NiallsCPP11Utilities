@@ -289,7 +289,7 @@ To use this you must compile Int128_256.cpp.
 
 Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
 
-SHA-256 performance on 32 bit is approx. 17.91 cycles/byte. Performance on 64 bit is approx. 15.66 cycles/byte.
+SHA-256 performance on 32 bit is approx. 17.36 cycles/byte (batch 6.95 cycles/byte). Performance on 64 bit is approx. 15.06 cycles/byte (batch 4.33 cycles/byte).
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {

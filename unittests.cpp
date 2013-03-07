@@ -398,7 +398,7 @@ TEST_CASE("Int256/works", "Tests that Int256 works")
 TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 {
 	using namespace std;
-	const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2");
+	const string shouldbe("34031f4e6d985304bb6a0d98800774de");
 	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
@@ -452,7 +452,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
 	{
-		const string shouldbe("cbfcbb29c84eea014a3e10af5c0687a2853582ffda4bfdf34b82e8d2bc28a1f6");
+		const string shouldbe("34031f4e6d985304bb6a0d98800774de515a0f3e66f2887fd43b5824bbdebad4");
 		Hash256 hash;
 		{
 			auto begin=chrono::high_resolution_clock::now();
@@ -468,7 +468,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		CHECK(shouldbe==hash.asHexString());
 	}
 	{
-		const string shouldbe("8d4552fb934bc3752602f36535e1aa118ef8a582b1e793b7caf1bbd87f94d7b2");
+		const string shouldbe("226221284d936077a2709aeca84235c309669375e3339ce112c5156a4ebbb60f");
 		Hash256 hash;
 		{
 			auto begin=chrono::high_resolution_clock::now();
@@ -482,6 +482,27 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		}
 		cout << "Hash is " << hash.asHexString() << endl;
 		CHECK(shouldbe==hash.asHexString());
+	}
+	{
+		const string shouldbe("226221284d936077a2709aeca84235c309669375e3339ce112c5156a4ebbb60f");
+		Hash256 hashes[4];
+		const char *datas[4]={random, random, random, random};
+		size_t lengths[4]={sizeof(random), sizeof(random), sizeof(random), sizeof(random)};
+		{
+			auto begin=chrono::high_resolution_clock::now();
+			for(int n=0; n<100; n++)
+			{
+				Hash256::BatchAddSHA256To(4, hashes, datas, lengths);
+			}
+			auto end=chrono::high_resolution_clock::now();
+			auto diff=chrono::duration_cast<secs_type>(end-begin);
+			cout << "Batch SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100ULL*4*sizeof(random)) << " cycles/byte" << endl;
+		}
+		cout << "Hash is " << hashes[0].asHexString() << endl;
+		CHECK(shouldbe==hashes[0].asHexString());
+		CHECK(shouldbe==hashes[1].asHexString());
+		CHECK(shouldbe==hashes[2].asHexString());
+		CHECK(shouldbe==hashes[3].asHexString());
 	}
 }
 

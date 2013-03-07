@@ -35,7 +35,7 @@ namespace NiallsCPP11Utilities {
 template<class generator_type> void FillRandom(char *buffer, size_t length)
 {
 	// No speed benefit so disabled
-//#pragma omp parallel if(0 && length>=1024) num_threads((int)(length/256))
+//#pragma omp parallel if(0 && length>=1024) num_threads((int)(length/256)) schedule(dynamic)
 	{
 #if 0 //def _OPENMP
 		const int partitions=omp_get_num_threads();
@@ -126,7 +126,7 @@ void Hash128::AddFastHashTo(const char *data, size_t length)
 void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, size_t *length)
 {
 	// TODO: Implement a SIMD version of SpookyHash, and parallelise that too :)
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddFastHashTo(data[n], length[n]);
 }
@@ -149,7 +149,7 @@ void Hash256::AddFastHashTo(const char *data, size_t length)
 
 void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddFastHashTo(data[n], length[n]);
 }
@@ -161,6 +161,8 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 	size_t remaining=length-(no*sizeof(__sha256_block_t));
 	for(size_t n=0; n<no; n++)
 		__sha256_osol(*blks++, const_cast<unsigned int *>(asInts())); 
+
+	// Do termination
 	__sha256_block_t temp;
 	memset(temp, 0, sizeof(temp));
 	memcpy(temp, blks, remaining);
@@ -184,61 +186,86 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
 {
 #if HAVE_M128
-	const __sha256_block_t *blks[4]={0};
-	size_t lengths[4]={0};
-	__sha256_hash_t *out[4]={0};
-	vector<tuple<Hash256 *, const char *, size_t>> tobefinished; // The hash and amount (less than one block) remaining. These need processing separately.
-	tobefinished.reserve(no);
-	bool done=false;
-	while(!done)
+	// TODO: No reason this can't OpenMP parallelise given sufficient no
+	__sha256_block_t temps[4], emptyblk;
+	const __sha256_block_t *blks[4]={&emptyblk, &emptyblk, &emptyblk, &emptyblk};
+	size_t lengths[4]={0}, togos[4]={0};
+	__sha256_hash_t emptyout;
+	__sha256_hash_t *out[4]={&emptyout, &emptyout, &emptyout, &emptyout};
+	int inuse=0;
+	do
 	{
 		// Fill SHA streams with work
-		for(size_t n=0; n<4; n++)
+		if(no)
 		{
-			if(!blks[n] && no)
+			for(size_t n=0; n<4; n++)
 			{
-				blks[n]=(const __sha256_block_t *) *data++;
-				out[n]=(__sha256_hash_t *)(*hashs++).asInts();
-				lengths[n]=*length++;
-				if(--no==(size_t)-1)
+				if(&emptyblk==blks[n] && no)
 				{
-					done=true;
-					break;
+					blks[n]=(const __sha256_block_t *) *data++;
+					out[n]=(__sha256_hash_t *) const_cast<unsigned int *>((*hashs++).asInts());
+					lengths[n]=togos[n]=*length++;
+					no--;
+					inuse++;
 				}
 			}
-			// Retire if length is too small
-			if(blks[n] && lengths[n]<sizeof(__sha256_block_t))
+		}
+		for(size_t n=0; n<4; n++)
+		{
+			if(&emptyblk!=blks[n])
 			{
-				if(lengths[n])
-					tobefinished.push_back(make_tuple((Hash256 *) out[n], (const char *) blks[n], lengths[n]));
-				blks[n]=0;
-				continue;
+				// Do we need to do termination?
+				if(togos[n]<sizeof(__sha256_block_t))
+				{
+					// Need to start termination?
+					if(blks[n]!=&temps[n])
+					{
+						memset(temps[n], 0, sizeof(temps[n]));
+						memcpy(temps[n], blks[n], togos[n]);
+						blks[n]=&temps[n];
+						temps[n][togos[n]]=0x80;
+						// Will we need an extra round for termination?
+						if(togos[n]>=56)
+							togos[n]+=9;
+					}
+					else
+						memset(temps[n], 0, sizeof(temps[n]));
+					// Can we terminate now?
+					if(togos[n]<56)
+						*(uint64_t *)(temps[n]+56)=bswap_64(8*lengths[n]);
+				}
 			}
 		}
-		if(done) break;
-#ifndef NDEBUG
-		for(size_t n=0; n<4; n++)
-		{
-			assert(blks[n]);
-			assert(lengths[n]>=sizeof(__sha256_block_t));
-		}
-#endif
+#if 1
 		__sha256_int(blks, out); 
+#else
+		for(size_t n=0; n<4; n++)
+			__sha256_osol(*blks[n], *out[n]);
+#endif
 		for(size_t n=0; n<4; n++)
 		{
-			blks[n]++;
-			lengths[n]-=sizeof(__sha256_block_t);
+			if(&emptyblk==blks[n]) continue;
+			if(blks[n]!=&temps[n])
+			{
+				blks[n]++;
+				togos[n]-=sizeof(__sha256_block_t);
+			}
+			else if(togos[n]>=56) // One last round for overflowed termination
+				togos[n]-=sizeof(__sha256_block_t);
+			else
+			{
+				// As we're little endian flip back the words
+				for(int m=0; m<8; m++)
+					*(*out[n]+m)=LOAD_BIG_32(*out[n]+m);
+				// Retire
+				blks[n]=&emptyblk;
+				out[n]=&emptyout;
+				inuse--;
+			}
 		}
-	}
-	for(const auto &i : tobefinished)
-	{
-		__sha256_block_t temp;
-		memset(temp, 0, sizeof(temp));
-		memcpy(temp, get<1>(i), get<2>(i));
-		__sha256_osol(temp, const_cast<unsigned int *>(get<0>(i)->asInts())); 
-	}
+	} while(inuse>0);
 #else
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddSHA256To(data[n], length[n]);
 #endif
