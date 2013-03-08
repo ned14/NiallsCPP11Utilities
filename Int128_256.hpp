@@ -62,6 +62,8 @@ namespace NiallsCPP11Utilities {
 
 /*! \class Int128
 \brief Declares a 128 bit SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
+
+Implemented as a __m128i if available, otherwise as long longs.
 */
 class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 {
@@ -153,6 +155,8 @@ public:
 
 /*! \class Int256
 \brief Declares a 256 bit AVX2/SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
+
+Implemented as a __m256i if available (AVX2), otherwise two __m128i's if available, otherwise as many long longs.
 */
 class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 {
