@@ -289,7 +289,13 @@ To use this you must compile Int128_256.cpp.
 
 Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
 
-SHA-256 performance on 32 bit is approx. 17.36 cycles/byte (batch 6.95 cycles/byte). Performance on 64 bit is approx. 15.06 cycles/byte (batch 4.33 cycles/byte).
+SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (batch 6.89 cycles/byte). Performance on 64 bit is approx. 14.89 cycles/byte (batch 4.23 cycles/byte).
+
+SHA-256, being cryptographically secure, requires a setup, data contribution and finalisation stage in order to produce FIPS compliant
+output (mainly because the total bits hashed must be appended at the end). Only AddSHA256ToBatch() can therefore correctly handle
+incremental hashing if you want the "correct" hash to be output. Internally, this implies having to construct scratch space and having
+to cope with non-block multiple incremental data. For speed, and for ease of programming the SSE2 SIMD units, the batch implementation
+currently throws an exception if you supply non-64 byte multiples to AddSHA256ToBatch() except as the final increment before FinishBatch().
 */
 class NIALLSCPP11UTILITIES_API Hash256 : public Int256
 {
@@ -306,11 +312,25 @@ public:
 	explicit Hash256(const char *bytes) : Int256(bytes) { }
 	//! Adds fast hashed data to this hash. Uses two threads if given >=1024 bytes and OpenMP support.
 	void AddFastHashTo(const char *data, size_t length);
-	//! Batch adds fast hashed data to hashes.
-	static void BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length);
-	//! Adds SHA-256 data to this hash.
+	//! Adds SHA-256 data to this hash as a single operation.
 	void AddSHA256To(const char *data, size_t length);
-	//! Batch adds SHA-256 data to hashes.
+
+	//! A handle to an ongoing batch hash operation
+	typedef void *BatchHashOp;
+	//! Specifies which batch item this data is for. Format is hash idx, data, length of data.
+	typedef std::tuple<size_t, const char *, size_t> BatchItem;
+	//! Begins an incremental batch hash. Tip: use FinishBatch(h, false) to avoid recreating this.
+	static BatchHashOp BeginBatch(size_t no, Hash256 *hashs);
+	//! Adds data to an incremental fast hash operation. Don't mix this with AddSHA256ToBatch() on the same BatchHashOp.
+	static void AddFastHashToBatch(BatchHashOp h, size_t items, const BatchItem *datas);
+	//! Adds data to an incremental SHA-256 operation. Don't mix this with AddSHA256ToBatch() on the same BatchHashOp.
+	static void AddSHA256ToBatch(BatchHashOp h, size_t items, const BatchItem *datas);
+	//! Finishes an incremental batch hash
+	static void FinishBatch(BatchHashOp h, bool free=true);
+
+	//! Batch adds fast hashed data to hashes as a single operation.
+	static void BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length);
+	//! Batch adds SHA-256 data to hashes as a single operation.
 	static void BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length);
 };
 

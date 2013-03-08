@@ -147,13 +147,6 @@ void Hash256::AddFastHashTo(const char *data, size_t length)
 	*(uint128 *)(asLongLongs()+2)=cityhash;
 }
 
-void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
-{
-#pragma omp parallel for schedule(dynamic)
-	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
-		hashs[n].AddFastHashTo(data[n], length[n]);
-}
-
 void Hash256::AddSHA256To(const char *data, size_t length)
 {
 	const __sha256_block_t *blks=(const __sha256_block_t *) data;
@@ -183,16 +176,82 @@ void Hash256::AddSHA256To(const char *data, size_t length)
 		const_cast<unsigned int *>(asInts())[n]=LOAD_BIG_32(asInts()+n);
 }
 
-void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
+struct HashOp
 {
+	size_t no;
+	Hash256 *hashs;
+	enum class HashType
+	{
+		Unknown,
+		FastHash,
+		SHA256
+	} hashType;
+	struct TYPEALIGNMENT(32) Scratch
+	{
+		char d[64];
+		size_t pos, length;
+		char ___pad[32-2*sizeof(size_t)];
+	};
+	aligned_allocator<Scratch, 32> alloc;
+	Scratch *scratch; // Only used for SHA-256
+	HashOp(size_t _no, Hash256 *_hashs) : no(_no), hashs(_hashs), hashType(HashType::Unknown), scratch(0) { }
+	void make_scratch()
+	{
+		if(!scratch)
+		{
+			scratch=alloc.allocate(no);
+			memset(scratch, 0, no*sizeof(Scratch));
+		}
+	}
+	~HashOp()
+	{
+		if(scratch)
+			alloc.deallocate(scratch, no);
+	}
+};
+
+Hash256::BatchHashOp BeginBatch(size_t no, Hash256 *hashs)
+{
+	return new HashOp(no, hashs);
+}
+void Hash256::AddFastHashToBatch(BatchHashOp _h, size_t items, const BatchItem *datas)
+{
+	auto h=(HashOp *) _h;
+	if(h->hashType==HashOp::HashType::Unknown)
+		h->hashType=HashOp::HashType::FastHash;
+	else if(h->hashType!=HashOp::HashType::FastHash)
+		throw std::runtime_error("You can't add a fast hash to a SHA-256 hash");
+#pragma omp parallel for schedule(dynamic)
+	for(ptrdiff_t n=0; n<(ptrdiff_t) items; n++)
+	{
+		auto &data=datas[n];
+		h->hashs[get<0>(data)].AddFastHashTo(get<1>(data), get<2>(data));
+	}
+}
+void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas)
+{
+	auto h=(HashOp *) _h;
+	if(h->hashType==HashOp::HashType::Unknown)
+		h->hashType=HashOp::HashType::SHA256;
+	else if(h->hashType!=HashOp::HashType::SHA256)
+		throw std::runtime_error("You can't add a SHA-256 hash to a fast hash");
+	h->make_scratch();
 #if HAVE_M128
 	// TODO: No reason this can't OpenMP parallelise given sufficient no
-	__sha256_block_t temps[4], emptyblk;
+	__sha256_block_t emptyblk;
+	size_t hashidxs[4]={0};
 	const __sha256_block_t *blks[4]={&emptyblk, &emptyblk, &emptyblk, &emptyblk};
-	size_t lengths[4]={0}, togos[4]={0};
+	size_t togos[4]={0};
 	__sha256_hash_t emptyout;
 	__sha256_hash_t *out[4]={&emptyout, &emptyout, &emptyout, &emptyout};
 	int inuse=0;
+	auto retire=[h, &hashidxs, &emptyblk, &blks, &togos, &emptyout, &out](size_t n){
+		size_t hashidx=hashidxs[n];
+		memcpy(h->scratch[hashidx].d, blks[n], togos[n]);
+		h->scratch[hashidx].pos=togos[n];
+		blks[n]=&emptyblk;
+		out[n]=&emptyout;
+	};
 	do
 	{
 		// Fill SHA streams with work
@@ -200,39 +259,23 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 		{
 			for(size_t n=0; n<4; n++)
 			{
-				if(&emptyblk==blks[n] && no)
+				while(&emptyblk==blks[n] && no)
 				{
-					blks[n]=(const __sha256_block_t *) *data++;
-					out[n]=(__sha256_hash_t *) const_cast<unsigned int *>((*hashs++).asInts());
-					lengths[n]=togos[n]=*length++;
-					no--;
-					inuse++;
-				}
-			}
-		}
-		for(size_t n=0; n<4; n++)
-		{
-			if(&emptyblk!=blks[n])
-			{
-				// Do we need to do termination?
-				if(togos[n]<sizeof(__sha256_block_t))
-				{
-					// Need to start termination?
-					if(blks[n]!=&temps[n])
-					{
-						memset(temps[n], 0, sizeof(temps[n]));
-						memcpy(temps[n], blks[n], togos[n]);
-						blks[n]=&temps[n];
-						temps[n][togos[n]]=0x80;
-						// Will we need an extra round for termination?
-						if(togos[n]>=56)
-							togos[n]+=9;
-					}
+					auto &data=*datas;
+					hashidxs[n]=get<0>(data);
+					if(h->scratch[hashidxs[n]].pos)
+						throw std::runtime_error("Feeding SHA-256 with chunks not exactly divisible by 64 bytes, except as the very final chunk, is currently not supported.");
 					else
-						memset(temps[n], 0, sizeof(temps[n]));
-					// Can we terminate now?
-					if(togos[n]<56)
-						*(uint64_t *)(temps[n]+56)=bswap_64(8*lengths[n]);
+						blks[n]=(const __sha256_block_t *) get<1>(data);
+					out[n]=(__sha256_hash_t *) const_cast<unsigned int *>(h->hashs[hashidxs[n]].asInts());
+					h->scratch[hashidxs[n]].length=togos[n]=get<2>(data);
+					datas++;
+					no--;
+					// Too small, so retire instantly
+					if(togos[n]<sizeof(__sha256_block_t))
+						retire(n);
+					else
+						inuse++;
 				}
 			}
 		}
@@ -245,31 +288,153 @@ void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, siz
 		for(size_t n=0; n<4; n++)
 		{
 			if(&emptyblk==blks[n]) continue;
-			if(blks[n]!=&temps[n])
+			blks[n]++;
+			togos[n]-=sizeof(__sha256_block_t);
+			if(togos[n]<sizeof(__sha256_block_t))
 			{
-				blks[n]++;
-				togos[n]-=sizeof(__sha256_block_t);
-			}
-			else if(togos[n]>=56) // One last round for overflowed termination
-				togos[n]-=sizeof(__sha256_block_t);
-			else
-			{
-				// As we're little endian flip back the words
-				for(int m=0; m<8; m++)
-					*(*out[n]+m)=LOAD_BIG_32(*out[n]+m);
-				// Retire
-				blks[n]=&emptyblk;
-				out[n]=&emptyout;
+				retire(n);
 				inuse--;
 			}
 		}
-	} while(inuse>0);
+		// We know from benchmarking that the above can push 3.5 streams in the time of a single stream,
+		// so keep going if there are at least two streams remaining
+	} while(inuse>1);
+	if(inuse)
+	{
+		for(size_t n=0; n<4; n++)
+		{
+			if(&emptyblk!=blks[n])
+			{
+				do
+				{
+					__sha256_osol(*blks[n], *out[n]);
+					blks[n]++;
+					togos[n]-=sizeof(__sha256_block_t);
+				} while(togos[n]>=sizeof(__sha256_block_t));
+				retire(n);
+				inuse--;
+			}
+		}
+	}
 #else
+	// TODO: Implement incremental SHA for non-SIMD
+#error Fixme! Implement incremental SHA for non-SIMD
 #pragma omp parallel for schedule(dynamic)
 	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
 		hashs[n].AddSHA256To(data[n], length[n]);
 #endif
 }
+static void _FinishBatch(HashOp *h)
+{
+	switch(h->hashType)
+	{
+	case HashOp::HashType::FastHash:
+		{
+			break;
+		}
+	case HashOp::HashType::SHA256:
+		{
+			// Terminate all remaining hashes
+#if HAVE_M128
+			__sha256_block_t emptyblk;
+			const __sha256_block_t *blks[4]={&emptyblk, &emptyblk, &emptyblk, &emptyblk};
+			__sha256_hash_t emptyout;
+			__sha256_hash_t *out[4]={&emptyout, &emptyout, &emptyout, &emptyout};
+			int inuse=0;
+			// First run is to find all hashes with scratchpos>=56 as these need an extra round
+			for(size_t n=0; n<h->no; n++)
+			{
+				if(h->scratch[n].pos>=56)
+				{
+					memset(h->scratch[n].d+h->scratch[n].pos, 0, sizeof(__sha256_block_t)-h->scratch[n].pos);
+					h->scratch[n].d[h->scratch[n].pos]=(unsigned char) 0x80;
+					blks[inuse]=(const __sha256_block_t *) h->scratch[n].d;
+					out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
+					if(4==++inuse)
+					{
+						__sha256_int(blks, out);
+						inuse=0;
+					}
+					h->scratch[n].pos=0;
+				}
+			}
+			if(inuse)
+			{
+				for(size_t n=inuse; n<4; n++)
+				{
+					blks[n]=&emptyblk;
+					out[n]=&emptyout;
+				}
+				__sha256_int(blks, out);
+				inuse=0;
+			}
+			// First run is to find all hashes with scratchpos>=56 as these need an extra round
+			for(size_t n=0; n<h->no; n++)
+			{
+				memset(h->scratch[n].d+h->scratch[n].pos, 0, sizeof(__sha256_block_t)-h->scratch[n].pos);
+				h->scratch[n].d[h->scratch[n].pos]=(unsigned char) 0x80;
+				*(uint64_t *)(h->scratch[n].d+56)=bswap_64(8*h->scratch[n].length);
+				blks[inuse]=(const __sha256_block_t *) h->scratch[n].d;
+				out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
+				if(4==++inuse)
+				{
+					__sha256_int(blks, out);
+					inuse=0;
+				}
+			}
+			if(inuse)
+			{
+				for(size_t n=inuse; n<4; n++)
+				{
+					blks[n]=&emptyblk;
+					out[n]=&emptyout;
+				}
+				__sha256_int(blks, out);
+				inuse=0;
+			}
+			// As we're little endian flip back the words
+			for(size_t n=0; n<h->no; n++)
+			{
+				for(int m=0; m<8; m++)
+					*const_cast<unsigned int *>(h->hashs[n].asInts()+m)=LOAD_BIG_32(h->hashs[n].asInts()+m);
+			}
+#else
+#error Fixme!
+#endif
+			break;
+		}
+	}
+}
+void Hash256::FinishBatch(BatchHashOp _h, bool free)
+{
+	auto h=(HashOp *) _h;
+	_FinishBatch(h);
+	if(free)
+		delete h;
+	else
+		h->hashType=HashOp::HashType::Unknown;
+}
+
+void Hash256::BatchAddFastHashTo(size_t no, Hash256 *hashs, const char **data, size_t *length)
+{
+	HashOp h(no, hashs);
+	BatchItem *items=(BatchItem *) alloca(sizeof(BatchItem)*no);
+	for(size_t n=0; n<no; n++)
+		items[n]=BatchItem(n, data[n], length[n]);
+	AddFastHashToBatch(&h, no, items);
+	_FinishBatch(&h);
+}
+
+void Hash256::BatchAddSHA256To(size_t no, Hash256 *hashs, const char **data, size_t *length)
+{
+	HashOp h(no, hashs);
+	BatchItem *items=(BatchItem *) alloca(sizeof(BatchItem)*no);
+	for(size_t n=0; n<no; n++)
+		items[n]=BatchItem(n, data[n], length[n]);
+	AddSHA256ToBatch(&h, no, items);
+	_FinishBatch(&h);
+}
+
 
 
 } // namespace
