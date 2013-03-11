@@ -398,7 +398,7 @@ TEST_CASE("Int256/works", "Tests that Int256 works")
 TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 {
 	using namespace std;
-	const string shouldbe("34031f4e6d985304bb6a0d98800774de");
+	const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d");
 	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
@@ -452,7 +452,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
 	{
-		const string shouldbe("34031f4e6d985304bb6a0d98800774de515a0f3e66f2887fd43b5824bbdebad4");
+		const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d515a0f3e66f2887fd43b5824bbdebad4");
 		Hash256 hash;
 		{
 			auto begin=chrono::high_resolution_clock::now();
