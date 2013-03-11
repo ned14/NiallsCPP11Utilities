@@ -139,14 +139,18 @@ public:
 	}
 	/*! \brief Fast gets \em no random Int128s.
 
-	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+
+	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
 	*/
 	static void FillFastRandom(Int128 *ints, size_t no);
 	//! Fast fills a vector with random Int128s
 	static inline void FillFastRandom(std::vector<Int128> &ints);
 	/*! \brief Quality gets \em no random Int128s.
 
-	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+
+	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
 	*/
 	static void FillQualityRandom(Int128 *ints, size_t no);
 	//! Quality fills a vector with random Int128s
@@ -246,14 +250,18 @@ public:
 	}
 	/*! \brief Fast gets \em no random Int256s.
 
-	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+
+	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
 	*/
 	static void FillFastRandom(Int256 *ints, size_t no);
 	//! Fast fills a vector with random Int256s.
 	static inline void FillFastRandom(std::vector<Int256> &ints);
 	/*! \brief Quality gets \em no random Int256s.
 
-	Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
+
+	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
 	*/
 	static void FillQualityRandom(Int256 *ints, size_t no);
 	//! Quality fills a vector with random Int256s.
@@ -265,7 +273,9 @@ public:
 
 To use this you must compile Int128_256.cpp.
 
-Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Performance on 64 bit is approx. 0.31 cycles/byte.
+Intel Ivy Bridge: Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Performance on 64 bit is approx. 0.31 cycles/byte.
+
+Intel Atom: Performance on 32 bit is approx. 3.38 cycles/byte
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
@@ -291,9 +301,13 @@ public:
 
 To use this you must compile Int128_256.cpp.
 
-Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
+Intel Ivy Bridge: Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
 
-SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (batch 6.89 cycles/byte). Performance on 64 bit is approx. 14.89 cycles/byte (batch 4.23 cycles/byte).
+Intel Atom (single core): Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 9.31 cycles/byte.
+
+Intel Ivy Bridge: SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (batch 6.89 cycles/byte). Performance on 64 bit is approx. 14.89 cycles/byte (batch 4.23 cycles/byte).
+
+Intel Atom (single core): SHA-256 performance on 32 bit is approx. 40.35 cycles/byte (batch 24.46 cycles/byte).
 
 SHA-256, being cryptographically secure, requires a setup, data contribution and finalisation stage in order to produce FIPS compliant
 output (mainly because the total bits hashed must be appended at the end). Only AddSHA256ToBatch() can therefore correctly handle
