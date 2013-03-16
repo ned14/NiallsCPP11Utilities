@@ -25,6 +25,11 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #include <omp.h>
 #endif
 #include <random>
+#ifdef WIN32
+#include <malloc.h>
+#else
+#include <alloca.h>
+#endif
 
 #if ALLOW_UNALIGNED_READS
 #error ALLOW_UNALIGNED_READS needs to be zero for ARM compatibility
