@@ -44,7 +44,7 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 #include <emmintrin.h>
 #endif
 #elif defined(__GNUC__)
-#if defined(__SSE2__) || defined(__ARM_NEON__)
+#if defined(__SSE2__)
 #define HAVE_M128 1
 #include <emmintrin.h>
 #endif
@@ -75,6 +75,9 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 		size_t asSize_t;
 #if HAVE_M128
 		__m128i asM128;
+#endif
+#ifdef __GNUC__
+		int __attribute__ ((vector_size(16))) vect16;
 #endif
 	} mydata;
 	void int_testAlignment() const
@@ -175,6 +178,9 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 #endif
 #if HAVE_M256
 		__m256i asM256;
+#endif
+#ifdef __GNUC__
+		int __attribute__ ((vector_size(32))) vect32;
 #endif
 	} mydata;
 	void int_testAlignment() const

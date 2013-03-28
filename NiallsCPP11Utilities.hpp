@@ -118,7 +118,7 @@ namespace std {
 #ifdef _MSC_VER
 #define TYPEALIGNMENT(bytes) __declspec(align(bytes))
 #elif defined(__GNUC__)
-#define TYPEALIGNMENT(bytes) __attribute__((alignment(bytes)))
+#define TYPEALIGNMENT(bytes) __attribute__((aligned(bytes)))
 #else
 #define TYPEALIGNMENT(bytes) unknown_type_alignment_markup_for_this_compiler
 #endif

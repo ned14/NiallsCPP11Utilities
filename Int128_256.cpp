@@ -124,7 +124,7 @@ void Int256::FillQualityRandom(Int256 *ints, size_t no)
 
 void Hash128::AddFastHashTo(const char *data, size_t length)
 {
-	uint64 *spookyhash=const_cast<unsigned long long *>(asLongLongs());
+	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
 	SpookyHash::Hash128(data, length, spookyhash, spookyhash+1);
 }
 
@@ -139,7 +139,7 @@ void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, s
 
 void Hash256::AddFastHashTo(const char *data, size_t length)
 {
-	uint64 *spookyhash=const_cast<unsigned long long *>(asLongLongs());
+	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
 	uint128 cityhash=*(uint128 *)(asLongLongs()+2);
 #pragma omp parallel for if(length>=1024)
 	for(int n=0; n<2; n++)
