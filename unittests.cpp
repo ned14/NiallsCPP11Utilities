@@ -14,24 +14,25 @@ File Created: Nov 2012
 #include <random>
 #include <chrono>
 
+#ifdef WIN32
 extern "C" char* __cdecl __unDName(char* buffer, const char* mangled, int buflen,
                       void *(*memget)(size_t), void (*memfree)(void *),
                       unsigned short int flags);
-
+#endif
 
 using namespace NiallsCPP11Utilities;
 using namespace std;
 
 static void _foo() { }
 
-static char random[25*1024*1024];
+static char random_[25*1024*1024];
 
 int main (int argc, char * const argv[]) {
     std::mt19937 gen(0x78adbcff);
     std::uniform_int_distribution<char> dis;
-	for(int n=0; n<sizeof(random); n++)
+	for(int n=0; n<sizeof(random_); n++)
 	{
-		random[n]=dis(gen);
+		random_[n]=dis(gen);
 	}
     int ret=Catch::Main( argc, argv );
 	printf("Press Return to exit ...\n");
@@ -399,33 +400,33 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 {
 	using namespace std;
 	const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d");
-	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
+	auto scratch=unique_ptr<char>(new char[sizeof(random_)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
 	{
-		memcpy(scratch.get(), random, sizeof(random));
+		memcpy(scratch.get(), random_, sizeof(random_));
 	}
 	{
 		auto begin=chrono::high_resolution_clock::now();
 		auto p=scratch.get();
 		for(int n=0; n<1000; n++)
 		{
-			memcpy(p, random, sizeof(random));
+			memcpy(p, random_, sizeof(random_));
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
+		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random_)) << " cycles/byte" << endl;
 	}
 	Hash128 hash;
 	{
 		auto begin=chrono::high_resolution_clock::now();
 		for(int n=0; n<1000; n++)
 		{
-			hash.AddFastHashTo(random, sizeof(random));
+			hash.AddFastHashTo(random_, sizeof(random_));
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "Niall's nasty 128 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
+		cout << "Niall's nasty 128 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random_)) << " cycles/byte" << endl;
 	}
 	cout << "Hash is " << hash.asHexString() << endl;
 	CHECK(shouldbe==hash.asHexString());
@@ -434,22 +435,22 @@ TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 {
 	using namespace std;
-	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
+	auto scratch=unique_ptr<char>(new char[sizeof(random_)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
 	{
-		memcpy(scratch.get(), random, sizeof(random));
+		memcpy(scratch.get(), random_, sizeof(random_));
 	}
 	{
 		auto begin=chrono::high_resolution_clock::now();
 		auto p=scratch.get();
 		for(int n=0; n<1000; n++)
 		{
-			memcpy(p, random, sizeof(random));
+			memcpy(p, random_, sizeof(random_));
 		}
 		auto end=chrono::high_resolution_clock::now();
 		auto diff=chrono::duration_cast<secs_type>(end-begin);
-		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
+		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random_)) << " cycles/byte" << endl;
 	}
 	{
 		const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d515a0f3e66f2887fd43b5824bbdebad4");
@@ -458,11 +459,11 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 			auto begin=chrono::high_resolution_clock::now();
 			for(int n=0; n<1000; n++)
 			{
-				hash.AddFastHashTo(random, sizeof(random));
+				hash.AddFastHashTo(random_, sizeof(random_));
 			}
 			auto end=chrono::high_resolution_clock::now();
 			auto diff=chrono::duration_cast<secs_type>(end-begin);
-			cout << "Niall's nasty 256 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
+			cout << "Niall's nasty 256 bit hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random_)) << " cycles/byte" << endl;
 		}
 		cout << "Hash is " << hash.asHexString() << endl;
 		CHECK(shouldbe==hash.asHexString());
@@ -474,11 +475,11 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 			auto begin=chrono::high_resolution_clock::now();
 			for(int n=0; n<100; n++)
 			{
-				hash.AddSHA256To(random, sizeof(random));
+				hash.AddSHA256To(random_, sizeof(random_));
 			}
 			auto end=chrono::high_resolution_clock::now();
 			auto diff=chrono::duration_cast<secs_type>(end-begin);
-			cout << "Reference SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100*sizeof(random)) << " cycles/byte" << endl;
+			cout << "Reference SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100*sizeof(random_)) << " cycles/byte" << endl;
 		}
 		cout << "Hash is " << hash.asHexString() << endl;
 		CHECK(shouldbe==hash.asHexString());
@@ -486,8 +487,8 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 	{
 		const string shouldbe("226221284d936077a2709aeca84235c309669375e3339ce112c5156a4ebbb60f");
 		Hash256 hashes[4];
-		const char *datas[4]={random, random, random, random};
-		size_t lengths[4]={sizeof(random), sizeof(random), sizeof(random), sizeof(random)};
+		const char *datas[4]={random_, random_, random_, random_};
+		size_t lengths[4]={sizeof(random_), sizeof(random_), sizeof(random_), sizeof(random_)};
 		{
 			auto begin=chrono::high_resolution_clock::now();
 			for(int n=0; n<100; n++)
@@ -496,7 +497,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 			}
 			auto end=chrono::high_resolution_clock::now();
 			auto diff=chrono::duration_cast<secs_type>(end-begin);
-			cout << "Batch SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100ULL*4*sizeof(random)) << " cycles/byte" << endl;
+			cout << "Batch SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100ULL*4*sizeof(random_)) << " cycles/byte" << endl;
 		}
 		cout << "Hash is " << hashes[0].asHexString() << endl;
 		CHECK(shouldbe==hashes[0].asHexString());

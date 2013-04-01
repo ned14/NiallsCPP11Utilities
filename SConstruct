@@ -13,7 +13,7 @@ AddOption('--static', dest='static', nargs='?', const=True, help='build a static
 AddOption('--useclang', dest='useclang', nargs='?', const=True, help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs='?', const=True, help='use gcc if it is available')
 AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
-AddOption('--sse', dest='sse', nargs=1, type='int', default=1, help='set SSE used (0-4) on 32 bit x86. Defaults to 1 (SSE1).')
+AddOption('--sse', dest='sse', nargs=1, type='int', default=2, help='set SSE used (0-4) on 32 bit x86. Defaults to 2 (SSE2).')
 AddOption('--avx', dest='avx', nargs=1, type='int', default=0, help='set AVX used (0-2) on x86/x64. Defaults to 0 (No AVX).')
 
 # Force scons to always use absolute paths in everything (helps debuggers to find source files)
