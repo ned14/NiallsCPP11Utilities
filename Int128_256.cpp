@@ -70,15 +70,21 @@ template<class generator_type> void FillRandom(char *buffer, size_t length)
 
 void Int128::FillFastRandom(Int128 *ints, size_t no)
 {
-	// For integers, Mersenne is faster
-	FillQualityRandom(ints, no);
-	return;
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
+#ifdef HAVE_M128
+	// The Mersenne Twister's SSE2 implementation beats all else
+#ifdef __LP64__
+	typedef mt19937_64 generator_type;
+#else
+	typedef mt19937 generator_type;
+#endif
+#else
 #ifdef __LP64__
 	typedef ranlux48_base generator_type;
 #else
 	typedef ranlux24_base generator_type;
+#endif
 #endif
 	FillRandom<generator_type>((char *) ints, length);
 }
@@ -97,15 +103,21 @@ void Int128::FillQualityRandom(Int128 *ints, size_t no)
 
 void Int256::FillFastRandom(Int256 *ints, size_t no)
 {
-	// For integers, Mersenne is faster
-	FillQualityRandom(ints, no);
-	return;
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
+#ifdef HAVE_M128
+	// The Mersenne Twister's SSE2 implementation beats all else
+#ifdef __LP64__
+	typedef mt19937_64 generator_type;
+#else
+	typedef mt19937 generator_type;
+#endif
+#else
 #ifdef __LP64__
 	typedef ranlux48_base generator_type;
 #else
 	typedef ranlux24_base generator_type;
+#endif
 #endif
 	FillRandom<generator_type>((char *) ints, length);
 }
@@ -124,7 +136,7 @@ void Int256::FillQualityRandom(Int256 *ints, size_t no)
 
 void Hash128::AddFastHashTo(const char *data, size_t length)
 {
-	uint64 *spookyhash=const_cast<unsigned long long *>(asLongLongs());
+	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
 	SpookyHash::Hash128(data, length, spookyhash, spookyhash+1);
 }
 
@@ -139,7 +151,7 @@ void Hash128::BatchAddFastHashTo(size_t no, Hash128 *hashs, const char **data, s
 
 void Hash256::AddFastHashTo(const char *data, size_t length)
 {
-	uint64 *spookyhash=const_cast<unsigned long long *>(asLongLongs());
+	uint64 *spookyhash=(uint64 *) const_cast<unsigned long long *>(asLongLongs());
 	uint128 cityhash=*(uint128 *)(asLongLongs()+2);
 #pragma omp parallel for if(length>=1024)
 	for(int n=0; n<2; n++)

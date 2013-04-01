@@ -90,4 +90,5 @@ testlibs=[myliblib]
 testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
 
+outputs['mylib']=outputs['mylib'][0]
 Return("outputs")

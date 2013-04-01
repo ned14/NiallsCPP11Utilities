@@ -19,11 +19,32 @@ File Created: Nov 2012
   #include <sys/mount.h>
   #include <mach/mach.h>
   #include <mach/vm_map.h>
+#else
+#include <fcntl.h>
+#include <unistd.h>
+#include <memory.h>
 #endif
 
 namespace NiallsCPP11Utilities {
 
 using namespace std;
+
+// trim from start
+static inline std::string &ltrim(std::string &s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(::isspace))));
+        return s;
+}
+
+// trim from end
+static inline std::string &rtrim(std::string &s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(::isspace))).base(), s.end());
+        return s;
+}
+
+// trim from both ends
+static inline std::string &trim(std::string &s) {
+        return ltrim(rtrim(s));
+}
 
 std::map<size_t, MappedFileInfo> MappedFileInfo::mappedFiles()
 {
@@ -105,16 +126,16 @@ std::map<size_t, MappedFileInfo> MappedFileInfo::mappedFiles()
 		}
 	}
 #endif
-#ifdef USE_POSIX
+#ifndef WIN32
 #ifdef __linux__
-	FXString procpath=FXString("/proc/%1/maps").arg(FXProcess::id());
-	QFile fh(procpath, QFile::WantLightQFile());
-	fh.open(IO_ReadOnly);
+	int fh;
+	ERRHOS(fh=open("/proc/self/maps", O_RDONLY));
+	auto unfh=Undoer([fh] { close(fh); });
 	char rawbuffer[16384];
-	FXuval read=0;
-	while((read=fh.readBlock(rawbuffer+read, sizeof(rawbuffer)-read)))
+	size_t readed=0, laststartaddr=0;
+	while((readed=::read(fh, rawbuffer+readed, sizeof(rawbuffer)-readed)))
 	{
-		char *end=rawbuffer+read;
+		char *end=rawbuffer+readed;
 		*end=0;
 		for(; *end!=10; --end);
 		for(char *ptr=rawbuffer; ptr<end; ptr=strchr(ptr, 10)+1)
@@ -124,21 +145,22 @@ std::map<size_t, MappedFileInfo> MappedFileInfo::mappedFiles()
 			int t1, t2;
 			unsigned int pid;
 			char path[2048];
-			int len=sscanf(ptr, "%lx-%lx %c%c%c%c %lx %d:%d %u %s", &startaddr, &endaddr,
+			// 00c37000-00c39000 r--p 0019f000 fd:04 1050887                            /lib/i386-linux-gnu/libc-2.15.so
+			int len=sscanf(ptr, "%lx-%lx %c%c%c%c %lx %x:%x %u %s", &startaddr, &endaddr,
 				&_r, &_w, &_x, &_p, &offset, &t1, &t2, &pid, path);
-			bi.startaddr=(FXulong) startaddr;
-			bi.endaddr=(FXulong) endaddr;
+			bi.startaddr=(size_t) startaddr;
+			bi.endaddr=(size_t) endaddr;
 			bi.length=bi.endaddr-bi.startaddr;
 			bi.read=('r'==_r);
 			bi.write=('w'==_w);
 			bi.execute=('x'==_x);
 			bi.copyonwrite=('p'==_p);
-			bi.offset=(FXulong) offset;
+			bi.offset=(size_t) offset;
 			bi.path=path;
-			bi.path.trim();
+			trim(bi.path);
 			if(!list.empty())
 			{	// Linux doesn't say RAM sections belong to DLL
-				MappedFileInfo &bbi=list.back();
+				MappedFileInfo &bbi=list[laststartaddr];
 				if(bbi.endaddr==bi.startaddr && bi.path.empty()
 					&& bi.read==bbi.read && bi.write==bbi.write && bi.execute==bbi.execute && bi.copyonwrite==bbi.copyonwrite)
 				{	// Collapse
@@ -146,13 +168,13 @@ std::map<size_t, MappedFileInfo> MappedFileInfo::mappedFiles()
 					continue;
 				}
 			}
-			list.append(bi);
+			list[bi.startaddr]=bi;
+			laststartaddr=bi.startaddr;
 		}
 		end++;
-		read-=end-rawbuffer;
-		memmove(rawbuffer, end, read);
+		readed-=end-rawbuffer;
+		memmove(rawbuffer, end, readed);
 	}
-	fh.close();
 #endif
 #if defined(__FreeBSD__)
 	FXString procpath=FXString("/proc/%1/map").arg(FXProcess::id());
