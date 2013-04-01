@@ -112,7 +112,7 @@ namespace std {
 
 //! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
 #ifndef TYPEALIGNMENT
-#if __cplusplus>=201103L
+#if __cplusplus>=201103L && GCC_VERSION > 40800
 #define TYPEALIGNMENT(bytes) alignas(bytes)
 #else
 #ifdef _MSC_VER
@@ -179,7 +179,7 @@ namespace Impl {
 	template<typename T> struct is_nullptr<T, false> { bool operator()(T) const noexcept { return false; } };
 }
 //! Compile-time safe detector of if \em v is nullptr (can cope with non-pointer convertibles)
-#if defined(__GNUC__) && GCC_VERSION<40700
+#if defined(__GNUC__) && GCC_VERSION<40900
 template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_constructible<bool, T>::value>()(std::forward<T>(v)); }
 #else
 template<typename T> bool is_nullptr(T v) noexcept { return Impl::is_nullptr<T, std::is_trivially_constructible<bool, T>::value>()(std::forward<T>(v)); }
