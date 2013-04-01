@@ -26,12 +26,34 @@ static void _foo() { }
 
 static char random[25*1024*1024];
 
+// From http://burtleburtle.net/bob/rand/smallprng.html
+typedef unsigned int  u4;
+typedef struct ranctx { u4 a; u4 b; u4 c; u4 d; } ranctx;
+
+#define rot(x,k) (((x)<<(k))|((x)>>(32-(k))))
+u4 ranval( ranctx *x ) {
+    u4 e = x->a - rot(x->b, 27);
+    x->a = x->b ^ rot(x->c, 17);
+    x->b = x->c + x->d;
+    x->c = x->d + e;
+    x->d = e + x->a;
+    return x->d;
+}
+
+void raninit( ranctx *x, u4 seed ) {
+    u4 i;
+    x->a = 0xf1ea5eed, x->b = x->c = x->d = seed;
+    for (i=0; i<20; ++i) {
+        (void)ranval(x);
+    }
+}
+
 int main (int argc, char * const argv[]) {
-    std::mt19937 gen(0x78adbcff);
-    std::uniform_int_distribution<char> dis;
-	for(int n=0; n<sizeof(random); n++)
+	ranctx gen;
+	raninit(&gen, 0x78adbcff);
+	for(int n=0; n<sizeof(random)/sizeof(u4); n++)
 	{
-		random[n]=dis(gen);
+		((u4 *)random)[n]=ranval(&gen);
 	}
     int ret=Catch::Main( argc, argv );
 	printf("Press Return to exit ...\n");
@@ -398,7 +420,7 @@ TEST_CASE("Int256/works", "Tests that Int256 works")
 TEST_CASE("Hash128/works", "Tests that niallsnasty128hash works")
 {
 	using namespace std;
-	const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d");
+	const string shouldbe("609f3fd85acc3bb4f8833ac53ab33458");
 	auto scratch=unique_ptr<char>(new char[sizeof(random)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
 	for(int n=0; n<100; n++)
@@ -452,7 +474,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		cout << "memcpy does " << (CPU_CYCLES_PER_SEC*diff.count())/(1000ULL*sizeof(random)) << " cycles/byte" << endl;
 	}
 	{
-		const string shouldbe("5aba4e2d5e7c93f904fd723c4dd0286d515a0f3e66f2887fd43b5824bbdebad4");
+		const string shouldbe("609f3fd85acc3bb4f8833ac53ab3345823dc6462d245a5830fe001a9767d09f0");
 		Hash256 hash;
 		{
 			auto begin=chrono::high_resolution_clock::now();
@@ -468,7 +490,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		CHECK(shouldbe==hash.asHexString());
 	}
 	{
-		const string shouldbe("226221284d936077a2709aeca84235c309669375e3339ce112c5156a4ebbb60f");
+		const string shouldbe("ea1483962ca908676335418b06b6f98603d3d32b0962cda299a81cacdb5b1cb0");
 		Hash256 hash;
 		{
 			auto begin=chrono::high_resolution_clock::now();
@@ -484,7 +506,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 		CHECK(shouldbe==hash.asHexString());
 	}
 	{
-		const string shouldbe("226221284d936077a2709aeca84235c309669375e3339ce112c5156a4ebbb60f");
+		const string shouldbe("ea1483962ca908676335418b06b6f98603d3d32b0962cda299a81cacdb5b1cb0");
 		Hash256 hashes[4];
 		const char *datas[4]={random, random, random, random};
 		size_t lengths[4]={sizeof(random), sizeof(random), sizeof(random), sizeof(random)};
