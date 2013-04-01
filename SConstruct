@@ -12,7 +12,7 @@ AddOption('--debugbuild', dest='debug', nargs='?', const=True, help='enable debu
 AddOption('--static', dest='static', nargs='?', const=True, help='build a static library rather than shared library')
 AddOption('--useclang', dest='useclang', nargs='?', const=True, help='use clang if it is available')
 AddOption('--usegcc', dest='usegcc', nargs='?', const=True, help='use gcc if it is available')
-AddOption('--force32', dest='force32', help='force 32 bit build on 64 bit machine')
+AddOption('--force32', dest='force32', nargs='?', const=True, help='force 32 bit build on 64 bit machine')
 AddOption('--sse', dest='sse', nargs=1, type='int', default=2, help='set SSE used (0-4) on 32 bit x86. Defaults to 2 (SSE2).')
 AddOption('--avx', dest='avx', nargs=1, type='int', default=0, help='set AVX used (0-2) on x86/x64. Defaults to 0 (No AVX).')
 
@@ -74,6 +74,17 @@ else:
         cc.env['CPPFLAGS']=temp
         cc.Result(result)
         return result
+    def CheckHaveOpenMP(cc):
+        cc.Message("Checking for OpenMP support ...")
+        try:
+            temp=cc.env['CPPFLAGS']
+        except:
+            temp=[]
+        cc.env['CPPFLAGS']=temp+["-fopenmp"]
+        result=cc.TryCompile('#include <omp.h>\nint main(void) { return 0; }\n', '.cpp')
+        cc.env['CPPFLAGS']=temp
+        cc.Result(result)
+        return result
     def CheckHaveCPP11Features(cc):
         cc.Message("Checking if can enable C++11 features ...")
         try:
@@ -94,7 +105,7 @@ else:
         result=cc.TryCompile('#include "boost/mpl/vector.hpp"\n', '.cpp')
         cc.Result(result)
         return result
-    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
+    conf=Configure(env, { "CheckHaveClang" : CheckHaveClang, "CheckHaveGCC" : CheckHaveGCC, "CheckHaveVisibility" : CheckHaveVisibility, "CheckHaveOpenMP" : CheckHaveOpenMP, "CheckHaveCPP11Features" : CheckHaveCPP11Features, "CheckHaveBoost" : CheckHaveBoost } )
     if env.GetOption('useclang') and conf.CheckHaveClang():
         env['CC']="clang"
         env['CXX']="clang++"
@@ -109,6 +120,11 @@ else:
                              ]
     else:
         print "Disabling -fvisibility support"
+    if conf.CheckHaveOpenMP():
+        env['CPPFLAGS']+=["-fopenmp"]
+        env['LINKFLAGS']+=["-fopenmp"]
+    else:
+        print "Disabling OpenMP support"
 
     #if conf.CheckHaveCPP11Features():
     #    env['CXXFLAGS']+=["-std=c++11"]
