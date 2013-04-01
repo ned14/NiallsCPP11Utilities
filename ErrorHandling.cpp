@@ -17,7 +17,7 @@ namespace NiallsCPP11Utilities {
 
 using namespace std;
 
-void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::string *filename)
+void int_throwWinError(const char *file, const char *function, int lineno, unsigned code, const std::filesystem::path *filename)
 {
 	DWORD len;
 	TCHAR buffer[1024];
@@ -38,12 +38,12 @@ void int_throwWinError(const char *file, const char *function, int lineno, unsig
 	errstr.append(" ("+to_string(code)+") in '"+string(file)+"':"+string(function)+":"+to_string(lineno));
 	if(ERROR_FILE_NOT_FOUND==code || ERROR_PATH_NOT_FOUND==code)
 	{
-		errstr="File '"+*filename+"' not found [Host OS Error: "+errstr+"]";
+		errstr="File '"+filename->generic_string()+"' not found [Host OS Error: "+errstr+"]";
 		throw ios_base::failure(errstr);
 	}
 	else if(ERROR_ACCESS_DENIED==code || ERROR_EA_ACCESS_DENIED==code)
 	{
-		errstr="Access to '"+*filename+"' denied [Host OS Error: "+errstr+"]";
+		errstr="Access to '"+filename->generic_string()+"' denied [Host OS Error: "+errstr+"]";
 		throw ios_base::failure(errstr);
 	}
 	else if(ERROR_NO_DATA==code || ERROR_BROKEN_PIPE==code || ERROR_PIPE_NOT_CONNECTED==code || ERROR_PIPE_LISTENING==code)
@@ -64,7 +64,7 @@ namespace NiallsCPP11Utilities {
 
 using namespace std;
 
-void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::string *filename)
+void int_throwOSError(const char *file, const char *function, int lineno, int code, const std::filesystem::path *filename)
 {
 	/*if(EINTR==code && QThread::current()->isBeingCancelled())
 	{	*//* Some POSIX implementation have badly written pthread support which unpredictably returns
@@ -76,12 +76,12 @@ void int_throwOSError(const char *file, const char *function, int lineno, int co
 	errstr.append(" ("+to_string(code)+") in '"+string(file)+"':"+string(function)+":"+to_string(lineno));
 	if(ENOENT==code || ENOTDIR==code)
 	{
-		errstr="File '"+*filename+"' not found [Host OS Error: "+errstr+"]";
+		errstr="File '"+filename->generic_string()+"' not found [Host OS Error: "+errstr+"]";
 		throw ios_base::failure(errstr);
 	}
 	else if(EACCES==code)
 	{
-		errstr="Access to '"+*filename+"' denied [Host OS Error: "+errstr+"]";
+		errstr="Access to '"+filename->generic_string()+"' denied [Host OS Error: "+errstr+"]";
 		throw ios_base::failure(errstr);
 	}
 	else

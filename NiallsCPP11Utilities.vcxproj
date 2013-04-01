@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\ObjCompPrototype\deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\TripleGit\boost\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
