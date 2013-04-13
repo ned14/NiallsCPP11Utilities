@@ -1,7 +1,7 @@
 import os, sys, platform
 
-Import("env", "ARMcrosscompiler")
-env=env.Clone()
+Import("importedenv", "ARMcrosscompiler")
+env=importedenv.Clone()
 architecture=env['VARIANT'][:env['VARIANT'].find('/')]
 debugbuild="Debug" in env['VARIANT']
 if env['CC']=='cl':
