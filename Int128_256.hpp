@@ -145,6 +145,8 @@ public:
 	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
 
 	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
+	
+	ARM Cortex-A15: Performance on 32 bit is approx. 26.17 cycles/byte.
 	*/
 	static void FillFastRandom(Int128 *ints, size_t no);
 	//! Fast fills a vector with random Int128s
@@ -154,6 +156,8 @@ public:
 	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
 
 	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
+	
+	ARM Cortex-A15: Performance on 32 bit is approx. 26.84 cycles/byte.
 	*/
 	static void FillQualityRandom(Int128 *ints, size_t no);
 	//! Quality fills a vector with random Int128s
@@ -259,6 +263,8 @@ public:
 	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
 
 	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
+	
+	ARM Cortex-A15: Performance on 32 bit is approx. 16.63 cycles/byte.
 	*/
 	static void FillFastRandom(Int256 *ints, size_t no);
 	//! Fast fills a vector with random Int256s.
@@ -268,6 +274,8 @@ public:
 	Intel Ivy Bridge: Performance on 32 bit is approx. 2.95 cycles/byte. Performance on 64 bit is approx. 1.52 cycles/byte.
 
 	Intel Atom: Performance on 32 bit is approx. 9.38 cycles/byte. 
+	
+	ARM Cortex-A15: Performance on 32 bit is approx. 16.47 cycles/byte.
 	*/
 	static void FillQualityRandom(Int256 *ints, size_t no);
 	//! Quality fills a vector with random Int256s.
@@ -282,6 +290,8 @@ To use this you must compile Int128_256.cpp.
 Intel Ivy Bridge: Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cycles/byte. Performance on 64 bit is approx. 0.31 cycles/byte.
 
 Intel Atom: Performance on 32 bit is approx. 3.38 cycles/byte
+
+ARM Cortex-A15: Performance on 32 bit is approx. 1.72 cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
@@ -311,9 +321,13 @@ Intel Ivy Bridge: Fasthash (combined SpookyHash + CityHash) performance on 32 bi
 
 Intel Atom (single core): Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 9.31 cycles/byte.
 
+ARM Cortex-A15: Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.96 cycles/byte.
+
 Intel Ivy Bridge: SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (batch 6.89 cycles/byte). Performance on 64 bit is approx. 14.89 cycles/byte (batch 4.23 cycles/byte).
 
 Intel Atom (single core): SHA-256 performance on 32 bit is approx. 40.35 cycles/byte (batch 24.46 cycles/byte).
+
+ARM Cortex-A15: Fasthash SHA-256 performance on 32 bit is approx. 22.42 cycles/byte (batch ? cycles/byte).
 
 SHA-256, being cryptographically secure, requires a setup, data contribution and finalisation stage in order to produce FIPS compliant
 output (mainly because the total bits hashed must be appended at the end). Only AddSHA256ToBatch() can therefore correctly handle

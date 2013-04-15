@@ -253,7 +253,6 @@ void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas
 	else if(h->hashType!=HashOp::HashType::SHA256)
 		throw std::runtime_error("You can't add a SHA-256 hash to a fast hash");
 	h->make_scratch();
-#if HAVE_M128
 	// TODO: No reason this can't OpenMP parallelise given sufficient no
 	__sha256_block_t emptyblk;
 	size_t hashidxs[4]={0};
@@ -296,9 +295,10 @@ void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas
 				}
 			}
 		}
-#if 1
+#if HAVE_M128
 		__sha256_int(blks, out); 
 #else
+#pragma omp parallel for
 		for(size_t n=0; n<4; n++)
 			__sha256_osol(*blks[n], *out[n]);
 #endif
@@ -333,13 +333,6 @@ void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas
 			}
 		}
 	}
-#else
-	// TODO: Implement incremental SHA for non-SIMD
-#error Fixme! Implement incremental SHA for non-SIMD
-#pragma omp parallel for schedule(dynamic)
-	for(ptrdiff_t n=0; n<(ptrdiff_t) no; n++)
-		hashs[n].AddSHA256To(data[n], length[n]);
-#endif
 }
 static void _FinishBatch(HashOp *h)
 {
@@ -352,7 +345,6 @@ static void _FinishBatch(HashOp *h)
 	case HashOp::HashType::SHA256:
 		{
 			// Terminate all remaining hashes
-#if HAVE_M128
 			__sha256_block_t emptyblk;
 			const __sha256_block_t *blks[4]={&emptyblk, &emptyblk, &emptyblk, &emptyblk};
 			__sha256_hash_t emptyout;
@@ -369,7 +361,13 @@ static void _FinishBatch(HashOp *h)
 					out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 					if(4==++inuse)
 					{
+#if HAVE_M128
 						__sha256_int(blks, out);
+#else
+#pragma omp parallel for
+						for(size_t z=0; z<4; z++)
+							__sha256_osol(*blks[z], *out[z]);
+#endif
 						inuse=0;
 					}
 					h->scratch[n].pos=0;
@@ -382,7 +380,13 @@ static void _FinishBatch(HashOp *h)
 					blks[n]=&emptyblk;
 					out[n]=&emptyout;
 				}
+#if HAVE_M128
 				__sha256_int(blks, out);
+#else
+#pragma omp parallel for
+				for(size_t z=0; z<4; z++)
+					__sha256_osol(*blks[z], *out[z]);
+#endif
 				inuse=0;
 			}
 			// First run is to find all hashes with scratchpos>=56 as these need an extra round
@@ -395,7 +399,13 @@ static void _FinishBatch(HashOp *h)
 				out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 				if(4==++inuse)
 				{
+#if HAVE_M128
 					__sha256_int(blks, out);
+#else
+#pragma omp parallel for
+					for(size_t z=0; z<4; z++)
+						__sha256_osol(*blks[z], *out[z]);
+#endif
 					inuse=0;
 				}
 			}
@@ -406,7 +416,13 @@ static void _FinishBatch(HashOp *h)
 					blks[n]=&emptyblk;
 					out[n]=&emptyout;
 				}
+#if HAVE_M128
 				__sha256_int(blks, out);
+#else
+#pragma omp parallel for
+				for(size_t z=0; z<4; z++)
+					__sha256_osol(*blks[z], *out[z]);
+#endif
 				inuse=0;
 			}
 			// As we're little endian flip back the words
@@ -415,9 +431,6 @@ static void _FinishBatch(HashOp *h)
 				for(int m=0; m<8; m++)
 					*const_cast<unsigned int *>(h->hashs[n].asInts()+m)=LOAD_BIG_32(h->hashs[n].asInts()+m);
 			}
-#else
-#error Fixme!
-#endif
 			break;
 		}
 	}

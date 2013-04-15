@@ -3,7 +3,7 @@
 File Created: Nov 2012
 */
 
-#define CPU_CYCLES_PER_SEC (2400000000U)
+#define CPU_CYCLES_PER_SEC (1700000000U)
 
 #define CATCH_CONFIG_RUNNER
 #include "NiallsCPP11Utilities.hpp"
@@ -52,7 +52,7 @@ void raninit( ranctx *x, u4 seed ) {
 int main (int argc, char * const argv[]) {
 	ranctx gen;
 	raninit(&gen, 0x78adbcff);
-	for(int n=0; n<sizeof(random_)/sizeof(u4); n++)
+	for(size_t n=0; n<sizeof(random_)/sizeof(u4); n++)
 	{
 		((u4 *)random_)[n]=ranval(&gen);
 	}
