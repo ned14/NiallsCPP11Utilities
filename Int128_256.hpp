@@ -77,6 +77,9 @@ inline unsigned _mm_movemask_epi8_neon(uint32x4_t Input)
 #ifndef HAVE_M128
 #define HAVE_M128 0
 #endif
+#ifndef HAVE_NEON128
+#define HAVE_NEON128 0
+#endif
 #ifndef HAVE_M256
 #define HAVE_M256 0
 #endif
@@ -86,7 +89,7 @@ namespace NiallsCPP11Utilities {
 /*! \class Int128
 \brief Declares a 128 bit SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
 
-Implemented as a __m128i if available, otherwise as long longs.
+Implemented as a __m128i or NEON uint32x4_t if available, otherwise as long longs.
 */
 class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 {
@@ -204,7 +207,7 @@ public:
 /*! \class Int256
 \brief Declares a 256 bit AVX2/SSE2/NEON compliant container. WILL throw exception if initialised unaligned.
 
-Implemented as a __m256i if available (AVX2), otherwise two __m128i's if available, otherwise as many long longs.
+Implemented as a __m256i if available (AVX2), otherwise two __m128i's or two NEON uint32x4_t's if available, otherwise as many long longs.
 */
 class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 {
@@ -216,6 +219,9 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(32) Int256
 		size_t asSize_t;
 #if HAVE_M128
 		__m128i asM128s[2];
+#endif
+#if HAVE_NEON128
+		uint32x4_t asNEONs[2];
 #endif
 #if HAVE_M256
 		__m256i asM256;
@@ -257,6 +263,19 @@ public:
 		result[1]=_mm_cmpeq_epi32(mydata.asM128s[1], o.mydata.asM128s[1]);
 		unsigned r=_mm_movemask_epi8(result[0]);
 		r|=_mm_movemask_epi8(result[1])<<16;
+		return !(~r);
+	}
+#elif HAVE_NEON128
+	Int256(const Int256 &o) { int_testAlignment(); mydata.asNEONs[0]=o.mydata.asNEONs[0]; mydata.asNEONs[1]=o.mydata.asNEONs[1]; }
+	Int256 &operator=(const Int256 &o) { mydata.asNEONs[0]=o.mydata.asNEONs[0]; mydata.asNEONs[1]=o.mydata.asNEONs[1]; return *this; }
+	explicit Int256(const char *bytes) { int_testAlignment(); mydata.asNEONs[0]=vld1q_u32((const uint32_t *) bytes); mydata.asNEONs[1]=vld1q_u32((const uint32_t *) (bytes+16)); }
+	bool operator==(const Int256 &o) const
+	{
+		uint32x4_t result[2];
+		result[0]=vceqq_u32(mydata.asNEONs[0], o.mydata.asNEONs[0]);
+		result[1]=vceqq_u32(mydata.asNEONs[1], o.mydata.asNEONs[1]);
+		unsigned r=_mm_movemask_epi8_neon(result[0]);
+		r|=_mm_movemask_epi8_neon(result[1])<<16;
 		return !(~r);
 	}
 #else
@@ -328,7 +347,7 @@ Intel Ivy Bridge: Fasthash (SpookyHash) performance on 32 bit is approx. 1.17 cy
 
 Intel Atom: Performance on 32 bit is approx. 3.38 cycles/byte
 
-ARM Cortex-A15: Performance on 32 bit is approx. 1.72 cycles/byte.
+ARM Cortex-A15: Performance on 32 bit is approx. 1.49 cycles/byte.
 */
 class NIALLSCPP11UTILITIES_API Hash128 : public Int128
 {
@@ -356,15 +375,17 @@ To use this you must compile Int128_256.cpp.
 
 Intel Ivy Bridge: Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.71 cycles/byte. Performance on 64 bit is approx. 0.46 cycles/byte.
 
-Intel Atom (single core): Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 9.31 cycles/byte.
+Intel Atom (single hyperthreaded core): Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 9.31 cycles/byte.
 
 ARM Cortex-A15: Fasthash (combined SpookyHash + CityHash) performance on 32 bit is approx. 2.96 cycles/byte.
 
+
 Intel Ivy Bridge: SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (batch 6.89 cycles/byte). Performance on 64 bit is approx. 14.89 cycles/byte (batch 4.23 cycles/byte).
 
-Intel Atom (single core): SHA-256 performance on 32 bit is approx. 40.35 cycles/byte (batch 24.46 cycles/byte).
+Intel Atom (single hyperthreaded core): SHA-256 performance on 32 bit is approx. 40.35 cycles/byte (batch 24.46 cycles/byte).
 
-ARM Cortex-A15: Fasthash SHA-256 performance on 32 bit is approx. 22.42 cycles/byte (batch ? cycles/byte).
+ARM Cortex-A15: SHA-256 performance on 32 bit is approx. 22.42 cycles/byte (batch 22.11 cycles/byte).
+
 
 SHA-256, being cryptographically secure, requires a setup, data contribution and finalisation stage in order to produce FIPS compliant
 output (mainly because the total bits hashed must be appended at the end). Only AddSHA256ToBatch() can therefore correctly handle

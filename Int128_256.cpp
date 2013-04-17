@@ -72,8 +72,8 @@ void Int128::FillFastRandom(Int128 *ints, size_t no)
 {
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
-#ifdef HAVE_M128
-	// The Mersenne Twister's SSE2 implementation beats all else
+#if HAVE_M128 || HAVE_NEON128
+	// The Mersenne Twister's SIMD implementation beats all else
 #ifdef __LP64__
 	typedef mt19937_64 generator_type;
 #else
@@ -105,8 +105,8 @@ void Int256::FillFastRandom(Int256 *ints, size_t no)
 {
 	size_t length=no*sizeof(*ints);
 	if(no && no!=length/sizeof(*ints)) abort();
-#ifdef HAVE_M128
-	// The Mersenne Twister's SSE2 implementation beats all else
+#if HAVE_M128 || HAVE_NEON128
+	// The Mersenne Twister's SIMD implementation beats all else
 #ifdef __LP64__
 	typedef mt19937_64 generator_type;
 #else
@@ -298,7 +298,7 @@ void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas
 #if HAVE_M128
 		__sha256_int(blks, out); 
 #else
-#pragma omp parallel for
+//#pragma omp parallel for
 		for(size_t n=0; n<4; n++)
 			__sha256_osol(*blks[n], *out[n]);
 #endif
@@ -364,7 +364,7 @@ static void _FinishBatch(HashOp *h)
 #if HAVE_M128
 						__sha256_int(blks, out);
 #else
-#pragma omp parallel for
+//#pragma omp parallel for
 						for(size_t z=0; z<4; z++)
 							__sha256_osol(*blks[z], *out[z]);
 #endif
@@ -383,7 +383,7 @@ static void _FinishBatch(HashOp *h)
 #if HAVE_M128
 				__sha256_int(blks, out);
 #else
-#pragma omp parallel for
+//#pragma omp parallel for
 				for(size_t z=0; z<4; z++)
 					__sha256_osol(*blks[z], *out[z]);
 #endif
@@ -402,7 +402,7 @@ static void _FinishBatch(HashOp *h)
 #if HAVE_M128
 					__sha256_int(blks, out);
 #else
-#pragma omp parallel for
+//#pragma omp parallel for
 					for(size_t z=0; z<4; z++)
 						__sha256_osol(*blks[z], *out[z]);
 #endif
@@ -419,7 +419,7 @@ static void _FinishBatch(HashOp *h)
 #if HAVE_M128
 				__sha256_int(blks, out);
 #else
-#pragma omp parallel for
+//#pragma omp parallel for
 				for(size_t z=0; z<4; z++)
 					__sha256_osol(*blks[z], *out[z]);
 #endif
