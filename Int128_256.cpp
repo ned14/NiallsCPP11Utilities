@@ -18,6 +18,9 @@ which isn't fast, but it's the fastest reasonably good 256 bit hash I can make q
 #if HAVE_M128
 #include "hashes/sha256/sha256-sse.c"
 #endif
+#if HAVE_NEON128
+#include "hashes/sha256/sha256-neon.c"
+#endif
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -295,7 +298,7 @@ void Hash256::AddSHA256ToBatch(BatchHashOp _h, size_t no, const BatchItem *datas
 				}
 			}
 		}
-#if HAVE_M128
+#if HAVE_M128 || defined(HAVE_NEON128)
 		__sha256_int(blks, out); 
 #else
 //#pragma omp parallel for
@@ -361,7 +364,7 @@ static void _FinishBatch(HashOp *h)
 					out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 					if(4==++inuse)
 					{
-#if HAVE_M128
+#if HAVE_M128 || defined(HAVE_NEON128)
 						__sha256_int(blks, out);
 #else
 //#pragma omp parallel for
@@ -380,7 +383,7 @@ static void _FinishBatch(HashOp *h)
 					blks[n]=&emptyblk;
 					out[n]=&emptyout;
 				}
-#if HAVE_M128
+#if HAVE_M128 || defined(HAVE_NEON128)
 				__sha256_int(blks, out);
 #else
 //#pragma omp parallel for
@@ -399,7 +402,7 @@ static void _FinishBatch(HashOp *h)
 				out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 				if(4==++inuse)
 				{
-#if HAVE_M128
+#if HAVE_M128 || defined(HAVE_NEON128)
 					__sha256_int(blks, out);
 #else
 //#pragma omp parallel for
@@ -416,7 +419,7 @@ static void _FinishBatch(HashOp *h)
 					blks[n]=&emptyblk;
 					out[n]=&emptyout;
 				}
-#if HAVE_M128
+#if HAVE_M128 || defined(HAVE_NEON128)
 				__sha256_int(blks, out);
 #else
 //#pragma omp parallel for
