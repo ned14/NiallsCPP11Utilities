@@ -47,6 +47,29 @@ AVX2 accelerated 256 bit integer implementation. Falls back to SSE2/NEON 128 bit
 #if defined(__SSE2__)
 #define HAVE_M128 1
 #include <emmintrin.h>
+#elif defined(__ARM_NEON__)
+#define HAVE_NEON128 1
+#include <arm_neon.h>
+
+// Taken from http://stackoverflow.com/questions/11870910/sse-mm-movemask-epi8-equivalent-method-for-arm-neon
+inline unsigned _mm_movemask_epi8_neon(uint32x4_t Input)
+{
+  static const uint8_t __attribute__ ((aligned (16))) _Powers[16]= 
+      { 1, 2, 4, 8, 16, 32, 64, 128, 1, 2, 4, 8, 16, 32, 64, 128 };
+
+  // Set the powers of 2 (do it once for all, if applicable)
+  static uint8x16_t Powers= vld1q_u8(_Powers);
+
+  // Compute the mask from the input
+  uint64x2_t Mask= vpaddlq_u32(vpaddlq_u16(vpaddlq_u8(vandq_u8(vreinterpretq_u8_u32(Input), Powers))));
+
+  // Get the resulting bytes
+  uint16_t Output;
+  vst1q_lane_u8((uint8_t*)&Output + 0, (uint8x16_t)Mask, 0);
+  vst1q_lane_u8((uint8_t*)&Output + 1, (uint8x16_t)Mask, 8);
+
+  return (unsigned) Output;
+}
 #endif
 #endif
 #endif
@@ -76,6 +99,9 @@ class NIALLSCPP11UTILITIES_API TYPEALIGNMENT(16) Int128
 #if HAVE_M128
 		__m128i asM128;
 #endif
+#if HAVE_NEON128
+		uint32x4_t asNEON;
+#endif
 #ifdef __GNUC__
 		int __attribute__ ((vector_size(16))) vect16;
 #endif
@@ -102,6 +128,17 @@ public:
 		__m128i result;
 		result=_mm_cmpeq_epi32(mydata.asM128, o.mydata.asM128);
 		unsigned r=_mm_movemask_epi8(result);
+		return r==0xffff;
+	}
+#elif HAVE_NEON128
+	Int128(const Int128 &o) { int_testAlignment(); mydata.asNEON=o.mydata.asNEON; }
+	Int128 &operator=(const Int128 &o) { mydata.asNEON=o.mydata.asNEON; return *this; }
+	explicit Int128(const char *bytes) { int_testAlignment(); mydata.asNEON=vld1q_u32((const uint32_t *) bytes); }
+	bool operator==(const Int128 &o) const
+	{
+		uint32x4_t result;
+		result=vceqq_u32(mydata.asNEON, o.mydata.asNEON);
+		unsigned r=_mm_movemask_epi8_neon(result);
 		return r==0xffff;
 	}
 #else
