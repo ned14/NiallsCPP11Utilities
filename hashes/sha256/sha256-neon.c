@@ -32,12 +32,6 @@ typedef uint32x4_t __m128i;
 #define _mm_and_si128(a, b) vandq_u32((a), (b))
 #define _mm_or_si128(a, b) vorrq_u32((a), (b))
 #define _mm_xor_si128(a, b) veorq_u32((a), (b))
-//#define _mm_slli_epi32(a, b) vshlq_u32((a), vdupq_n_s32((b)))
-static uint32x4_t _mm_set_epi32(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
-{
-  uint32_t v[4]={ (d), (c), (b), (a) };
-  return vld1q_u32(v);
-}
 #define _mm_set1_epi32(a) vdupq_n_u32((a))
 #define _mm_add_epi32(a, b) vaddq_u32((a), (b))
 
@@ -65,8 +59,12 @@ static inline __m128i Maj(__m128i b, __m128i c, __m128i d) {
 #define	SIGMA0_256(x)		(_mm_xor_si128(_mm_xor_si128(ROTR((x), 7), ROTR((x), 18)), SHR((x), 3)))
 #define	SIGMA1_256(x)		(_mm_xor_si128(_mm_xor_si128(ROTR((x), 17), ROTR((x), 19)), SHR((x), 10)))
 
-static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3) {
+/*static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3) {
 	return _mm_set_epi32(x0, x1, x2, x3);
+}*/
+static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3) {
+  uint32_t v[4] = { (x0), (x1), (x2), (x3) };
+  return vld1q_u32(v);
 }
 
 /*static inline uint32_t store32(__m128i x) {
@@ -74,16 +72,18 @@ static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t
     box.x = x;
     return box.ret[0];
 }*/
-#define store32(x) vgetq_lane_u32((x), 0)
+//#define store32(x) vgetq_lane_u32((x), 0)
 
-static inline void store_epi32(__m128i x, uint32_t *x0, uint32_t *x1, uint32_t *x2, uint32_t *x3) {
+/*static inline void store_epi32(__m128i x, uint32_t *x0, uint32_t *x1, uint32_t *x2, uint32_t *x3) {
     union { uint32_t ret[4]; __m128i x; } box; box.x=x;
     *x0 = box.ret[3]; *x1 = box.ret[2]; *x2 = box.ret[1]; *x3 = box.ret[0];
-}
+}*/
+#define store_epi32(x, x0, x1, x2, x3) (*(x0)=vgetq_lane_u32((x), 0), *(x1)=vgetq_lane_u32((x), 1), *(x2)=vgetq_lane_u32((x), 2), *(x3)=vgetq_lane_u32((x), 3))
 
-static inline __m128i SHA256_CONST(int i) {
+/*static inline __m128i SHA256_CONST(int i) {
     return _mm_set1_epi32(sha256_consts[i]);
-}
+}*/
+#define SHA256_CONST(i) vdupq_n_u32(sha256_consts[(i)])
 
 #define add4(x0, x1, x2, x3) _mm_add_epi32(_mm_add_epi32(_mm_add_epi32(x0, x1), x2), x3)
 #define add5(x0, x1, x2, x3, x4) _mm_add_epi32(add4(x0, x1, x2, x3), x4)
@@ -95,19 +95,28 @@ static inline __m128i SHA256_CONST(int i) {
     T2 = _mm_add_epi32(BIGSIGMA0_256(a), Maj(a, b, c));                 \
     h = _mm_add_epi32(T1, T2);
 
-static inline uint32_t SWAP32(const void *addr) {
+/*static inline uint32_t SWAP32(const void *addr) {
 #ifdef _MSC_VER
 	return _byteswap_ulong(*((uint32_t *)(addr)));
 #else
     return __builtin_bswap32(*((uint32_t *)(addr)));
 #endif
-}
+}*/
 
-static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
+/*static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
     return load_epi32(SWAP32(*blk[0] + i * 4), SWAP32(*blk[1] + i * 4), SWAP32(*blk[2] + i * 4), SWAP32(*blk[3] + i * 4));
+}*/
+static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
+    uint32_t v[4];
+    v[0]=*((uint32_t *)(*blk[0] + i * 4));
+    v[1]=*((uint32_t *)(*blk[1] + i * 4));
+    v[2]=*((uint32_t *)(*blk[2] + i * 4));
+    v[3]=*((uint32_t *)(*blk[3] + i * 4));
+    return vreinterpretq_u32_u8(vrev32q_u8(vreinterpretq_u8_u32(vld1q_u32(v))));
 }
 
-static inline void dumpreg(__m128i x, char *msg) {
+
+static inline void dumpreg(__m128i x, const char *msg) {
     union { uint32_t ret[4]; __m128i x; } box; box.x = x;
     printf("%s %08x %08x %08x %08x\n", msg, box.ret[0], box.ret[1], box.ret[2], box.ret[3]);
 }
@@ -125,6 +134,23 @@ void __sha256_int(const __sha256_block_t *blk[4], __sha256_hash_t *hash[4])
 #define load(x, i) __m128i x = load_epi32((*h0)[i], (*h1)[i], (*h2)[i], (*h3)[i])
 
     load(a, 0);
+#if 0
+    printf("%08x %08x %08x %08x\n", (*h0)[0], (*h1)[0], (*h2)[0], (*h3)[0]);
+    dumpreg(a, "neon");
+    {
+      __m128i foo=a;
+      uint32_t w, x, y, z;
+      dumpreg(foo, "foo");
+      foo=vreinterpretq_u32_u8(vrev32q_u8(vreinterpretq_u8_u32(foo)));
+      dumpreg(foo, "bs");
+      foo=ROTR(foo, 8);
+      dumpreg(foo, "rotr");
+      foo=SHR(foo, 8);
+      dumpreg(foo, "shr");
+      store_epi32(foo, &w, &x, &y, &z); 
+      printf("%08x %08x %08x %08x\n", w, x, y, z);
+    }
+#endif
     load(b, 1);
     load(c, 2);
     load(d, 3);
