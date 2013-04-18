@@ -13,6 +13,7 @@ File Created: Mar 2013
 namespace std { namespace filesystem { using namespace tr2::filesystem; } }
 #else
 #include "boost/filesystem/convenience.hpp"
+#include "boost/filesystem/fstream.hpp"
 namespace std {
 	namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
 	template<class T> struct hash;
