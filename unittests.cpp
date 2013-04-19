@@ -57,8 +57,10 @@ int main (int argc, char * const argv[]) {
 		((u4 *)random_)[n]=ranval(&gen);
 	}
     int ret=Catch::Main( argc, argv );
+#ifdef _MSC_VER
 	printf("Press Return to exit ...\n");
 	getchar();
+#endif
 	return ret;
 }
 

@@ -54,7 +54,7 @@ static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t
 }
 
 static inline uint32_t store32(__m128i x) {
-    union { uint32_t ret[0]; __m128i x; } box;
+    union { uint32_t ret[1]; __m128i x; } box;
     box.x = x;
     return box.ret[0];
 }
