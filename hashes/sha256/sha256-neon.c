@@ -28,7 +28,7 @@ static const uint32_t sha256_consts[] = {
 
 // I'm really lazy so ...
 typedef uint32x4_t __m128i;
-#define _mm_andnot_si128(a, b) vbicq_u32((a), (b))
+#define _mm_andnot_si128(a, b) vbicq_u32((b), (a))
 #define _mm_and_si128(a, b) vandq_u32((a), (b))
 #define _mm_or_si128(a, b) vorrq_u32((a), (b))
 #define _mm_xor_si128(a, b) veorq_u32((a), (b))
@@ -63,7 +63,7 @@ static inline __m128i Maj(__m128i b, __m128i c, __m128i d) {
 	return _mm_set_epi32(x0, x1, x2, x3);
 }*/
 static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t x3) {
-  uint32_t v[4] = { (x0), (x1), (x2), (x3) };
+  uint32_t v[4] = { (x3), (x2), (x1), (x0) };
   return vld1q_u32(v);
 }
 
@@ -78,7 +78,7 @@ static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t
     union { uint32_t ret[4]; __m128i x; } box; box.x=x;
     *x0 = box.ret[3]; *x1 = box.ret[2]; *x2 = box.ret[1]; *x3 = box.ret[0];
 }*/
-#define store_epi32(x, x0, x1, x2, x3) (*(x0)=vgetq_lane_u32((x), 0), *(x1)=vgetq_lane_u32((x), 1), *(x2)=vgetq_lane_u32((x), 2), *(x3)=vgetq_lane_u32((x), 3))
+#define store_epi32(x, x0, x1, x2, x3) (*(x0)=vgetq_lane_u32((x), 3), *(x1)=vgetq_lane_u32((x), 2), *(x2)=vgetq_lane_u32((x), 1), *(x3)=vgetq_lane_u32((x), 0))
 
 /*static inline __m128i SHA256_CONST(int i) {
     return _mm_set1_epi32(sha256_consts[i]);
@@ -108,10 +108,10 @@ static inline __m128i load_epi32(uint32_t x0, uint32_t x1, uint32_t x2, uint32_t
 }*/
 static inline __m128i LOAD(const __sha256_block_t *blk[4], int i) {
     uint32_t v[4];
-    v[0]=*((uint32_t *)(*blk[0] + i * 4));
-    v[1]=*((uint32_t *)(*blk[1] + i * 4));
-    v[2]=*((uint32_t *)(*blk[2] + i * 4));
-    v[3]=*((uint32_t *)(*blk[3] + i * 4));
+    v[3]=*((uint32_t *)(*blk[0] + i * 4));
+    v[2]=*((uint32_t *)(*blk[1] + i * 4));
+    v[1]=*((uint32_t *)(*blk[2] + i * 4));
+    v[0]=*((uint32_t *)(*blk[3] + i * 4));
     return vreinterpretq_u32_u8(vrev32q_u8(vreinterpretq_u8_u32(vld1q_u32(v))));
 }
 
