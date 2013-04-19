@@ -384,7 +384,7 @@ Intel Ivy Bridge: SHA-256 performance on 32 bit is approx. 17.23 cycles/byte (ba
 
 Intel Atom (single hyperthreaded core): SHA-256 performance on 32 bit is approx. 40.35 cycles/byte (batch 24.46 cycles/byte).
 
-ARM Cortex-A15: SHA-256 performance on 32 bit is approx. 22.42 cycles/byte (batch 22.11 cycles/byte).
+ARM Cortex-A15: SHA-256 performance on 32 bit is approx. 21.24 cycles/byte (batch 15.11 cycles/byte).
 
 
 SHA-256, being cryptographically secure, requires a setup, data contribution and finalisation stage in order to produce FIPS compliant
