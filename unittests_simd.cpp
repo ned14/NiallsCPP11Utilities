@@ -49,6 +49,7 @@ TEST_CASE("SHA256/store", "Tests that SIMD store works")
 	CHECK( c[3] == 0xfee1baad );
 }
 
+#if !HAVE_NEON128
 TEST_CASE("SHA256/shaload", "Tests that SHA LOAD works")
 {
 	union { uint32_t a[4]; __m128i b; } x;
@@ -60,6 +61,41 @@ TEST_CASE("SHA256/shaload", "Tests that SHA LOAD works")
 	CHECK( x.a[2] == 0xefbeadde );
 	CHECK( x.a[3] == 0x78563412 );
 }
+#endif
+
+#if HAVE_NEON128
+TEST_CASE("SHA256/shaload4", "Tests that SHA LOAD4 works")
+{
+	union { uint32_t a[4]; __m128i b; } x[4];
+	uint32_t a[4]={0x11111111, 0x11111111, 0x11111111, 0x11111111};
+	uint32_t b[4]={0x22222222, 0x22222222, 0x22222222, 0x22222222};
+	uint32_t c[4]={0x33333333, 0x33333333, 0x33333333, 0x33333333};
+	uint32_t d[4]={0x44444444, 0x44444444, 0x44444444, 0x44444444};
+	const __sha256_block_t *blks[4]={ (__sha256_block_t *)(a), (__sha256_block_t *)(b), (__sha256_block_t *)(c), (__sha256_block_t *)(d) };
+	LOAD4(&x[0].b, blks, 0);
+	cout << "should: 0x78563412, 0xefbeadde, 0x32547698, 0xadbae1fe" << endl;
+	cout << "     0: 0x" << hex << x[0].a[0] << " 0x" << x[0].a[1] << " 0x" << x[0].a[2] << " 0x" << x[0].a[3] << endl;
+	cout << "     1: 0x" << hex << x[1].a[0] << " 0x" << x[1].a[1] << " 0x" << x[1].a[2] << " 0x" << x[1].a[3] << endl;
+	cout << "     2: 0x" << hex << x[2].a[0] << " 0x" << x[2].a[1] << " 0x" << x[2].a[2] << " 0x" << x[2].a[3] << endl;
+	cout << "     3: 0x" << hex << x[3].a[0] << " 0x" << x[3].a[1] << " 0x" << x[3].a[2] << " 0x" << x[3].a[3] << endl;
+	CHECK( x[0].a[0] == 0x78563412 );
+	CHECK( x[0].a[1] == 0x78563412 );
+	CHECK( x[0].a[2] == 0x78563412 );
+	CHECK( x[0].a[3] == 0x78563412 );
+	CHECK( x[1].a[0] == 0xefbeadde );
+	CHECK( x[1].a[1] == 0xefbeadde );
+	CHECK( x[1].a[2] == 0xefbeadde );
+	CHECK( x[1].a[3] == 0xefbeadde );
+	CHECK( x[2].a[0] == 0x32547698 );
+	CHECK( x[2].a[1] == 0x32547698 );
+	CHECK( x[2].a[2] == 0x32547698 );
+	CHECK( x[2].a[3] == 0x32547698 );
+	CHECK( x[3].a[0] == 0xadbae1fe );
+	CHECK( x[3].a[1] == 0xadbae1fe );
+	CHECK( x[3].a[2] == 0xadbae1fe );
+	CHECK( x[3].a[3] == 0xadbae1fe );
+}
+#endif
 
 TEST_CASE("SHA256/const", "Tests that SHA CONST works")
 {

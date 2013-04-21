@@ -461,6 +461,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 	using namespace std;
 	auto scratch=unique_ptr<char>(new char[sizeof(random_)]);
 	typedef std::chrono::duration<double, ratio<1>> secs_type;
+	double SHA256cpb, BatchSHA256cpb;
 	for(int n=0; n<100; n++)
 	{
 		memcpy(scratch.get(), random_, sizeof(random_));
@@ -504,6 +505,7 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 			auto end=chrono::high_resolution_clock::now();
 			auto diff=chrono::duration_cast<secs_type>(end-begin);
 			cout << "Reference SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100*sizeof(random_)) << " cycles/byte" << endl;
+			SHA256cpb=(CPU_CYCLES_PER_SEC*diff.count())/(100*sizeof(random_));
 		}
 		cout << "Hash is " << hash.asHexString() << endl;
 		CHECK(shouldbe==hash.asHexString());
@@ -522,6 +524,8 @@ TEST_CASE("Hash256/works", "Tests that niallsnasty256hash works")
 			auto end=chrono::high_resolution_clock::now();
 			auto diff=chrono::duration_cast<secs_type>(end-begin);
 			cout << "Batch SHA-256 hash does " << (CPU_CYCLES_PER_SEC*diff.count())/(100ULL*4*sizeof(random_)) << " cycles/byte" << endl;
+			BatchSHA256cpb=(CPU_CYCLES_PER_SEC*diff.count())/(100ULL*4*sizeof(random_));
+			cout << "   ... which is " << ((SHA256cpb-BatchSHA256cpb)*100/SHA256cpb) << "% faster than the straight SHA-256." << endl;
 		}
 		cout << "Hash is " << hashes[0].asHexString() << endl;
 		CHECK(shouldbe==hashes[0].asHexString());
