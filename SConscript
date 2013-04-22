@@ -70,7 +70,7 @@ else:
     if debugbuild:
         env['CCFLAGS']+=["-O0", "-g"]
     else:
-        env['CCFLAGS']+=["-O2", "-g"]
+        env['CCFLAGS']+=["-O3", "-g"]
     env['CXXFLAGS']+=["-std=c++0x"]
     env['LIBS']+=["boost_filesystem", "boost_system", "boost_thread", "pthread"]
     env['LINKFLAGS']+=[]
