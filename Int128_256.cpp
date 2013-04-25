@@ -230,7 +230,7 @@ struct HashOp
 	}
 };
 
-Hash256::BatchHashOp BeginBatch(size_t no, Hash256 *hashs)
+Hash256::BatchHashOp Hash256::BeginBatch(size_t no, Hash256 *hashs)
 {
 	return new HashOp(no, hashs);
 }
