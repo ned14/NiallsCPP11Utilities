@@ -486,6 +486,23 @@ operator!= (const aligned_allocator<T,TAlign>&, const aligned_allocator<U, UAlig
 { return TAlign != UAlign; }
 
 
+template<size_t padding> class PadSizeToMultipleOfImpl
+{
+	char __padding[padding];
+};
+template<> class PadSizeToMultipleOfImpl<0>
+{
+};
+/*! \brief Rounds a type to a given multiple of a size
+*/
+template<class T, size_t sizemultiple=std::alignment_of<T>::value> struct PadSizeToMultipleOf : public T, private PadSizeToMultipleOfImpl<(sizemultiple-1+sizeof(T)) % sizemultiple>
+{
+public:
+	PadSizeToMultipleOf() { }
+	template<class A> PadSizeToMultipleOf(const A &o) : T(o) { }
+	template<class A> PadSizeToMultipleOf(A &&o) : T(std::move(o)) { }
+};
+
 template<class T> struct TextDumpImpl
 {
 	const T *inst;

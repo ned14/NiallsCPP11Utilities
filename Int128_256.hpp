@@ -453,7 +453,13 @@ namespace std
 #define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int128
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Hash128
+#include "incl_stl_allocator_override.hpp"
+#undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
 #define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Int256
+#include "incl_stl_allocator_override.hpp"
+#undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
+#define TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE NiallsCPP11Utilities::Hash256
 #include "incl_stl_allocator_override.hpp"
 #undef TYPE_TO_BE_OVERRIDEN_FOR_STL_ALLOCATOR_USAGE
 }
