@@ -133,10 +133,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a692689edd5864b5912e568dc714b3b1c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a692689edd5864b5912e568dc714b3b1c">is_nullptr</a> (T v) noexcept</td></tr>
 <tr class="memdesc:a692689edd5864b5912e568dc714b3b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compile-time safe detector of if <em>v</em> is nullptr (can cope with non-pointer convertibles)  <a href="#a692689edd5864b5912e568dc714b3b1c"></a><br/></td></tr>
 <tr class="separator:a692689edd5864b5912e568dc714b3b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a716f792f7339065d34beaaf7680f9b6f"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Tuple , typename... Args&gt; </td></tr>
-<tr class="memitem:a716f792f7339065d34beaaf7680f9b6f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a716f792f7339065d34beaaf7680f9b6f">call_using_tuple</a> (F f, Tuple &amp;&amp;t, Args...args)</td></tr>
-<tr class="memdesc:a716f792f7339065d34beaaf7680f9b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls some callable unpacking a supplied std::tuple&lt;&gt; as args.  <a href="#a716f792f7339065d34beaaf7680f9b6f"></a><br/></td></tr>
-<tr class="separator:a716f792f7339065d34beaaf7680f9b6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9811404d45931a3f5f2dbe3dec074740"><td class="memTemplParams" colspan="2">template&lt;typename F , typename Tuple &gt; </td></tr>
+<tr class="memitem:a9811404d45931a3f5f2dbe3dec074740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a9811404d45931a3f5f2dbe3dec074740">call_using_tuple</a> (F f, Tuple &amp;&amp;t)</td></tr>
+<tr class="memdesc:a9811404d45931a3f5f2dbe3dec074740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls some callable unpacking a supplied std::tuple&lt;&gt; as args.  <a href="#a9811404d45931a3f5f2dbe3dec074740"></a><br/></td></tr>
+<tr class="separator:a9811404d45931a3f5f2dbe3dec074740"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memTemplParams" colspan="2">template&lt;typename callable &gt; </td></tr>
 <tr class="memitem:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="memTemplItemLeft" align="right" valign="top">UndoerImpl&lt; callable &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_nialls_c_p_p11_utilities.html#a4b0a143d1ff6792ff1e21f24e8de3457">Undoer</a> (callable c)</td></tr>
 <tr class="memdesc:a4b0a143d1ff6792ff1e21f24e8de3457"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alexandrescu style rollbacks, a la C++ 11.  <a href="#a4b0a143d1ff6792ff1e21f24e8de3457"></a><br/></td></tr>
@@ -229,11 +229,11 @@ template&lt;class _typeregistry , class _type &gt; </div>
 </div><!-- fragment --> 
 </div>
 </div>
-<a class="anchor" id="a716f792f7339065d34beaaf7680f9b6f"></a>
+<a class="anchor" id="a9811404d45931a3f5f2dbe3dec074740"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename F , typename Tuple , typename... Args&gt; </div>
+template&lt;typename F , typename Tuple &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">void NiallsCPP11Utilities::call_using_tuple </td>
@@ -245,13 +245,7 @@ template&lt;typename F , typename Tuple , typename... Args&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">Tuple &amp;&amp;&#160;</td>
-          <td class="paramname"><em>t</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Args...&#160;</td>
-          <td class="paramname"><em>args</em>&#160;</td>
+          <td class="paramname"><em>t</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

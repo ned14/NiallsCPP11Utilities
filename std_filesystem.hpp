@@ -16,8 +16,8 @@ namespace std { namespace filesystem { using namespace tr2::filesystem; } }
 #include "boost/filesystem/fstream.hpp"
 namespace std {
 	namespace filesystem { using namespace boost::filesystem; using boost::filesystem::path; }
-	template<class T> class hash;
-	template<> class hash<boost::filesystem::path>
+	template<class T> struct hash;
+	template<> struct hash<boost::filesystem::path>
 	{
 	public:
 		size_t operator()(const boost::filesystem::path& p) const
