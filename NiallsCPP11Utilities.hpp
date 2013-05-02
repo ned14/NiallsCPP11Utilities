@@ -230,18 +230,18 @@ namespace Impl
    template <size_t offset, typename F, typename Tuple, bool Done, int Total, int... N>
     struct call_using_tuple
     {
-        template<class... Args> static void call(F f, Tuple && t, Args... args)
+        static void call(F f, Tuple && t)
         {
-            Impl::call_using_tuple<offset, F, Tuple, Total == 1 + sizeof...(N), Total, N..., sizeof...(N)>::call(std::forward<F>(f), std::forward<Tuple>(t), std::forward<Args>(args)...);
+            Impl::call_using_tuple<offset, F, Tuple, Total == 1 + sizeof...(N), Total, N..., sizeof...(N)>::call(std::forward<F>(f), std::forward<Tuple>(t));
         }
     };
 
     template <size_t offset, typename F, typename Tuple, int Total, int... N>
     struct call_using_tuple<offset, F, Tuple, true, Total, N...>
     {
-        template<class... Args> static void call(F f, Tuple && t, Args... args)
+        static void call(F f, Tuple && t)
         {
-            f(std::forward<Args>(args)..., std::get<offset + N>(std::forward<Tuple>(t))...);
+            f(std::get<offset + N>(std::forward<Tuple>(t))...);
         }
     };
 }
@@ -249,15 +249,15 @@ namespace Impl
 
 Derived from http://stackoverflow.com/questions/10766112/c11-i-can-go-from-multiple-args-to-tuple-but-can-i-go-from-tuple-to-multiple
 */
-template <typename F, typename Tuple, typename... Args> void call_using_tuple(F f, Tuple &&t, Args... args)
+template <typename F, typename Tuple> void call_using_tuple(F f, Tuple &&t)
 {
     typedef typename std::decay<Tuple>::type ttype;
-    Impl::call_using_tuple<0, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value>::call(std::forward<F>(f), std::forward<Tuple>(t), std::forward<Args>(args)...);
+    Impl::call_using_tuple<0, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value>::call(std::forward<F>(f), std::forward<Tuple>(t));
 }
-template <size_t offset, typename F, typename Tuple, typename... Args> void call_using_tuple(F f, Tuple &&t, Args... args)
+template <size_t offset, typename F, typename Tuple, typename... Args> void call_using_tuple(F f, Tuple &&t)
 {
     typedef typename std::decay<Tuple>::type ttype;
-    Impl::call_using_tuple<offset, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value-offset>::call(std::forward<F>(f), std::forward<Tuple>(t), std::forward<Args>(args)...);
+    Impl::call_using_tuple<offset, F, Tuple, 0 == std::tuple_size<ttype>::value, std::tuple_size<ttype>::value-offset>::call(std::forward<F>(f), std::forward<Tuple>(t));
 }
 
 template<typename callable> class UndoerImpl

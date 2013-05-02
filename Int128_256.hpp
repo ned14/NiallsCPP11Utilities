@@ -435,16 +435,18 @@ public:
 namespace std
 {
 	//! Defines a hash for a Int128 (simply truncates)
-	template<> struct hash<NiallsCPP11Utilities::Int128>
+	template<> class hash<NiallsCPP11Utilities::Int128>
 	{
+	public:
 		size_t operator()(const NiallsCPP11Utilities::Int128 &v) const
 		{
 			return v.asSize_t();
 		}
 	};
 	//! Defines a hash for a Int256 (simply truncates)
-	template<> struct hash<NiallsCPP11Utilities::Int256>
+	template<> class hash<NiallsCPP11Utilities::Int256>
 	{
+	public:
 		size_t operator()(const NiallsCPP11Utilities::Int256 &v) const
 		{
 			return v.asSize_t();
