@@ -125,6 +125,8 @@ TEST_CASE("StaticTypeRegistry/works", "Tests that StaticTypeRegistry works")
 	CHECK(l[1]==7);
 	l.clear();
 	cout << TextDump(MakeablesRegistry()) << endl;
+	UnregisterData<MakeablesRegistry>(7);
+	UnregisterData<MakeablesRegistry>(6);
 }
 
 TEST_CASE("MappedFileInfo/works", "Tests that MappedFileInfo works")
