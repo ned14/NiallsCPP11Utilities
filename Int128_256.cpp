@@ -395,9 +395,16 @@ static void _FinishBatch(HashOp *h)
 			// First run is to find all hashes with scratchpos>=56 as these need an extra round
 			for(size_t n=0; n<h->no; n++)
 			{
-				memset(h->scratch[n].d+h->scratch[n].pos, 0, sizeof(__sha256_block_t)-h->scratch[n].pos);
-				h->scratch[n].d[h->scratch[n].pos]=(unsigned char) 0x80;
-				*(uint64_t *)(void *)(h->scratch[n].d+56)=bswap_64(8*h->scratch[n].length);
+				PACKEDTYPE(struct termination_t
+				{
+					char data[56];
+					uint64_t length;
+				});
+				termination_t *termination=(termination_t *) h->scratch[n].d;
+				static_assert(sizeof(*termination)==64, "termination_t is not sized exactly 64 bytes!");
+				memset(termination->data+h->scratch[n].pos, 0, sizeof(__sha256_block_t)-h->scratch[n].pos);
+				termination->data[h->scratch[n].pos]=(unsigned char) 0x80;
+				termination->length=bswap_64(8*h->scratch[n].length);
 				blks[inuse]=(const __sha256_block_t *) h->scratch[n].d;
 				out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 				if(4==++inuse)

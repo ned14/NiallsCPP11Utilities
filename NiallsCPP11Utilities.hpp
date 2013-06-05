@@ -125,6 +125,16 @@ namespace std {
 #endif
 #endif
 
+//! \def PACKEDTYPE(typedecl) The markup this compiler uses to pack a structure as tightly as possible
+#ifndef PACKEDTYPE
+#ifdef _MSC_VER
+#define PACKEDTYPE(typedecl) __pragma(pack(push, 1)) typedecl __pragma(pack(pop))
+#elif defined(__GNUC__)
+#define PACKEDTYPE(typedecl) typedecl __attribute__((packed))
+#else
+#define PACKEDTYPE(typedecl) unknown_type_pack_markup_for_this_compiler
+#endif
+#endif
 
 #ifdef NIALLSCPP11UTILITIES_DLL_EXPORTS
 #define NIALLSCPP11UTILITIES_API DLLEXPORTMARKUP
