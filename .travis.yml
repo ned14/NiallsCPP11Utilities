@@ -10,10 +10,11 @@ notifications:
     on_success: change # [always|never|change] # default: change
     on_failure: change # [always|never|change] # default: always
 env:
-  - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER=""
-  - _="Build test GCC 4.8" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="4.8"
-  - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER=""
-  - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:Hash128/works exclude:Hash256/works" DEBUG=0 GCCVER=""
+  matrix:
+    - _="Build test" VALGRIND=0 UNIT_TESTS=0 DEBUG=0 GCCVER="" GCOV=0
+    - _="Build test GCC 4.8" VALGRIND=0 CCFLAGS="--usegcc=g++-4.8" UNIT_TESTS=0 DEBUG=0 GCCVER="4.8" GCOV=0
+    - _="Unit/functional tests" VALGRIND=0 UNIT_TESTS="" DEBUG=0 GCCVER="" GCOV=0
+    - _="Memory error and leak tests" VALGRIND=memcheck UNIT_TESTS="exclude:Hash128/works exclude:Hash256/works" DEBUG=0 GCCVER="" GCOV=0
 
 matrix:
   exclude:
@@ -26,6 +27,7 @@ before_install:
  - if [ $CXX = "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
  - sudo apt-get update -qq
  - sudo apt-get install -qq libboost1.53-all-dev
+ - if [ $GCOV -eq 1 ]; then sudo pip install cpp-coveralls --use-mirrors; fi
  - if [ $CXX = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev clang-3.2; fi
  - if [ $GCCVER != "" ]; then sudo apt-get install -qq g++-$GCCVER; fi
  - if [ $VALGRIND != "0" ]; then sudo apt-get install -qq valgrind; fi
@@ -40,3 +42,7 @@ script:
  - if [ $DEBUG -eq 1 ]; then PREFIXPATH="x64/Debug"; fi
 
  - if [ "$UNIT_TESTS" != "0" ]; then $PREFIXTEST $PREFIXPATH/unittests $UNIT_TESTS; fi
+
+after_success:
+ - if [ $GCOV -eq 1 ]; then coveralls --gcov "gcov-4.8 -p -r -s `pwd`" -e .sconf_temp -e tests -t $COVERALLS_TOKEN; fi
+  
