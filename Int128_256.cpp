@@ -397,7 +397,7 @@ static void _FinishBatch(HashOp *h)
 			{
 				memset(h->scratch[n].d+h->scratch[n].pos, 0, sizeof(__sha256_block_t)-h->scratch[n].pos);
 				h->scratch[n].d[h->scratch[n].pos]=(unsigned char) 0x80;
-				*(uint64_t *)(h->scratch[n].d+56)=bswap_64(8*h->scratch[n].length);
+				*(uint64_t *)(void *)(h->scratch[n].d+56)=bswap_64(8*h->scratch[n].length);
 				blks[inuse]=(const __sha256_block_t *) h->scratch[n].d;
 				out[inuse]=(__sha256_hash_t *) h->hashs[n].asInts();
 				if(4==++inuse)

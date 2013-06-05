@@ -576,7 +576,7 @@ template<class T> inline std::ostream &operator<<(std::ostream &s, const TextDum
 
 namespace Impl {
 	typedef std::unordered_map<size_t, std::map<std::string, void *>> ErasedTypeRegistryMapType;
-	extern NIALLSCPP11UTILITIES_API ErasedTypeRegistryMapType *static_type_registry_storage;
+	extern NIALLSCPP11UTILITIES_API std::shared_ptr<ErasedTypeRegistryMapType> get_static_type_registry_storage();
 
 	template<class _registry, class _type, class _containertype> struct StaticTypeRegistryStorage
 	{
@@ -589,9 +589,8 @@ namespace Impl {
 			if(!_registryStorage)
 			{
 				const std::type_info &typeinfo=typeid(containertype);
-				// This deliberately and intentionally leaks because we have no way of knowing when to clean it up
-				if(!static_type_registry_storage)
-					static_type_registry_storage=new ErasedTypeRegistryMapType;
+                // Holds a shared pointer until static deinit
+                static std::shared_ptr<ErasedTypeRegistryMapType> static_type_registry_storage(get_static_type_registry_storage());
 				auto &typemap=(*static_type_registry_storage)[typeinfo.hash_code()];
 				auto &containerstorage=typemap[typeinfo.name()];
 				if(!containerstorage)

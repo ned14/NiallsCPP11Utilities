@@ -68,12 +68,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\ObjCompPrototype\deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>../boost;$(IncludePath)</IncludePath>
+    <LibraryPath>../boost/stage/lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\ObjCompPrototype\deps\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\ndouglas.RIMNET\Documents\Visual Studio 2012\Projects\TripleGit\boost\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>../boost;$(VCInstallPath_CTP_NOV2012)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>../boost/stage/lib;$(VCInstallDir)lib\amd64;$(VCInstallDir)atlmfc\lib\amd64;$(WindowsSDK_LibraryPath_x64);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
