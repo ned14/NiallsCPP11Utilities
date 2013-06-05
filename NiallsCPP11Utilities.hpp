@@ -112,7 +112,7 @@ namespace std {
 
 //! \def TYPEALIGNMENT(bytes) The markup this compiler uses to mark a type as having some given alignment
 #ifndef TYPEALIGNMENT
-#if __cplusplus>=201103L && GCC_VERSION > 40800
+#if __cplusplus>=201103L && GCC_VERSION > 40900
 #define TYPEALIGNMENT(bytes) alignas(bytes)
 #else
 #ifdef _MSC_VER
