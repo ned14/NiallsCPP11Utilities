@@ -106,7 +106,7 @@ outputs['mylib']=(mylib, sources)
 
 # Unit tests
 sources = [ "unittests.cpp" ]
-objects = env.Object("unittests", source = sources) # + [myliblib]
+objects = env.Object("unittests", source = sources, CCFLAGS=env['CCFLAGSEXE']) # + [myliblib]
 testlibs=[myliblib]
 testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests']=(testprogram_cpp, sources)
