@@ -112,7 +112,7 @@ testprogram_cpp = env.Program("unittests", source = objects, LINKFLAGS=env['LINK
 outputs['unittests']=(testprogram_cpp, sources)
 
 sources = [ "unittests_simd.cpp" ]
-objects = env.Object("unittests_simd", source = sources) # + [myliblib]
+objects = env.Object("unittests_simd", source = sources, CCFLAGS=env['CCFLAGSEXE']) # + [myliblib]
 testlibs=[myliblib]
 testprogram_cpp = env.Program("unittests_simd", source = objects, LINKFLAGS=env['LINKFLAGSEXE'], LIBS = env['LIBS'] + testlibs)
 outputs['unittests_simd']=(testprogram_cpp, sources)
